@@ -3,23 +3,58 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs-extra';
 
-// Plugin to copy .nojekyll and other files
+// Plugin to copy .nojekyll and other files with logging
 const copyExtraFiles = () => {
   return {
     name: 'copy-extra-files',
     closeBundle: async () => {
-      // Ensure the dist directory exists
-      await fs.ensureDir('dist');
+      console.log('🔍 Starting file copy process...');
       
-      // Copy .nojekyll
-      await fs.copy('public/.nojekyll', 'dist/.nojekyll');
-      
-      // Copy favicon files if they exist
-      if (await fs.exists('public/favicon.ico')) {
-        await fs.copy('public/favicon.ico', 'dist/favicon.ico');
-      }
-      if (await fs.exists('public/favicon.svg')) {
-        await fs.copy('public/favicon.svg', 'dist/favicon.svg');
+      try {
+        // Log current working directory
+        console.log('📂 Current working directory:', process.cwd());
+        
+        // Ensure the dist directory exists
+        await fs.ensureDir('dist');
+        console.log('✅ Dist directory ensured');
+        
+        // List contents of public directory
+        const publicContents = await fs.readdir('public');
+        console.log('📁 Public directory contents:', publicContents);
+        
+        // Copy .nojekyll
+        if (await fs.exists('public/.nojekyll')) {
+          await fs.copy('public/.nojekyll', 'dist/.nojekyll');
+          console.log('✅ Copied .nojekyll file');
+        } else {
+          console.log('⚠️ .nojekyll not found in public directory');
+          // Create it if it doesn't exist
+          await fs.writeFile('dist/.nojekyll', '');
+          console.log('✅ Created new .nojekyll file');
+        }
+        
+        // Copy favicon files if they exist
+        if (await fs.exists('public/favicon.ico')) {
+          await fs.copy('public/favicon.ico', 'dist/favicon.ico');
+          console.log('✅ Copied favicon.ico');
+        } else {
+          console.log('⚠️ favicon.ico not found');
+        }
+        
+        if (await fs.exists('public/favicon.svg')) {
+          await fs.copy('public/favicon.svg', 'dist/favicon.svg');
+          console.log('✅ Copied favicon.svg');
+        } else {
+          console.log('⚠️ favicon.svg not found');
+        }
+        
+        // List contents of dist directory after copying
+        const distContents = await fs.readdir('dist');
+        console.log('📁 Final dist directory contents:', distContents);
+        
+      } catch (error) {
+        console.error('❌ Error during file copy:', error);
+        throw error;
       }
     }
   };
@@ -27,7 +62,19 @@ const copyExtraFiles = () => {
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), copyExtraFiles()],
+  plugins: [
+    react(),
+    copyExtraFiles(),
+    {
+      name: 'log-build-info',
+      configResolved(config) {
+        console.log('📝 Build Configuration:');
+        console.log('- Base URL:', config.base);
+        console.log('- Output Directory:', config.build.outDir);
+        console.log('- Public Directory:', config.publicDir);
+      }
+    }
+  ],
   resolve: {
     alias: {
       '@': '/src',
