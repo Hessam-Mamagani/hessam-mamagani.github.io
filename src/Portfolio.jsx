@@ -77,7 +77,7 @@ export default function Portfolio() {
             </p>
             <div className="flex gap-6 mb-8">
               <a
-                href="https://github.com/hessammamagani"
+                href="https://github.com/hessam-mamagani"
                 target="_blank"
                 rel="noreferrer"
                 className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
@@ -131,15 +131,23 @@ export default function Portfolio() {
             }}
             className="md:w-1/3 flex justify-center"
           >
-            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden bg-white bg-opacity-20 flex items-center justify-center shadow-2xl">
-              <span className="text-8xl">👨‍💻</span>
-              {/* Add your profile image here when available */}
-              {/* <img 
-                src="./profile.jpg" 
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden bg-white bg-opacity-20 shadow-2xl">
+              <img 
+                src="/profile.jpg"
                 alt="Hessam Mamagani" 
                 className="w-full h-full object-cover"
+                style={{
+                  display: 'block',
+                  minWidth: '100%',
+                  minHeight: '100%',
+                }}
                 loading="eager"
-              /> */}
+                onError={(e) => {
+                  console.log('First image failed to load, trying alternate path');
+                  e.target.onerror = null;
+                  e.target.src = '/images/profile.jpg';
+                }}
+              />
             </div>
           </motion.div>
         </div>
