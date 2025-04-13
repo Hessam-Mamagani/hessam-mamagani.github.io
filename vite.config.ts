@@ -86,7 +86,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
-  base: '/',
+  base: 'https://hessam-mamagani.github.io/',
   build: {
     outDir: 'dist',
     minify: 'terser',
@@ -100,6 +100,8 @@ export default defineConfig({
           ui: ['lucide-react', '@radix-ui/react-slot'],
         },
         assetFileNames: 'assets/[name].[hash].[ext]',
+        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'assets/[name].[hash].js',
       },
     },
   },
