@@ -112,9 +112,10 @@ jobs:
           
           # Add build script to package.json
           echo "Updating package.json scripts..."
-          npm pkg set scripts.build="tsc && vite build"
+          npm pkg set scripts.build="./node_modules/.bin/tsc && ./node_modules/.bin/vite build"
           npm pkg set scripts.dev="vite"
           npm pkg set scripts.preview="vite preview"
+          npm pkg set type="module"
           
           # Show final package.json
           echo "Final package.json contents:"
@@ -128,31 +129,22 @@ jobs:
           echo "Checking binary files..."
           ls -la node_modules/.bin || echo "No .bin directory found"
           
-          # Display TypeScript version
+          # Display TypeScript version using local installation
           echo "TypeScript version:"
-          npx tsc --version || echo "TypeScript not found"
+          ./node_modules/.bin/tsc --version || echo "TypeScript binary not found"
       
       - name: Build
         run: |
           echo "Starting build process..."
-          
-          # Debug node_modules
-          echo "Checking node_modules structure:"
-          ls -la node_modules/.bin || echo "/.bin directory not found"
-          echo "Checking typescript installation:"
-          npm list typescript
-          
           # First run TypeScript compilation
           echo "Running TypeScript compilation..."
-          echo "TypeScript version:"
-          npx --no-install typescript --version
-          npx --no-install typescript --project tsconfig.json
+          ./node_modules/.bin/tsc --version
+          ./node_modules/.bin/tsc --project tsconfig.json
           
           # Then run Vite build
           echo "Running Vite build..."
-          echo "Vite version:"
-          npx --no-install vite --version
-          npx --no-install vite build
+          ./node_modules/.bin/vite --version
+          ./node_modules/.bin/vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
