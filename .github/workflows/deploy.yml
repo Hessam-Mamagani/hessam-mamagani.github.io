@@ -46,30 +46,32 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # Create complete package.json with all dependencies
-          echo "Creating complete package.json..."
-          echo '{
-            "name": "hessam_portfolio",
-            "version": "1.0.0",
-            "private": true,
-            "type": "module",
-            "scripts": {
-              "dev": "vite",
-              "build": "tsc && vite build",
-              "preview": "vite preview"
-            },
-            "dependencies": {
-              "react": "18.2.0",
-              "react-dom": "18.2.0"
-            },
-            "devDependencies": {
-              "typescript": "5.1.6",
-              "vite": "4.4.7",
-              "@vitejs/plugin-react": "4.0.3",
-              "@types/react": "18.2.15",
-              "@types/react-dom": "18.2.7"
-            }
-          }' > package.json
+          # Debug npm configuration
+          echo "NPM Configuration:"
+          npm config list
+          
+          # Initialize npm with defaults
+          echo "Initializing npm project..."
+          npm init -y
+          
+          # Clean environment
+          echo "Cleaning environment..."
+          rm -rf node_modules package-lock.json
+          
+          # Install dependencies one by one with verbose logging
+          echo "Installing dependencies with verbose logging..."
+          
+          echo "Installing TypeScript..."
+          npm install typescript@5.1.6 --save-dev --verbose
+          
+          echo "Installing Vite and React plugin..."
+          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev --verbose
+          
+          echo "Installing React..."
+          npm install react@18.2.0 react-dom@18.2.0 --save --verbose
+          
+          echo "Installing React types..."
+          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --verbose
           
           # Create tsconfig.json
           echo "Creating tsconfig.json..."
@@ -108,13 +110,15 @@ jobs:
             "include": ["vite.config.ts"]
           }' > tsconfig.node.json
           
-          # Clean install
-          echo "Cleaning environment..."
-          rm -rf node_modules package-lock.json
+          # Add build script to package.json
+          echo "Updating package.json scripts..."
+          npm pkg set scripts.build="tsc && vite build"
+          npm pkg set scripts.dev="vite"
+          npm pkg set scripts.preview="vite preview"
           
-          # Install dependencies
-          echo "Installing dependencies..."
-          npm install
+          # Show final package.json
+          echo "Final package.json contents:"
+          cat package.json
           
           # Verify installation
           echo "Verifying installation..."
