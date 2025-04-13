@@ -30,27 +30,59 @@ jobs:
         with:
           node-version: '18'
       
+      - name: Debug Environment
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory contents:"
+          ls -la
+          echo "Package.json contents:"
+          cat package.json
+      
+      - name: Clean Environment
+        run: |
+          echo "Cleaning node_modules and package-lock.json"
+          rm -rf node_modules package-lock.json
+          
       - name: Install Dependencies
         run: |
-          # Install all dependencies including devDependencies
+          # First install core build dependencies
+          echo "Installing core build dependencies..."
+          npm install --save-dev typescript@5.1.6 vite@4.4.7 @vitejs/plugin-react@4.0.3
+          
+          # Then install React and its types
+          echo "Installing React and types..."
+          npm install --save react@18.2.0 react-dom@18.2.0
+          npm install --save-dev @types/react@18.2.15 @types/react-dom@18.2.7
+          
+          # Finally install remaining dependencies
+          echo "Installing remaining dependencies..."
           npm install
           
-          # Install build tools globally
-          npm install -g typescript@5.1.6 vite@4.4.7
+          # Verify installations
+          echo "Verifying installations..."
+          npm list react
+          npm list react-dom
+          npm list typescript
+          npm list vite
+          npm list @vitejs/plugin-react
           
-      - name: Verify Installation
-        run: |
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          echo "Installed packages:"
-          npm list typescript vite @vitejs/plugin-react
+          # Check if node_modules exists and has content
+          echo "Checking node_modules:"
+          ls -la node_modules
           
       - name: Build
         run: |
-          # Run TypeScript compile with explicit package
-          npx typescript@5.1.6 tsc
-          # Run Vite build with explicit package
-          npx vite@4.4.7 build
+          echo "Starting build process..."
+          # First run TypeScript compilation
+          echo "Running TypeScript compilation..."
+          npx tsc --version
+          npx tsc
+          
+          # Then run Vite build
+          echo "Running Vite build..."
+          npx vite --version
+          npx vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
