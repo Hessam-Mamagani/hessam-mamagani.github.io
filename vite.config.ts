@@ -67,7 +67,7 @@ const copyExtraFiles = () => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command, mode }) => ({
   plugins: [
     react(),
     copyExtraFiles(),
@@ -83,17 +83,20 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': '/src',
+      '@': path.resolve(__dirname, './src'),
     },
   },
-  base: 'https://hessam-mamagani.github.io/',
+  base: command === 'serve' ? '/' : '/hessam-mamagani/',
   build: {
     outDir: 'dist',
     minify: 'terser',
     sourcemap: false,
     assetsInlineLimit: 4096, // 4kb
-    copyPublicDir: true, // Ensure public directory is copied
+    copyPublicDir: true,
     rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html')
+      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'framer-motion'],
@@ -124,4 +127,4 @@ export default defineConfig({
   },
   publicDir: 'public',
   assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf', '**/*.jpg', '**/*.png'],
-});
+}));
