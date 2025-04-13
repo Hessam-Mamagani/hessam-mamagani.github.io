@@ -46,29 +46,32 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # Initialize fresh package.json
-          echo "Initializing fresh package.json..."
+          # Create complete package.json with all dependencies
+          echo "Creating complete package.json..."
           echo '{
             "name": "hessam_portfolio",
             "version": "1.0.0",
             "private": true,
             "type": "module",
             "scripts": {
-              "build": "tsc && vite build",
               "dev": "vite",
+              "build": "tsc && vite build",
               "preview": "vite preview"
+            },
+            "dependencies": {
+              "react": "18.2.0",
+              "react-dom": "18.2.0"
+            },
+            "devDependencies": {
+              "typescript": "5.1.6",
+              "vite": "4.4.7",
+              "@vitejs/plugin-react": "4.0.3",
+              "@types/react": "18.2.15",
+              "@types/react-dom": "18.2.7"
             }
           }' > package.json
           
-          # Clean environment
-          echo "Cleaning environment..."
-          rm -rf node_modules package-lock.json
-          
-          # Install TypeScript explicitly
-          echo "Installing TypeScript..."
-          npm install typescript@5.1.6 --save-dev
-          
-          # Create tsconfig.json if it doesn't exist
+          # Create tsconfig.json
           echo "Creating tsconfig.json..."
           echo '{
             "compilerOptions": {
@@ -92,29 +95,38 @@ jobs:
             "references": [{ "path": "./tsconfig.node.json" }]
           }' > tsconfig.json
           
-          # Install Vite and React plugin
-          echo "Installing Vite and plugins..."
-          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev
+          # Create tsconfig.node.json
+          echo "Creating tsconfig.node.json..."
+          echo '{
+            "compilerOptions": {
+              "composite": true,
+              "skipLibCheck": true,
+              "module": "ESNext",
+              "moduleResolution": "bundler",
+              "allowSyntheticDefaultImports": true
+            },
+            "include": ["vite.config.ts"]
+          }' > tsconfig.node.json
           
-          # Install React and its types
-          echo "Installing React and types..."
-          npm install react@18.2.0 react-dom@18.2.0 --save
-          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev
+          # Clean install
+          echo "Cleaning environment..."
+          rm -rf node_modules package-lock.json
           
-          # Install remaining dependencies
-          echo "Installing remaining dependencies..."
-          npm install --legacy-peer-deps
+          # Install dependencies
+          echo "Installing dependencies..."
+          npm install
           
-          # Verify installations
-          echo "Verifying installations..."
-          npm list typescript
-          npm list vite
-          npm list react
-          npm list react-dom
+          # Verify installation
+          echo "Verifying installation..."
+          npm list
           
           # Show binary files
           echo "Checking binary files..."
-          ls -la node_modules/.bin
+          ls -la node_modules/.bin || echo "No .bin directory found"
+          
+          # Display TypeScript version
+          echo "TypeScript version:"
+          npx tsc --version || echo "TypeScript not found"
       
       - name: Build
         run: |
