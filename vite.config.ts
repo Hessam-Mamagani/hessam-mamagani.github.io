@@ -33,6 +33,12 @@ const copyExtraFiles = () => {
           console.log('✅ Created new .nojekyll file');
         }
         
+        // Copy 404.html for GitHub Pages
+        if (await fs.exists('public/404.html')) {
+          await fs.copy('public/404.html', 'dist/404.html');
+          console.log('✅ Copied 404.html');
+        }
+        
         // Copy favicon files if they exist
         if (await fs.exists('public/favicon.ico')) {
           await fs.copy('public/favicon.ico', 'dist/favicon.ico');
@@ -80,6 +86,7 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  base: '/',
   build: {
     outDir: 'dist',
     minify: 'terser',
@@ -113,7 +120,6 @@ export default defineConfig({
     strictPort: true,
     host: true,
   },
-  base: '/',
   publicDir: 'public',
   assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf', '**/*.jpg', '**/*.png'],
 });
