@@ -28,9 +28,20 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: dist
-          branch: gh-pages
-          clean: true 
+      - name: Remove old assets
+        run: |
+          rm -rf assets
+          rm -f index.html
+
+      - name: Copy new build
+        run: |
+          cp -r dist/* .
+          rm -rf dist
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m "Deploy latest build" || echo "No changes to commit"
+          git push 
