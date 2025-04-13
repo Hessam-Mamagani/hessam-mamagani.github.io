@@ -39,7 +39,7 @@ jobs:
       - name: Type Check
         run: |
           echo "Running TypeScript check..."
-          ./node_modules/.bin/tsc --noEmit
+          npm exec tsc -- --noEmit
       
       - name: Build
         run: |
