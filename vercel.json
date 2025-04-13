@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/(.*).js",
+      "source": "/(.*)\\.js$",
       "headers": [
         {
           "key": "Content-Type",
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "source": "/assets/(.*).js",
+      "source": "/(.*)\\.mjs$",
       "headers": [
         {
           "key": "Content-Type",
