@@ -31,16 +31,21 @@ jobs:
           node-version: '18'
           cache: 'npm'
       
-      - name: Setup TypeScript Environment
+      - name: Setup Dependencies
         run: |
           rm -rf node_modules package-lock.json
           mkdir -p src/types
           npm install
           npm install --save react@18.2.0 react-dom@18.2.0
           npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
+          npm install -g vite
+          npm ls vite || npm install --save-dev vite
       
       - name: Build
         run: |
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          echo "Vite version: $(vite --version)"
           npm run build
           
       - name: Update index.html with production assets
