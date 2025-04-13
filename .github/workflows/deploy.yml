@@ -46,30 +46,39 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # First install core build dependencies
-          echo "Installing core build dependencies..."
-          npm install --save-dev typescript@5.1.6 vite@4.4.7 @vitejs/plugin-react@4.0.3
+          # Clean npm cache and remove existing installations
+          echo "Cleaning npm cache and existing installations..."
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          
+          # First install TypeScript and build tools explicitly
+          echo "Installing TypeScript and build tools..."
+          npm install typescript@5.1.6 --save-dev --no-package-lock
+          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev --no-package-lock
+          
+          # Verify TypeScript installation
+          echo "Verifying TypeScript installation..."
+          npm list typescript
           
           # Install React and its types with exact versions
           echo "Installing React and types..."
-          npm install --save react@18.2.0 react-dom@18.2.0 --legacy-peer-deps
-          npm install --save-dev @types/react@18.2.15 @types/react-dom@18.2.7
+          npm install react@18.2.0 react-dom@18.2.0 --save --legacy-peer-deps --no-package-lock
+          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --no-package-lock
           
-          # Install remaining dependencies with legacy peer deps to handle version conflicts
+          # Install remaining dependencies
           echo "Installing remaining dependencies..."
           npm install --legacy-peer-deps
           
-          # Clean install to ensure consistency
-          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
-          
-          # Verify installations
-          echo "Verifying installations..."
+          # Final verification of critical packages
+          echo "Final verification of installations..."
+          npm list typescript
           npm list react
           npm list react-dom
+          npm list vite
           
-          # Check if node_modules exists and has content
-          echo "Checking node_modules:"
-          ls -la node_modules
+          # Check node_modules structure
+          echo "Checking node_modules structure:"
+          ls -la node_modules/.bin
           
       - name: Build
         run: |
