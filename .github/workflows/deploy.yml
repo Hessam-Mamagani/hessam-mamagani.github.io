@@ -29,29 +29,22 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
       
-      - name: Install Dependencies
+      - name: Clean Install
         run: |
-          echo "Current working directory:"
-          pwd
-          echo "Directory contents:"
-          ls -la
-          echo "Package.json contents:"
-          cat package.json
+          rm -rf node_modules package-lock.json
+          npm install
           
-          # Clean install from package-lock.json
-          npm ci
+      - name: Verify Installation
+        run: |
+          echo "Node version: $(node -v)"
+          echo "NPM version: $(npm -v)"
+          echo "Installed packages:"
+          npm list --depth=0
           
-          # Verify installations
-          echo "Installed dependencies:"
-          npm ls --depth=0
-      
       - name: Build
         run: |
-          # Use local binaries
-          ./node_modules/.bin/tsc
-          ./node_modules/.bin/vite build
+          npm run build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
