@@ -76,13 +76,15 @@ jobs:
           echo "Starting build process..."
           # First run TypeScript compilation
           echo "Running TypeScript compilation..."
-          npx tsc --version
-          npx tsc
+          echo "TypeScript version:"
+          ./node_modules/.bin/tsc --version
+          ./node_modules/.bin/tsc --project tsconfig.json
           
           # Then run Vite build
           echo "Running Vite build..."
-          npx vite --version
-          npx vite build
+          echo "Vite version:"
+          ./node_modules/.bin/vite --version
+          ./node_modules/.bin/vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
