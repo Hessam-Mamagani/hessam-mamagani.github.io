@@ -2,9 +2,10 @@
   "name": "hessam_portfolio",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
@@ -32,5 +33,5 @@
     "typescript": "^5.1.6",
     "vite": "^4.4.7"
   },
-  "homepage": "https://hessam-mamagani.github.io/hessam-mamagani"
+  "homepage": "https://hessam-mamagani.github.io"
 }
