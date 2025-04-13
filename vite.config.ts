@@ -33,16 +33,6 @@ const copyExtraFiles = () => {
           console.log('✅ Created new .nojekyll file');
         }
         
-        // Create CNAME if needed
-        await fs.writeFile('dist/CNAME', 'hessam-mamagani.github.io');
-        console.log('✅ Created CNAME file');
-        
-        // Copy 404.html for GitHub Pages
-        if (await fs.exists('public/404.html')) {
-          await fs.copy('public/404.html', 'dist/404.html');
-          console.log('✅ Copied 404.html');
-        }
-        
         // Copy favicon files if they exist
         if (await fs.exists('public/favicon.ico')) {
           await fs.copy('public/favicon.ico', 'dist/favicon.ico');
@@ -71,7 +61,7 @@ const copyExtraFiles = () => {
 };
 
 // https://vitejs.dev/config/
-export default defineConfig(({ command, mode }) => ({
+export default defineConfig({
   plugins: [
     react(),
     copyExtraFiles(),
@@ -87,36 +77,22 @@ export default defineConfig(({ command, mode }) => ({
   ],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': '/src',
     },
   },
-  base: command === 'serve' ? '/' : '/',
   build: {
     outDir: 'dist',
     minify: 'terser',
     sourcemap: false,
-    assetsInlineLimit: 4096,
-    copyPublicDir: true,
+    assetsInlineLimit: 4096, // 4kb
+    copyPublicDir: true, // Ensure public directory is copied
     rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, 'index.html')
-      },
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom', 'framer-motion'],
           ui: ['lucide-react', '@radix-ui/react-slot'],
         },
-        format: 'es',
-        assetFileNames: (assetInfo) => {
-          const name = assetInfo.name || '';
-          const extType = name.split('.').at(1) || 'asset';
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-            return `assets/img/[name].[hash][extname]`;
-          }
-          return `assets/${extType}/[name].[hash][extname]`;
-        },
-        chunkFileNames: 'assets/js/[name].[hash].js',
-        entryFileNames: 'assets/js/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]',
       },
     },
   },
@@ -124,19 +100,13 @@ export default defineConfig(({ command, mode }) => ({
     port: 3000,
     strictPort: true,
     host: true,
-    hmr: {
-      overlay: true,
-      clientPort: 3000
-    },
-    watch: {
-      usePolling: true
-    }
   },
   preview: {
     port: 4173,
     strictPort: true,
     host: true,
   },
+  base: '/',
   publicDir: 'public',
   assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf', '**/*.jpg', '**/*.png'],
-}));
+});
