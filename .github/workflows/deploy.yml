@@ -33,20 +33,41 @@ jobs:
       
       - name: Setup Dependencies
         run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          
+          # Clean install
           rm -rf node_modules package-lock.json
           mkdir -p src/types
+          
+          # Install dependencies from package.json
           npm install
+          
+          # Install specific versions
           npm install --save react@18.2.0 react-dom@18.2.0
           npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
-          npm install -g vite
-          npm ls vite || npm install --save-dev vite
+          
+          # Install Vite and its plugins
+          npm install --save-dev vite@4.4.7 @vitejs/plugin-react@4.0.3
+          
+          # Verify installations
+          echo "Installed packages:"
+          npm list vite
+          npm list @vitejs/plugin-react
+          
+          # Check if vite.config.ts exists
+          if [ -f "vite.config.ts" ]; then
+            echo "vite.config.ts contents:"
+            cat vite.config.ts
+          else
+            echo "vite.config.ts not found!"
+          fi
       
       - name: Build
         run: |
-          echo "Node version: $(node -v)"
-          echo "NPM version: $(npm -v)"
-          echo "Vite version: $(vite --version)"
-          npm run build
+          # Use npx to run vite
+          npx vite build
           
       - name: Update index.html with production assets
         run: |
