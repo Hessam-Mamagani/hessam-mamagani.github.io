@@ -46,40 +46,76 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # Clean npm cache and remove existing installations
-          echo "Cleaning npm cache and existing installations..."
-          npm cache clean --force
+          # Initialize fresh package.json
+          echo "Initializing fresh package.json..."
+          echo '{
+            "name": "hessam_portfolio",
+            "version": "1.0.0",
+            "private": true,
+            "type": "module",
+            "scripts": {
+              "build": "tsc && vite build",
+              "dev": "vite",
+              "preview": "vite preview"
+            }
+          }' > package.json
+          
+          # Clean environment
+          echo "Cleaning environment..."
           rm -rf node_modules package-lock.json
           
-          # First install TypeScript and build tools explicitly
-          echo "Installing TypeScript and build tools..."
-          npm install typescript@5.1.6 --save-dev --no-package-lock
-          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev --no-package-lock
+          # Install TypeScript explicitly
+          echo "Installing TypeScript..."
+          npm install typescript@5.1.6 --save-dev
           
-          # Verify TypeScript installation
-          echo "Verifying TypeScript installation..."
-          npm list typescript
+          # Create tsconfig.json if it doesn't exist
+          echo "Creating tsconfig.json..."
+          echo '{
+            "compilerOptions": {
+              "target": "ES2020",
+              "useDefineForClassFields": true,
+              "lib": ["ES2020", "DOM", "DOM.Iterable"],
+              "module": "ESNext",
+              "skipLibCheck": true,
+              "moduleResolution": "bundler",
+              "allowImportingTsExtensions": true,
+              "resolveJsonModule": true,
+              "isolatedModules": true,
+              "noEmit": true,
+              "jsx": "react-jsx",
+              "strict": true,
+              "noUnusedLocals": true,
+              "noUnusedParameters": true,
+              "noFallthroughCasesInSwitch": true
+            },
+            "include": ["src"],
+            "references": [{ "path": "./tsconfig.node.json" }]
+          }' > tsconfig.json
           
-          # Install React and its types with exact versions
+          # Install Vite and React plugin
+          echo "Installing Vite and plugins..."
+          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev
+          
+          # Install React and its types
           echo "Installing React and types..."
-          npm install react@18.2.0 react-dom@18.2.0 --save --legacy-peer-deps --no-package-lock
-          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --no-package-lock
+          npm install react@18.2.0 react-dom@18.2.0 --save
+          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev
           
           # Install remaining dependencies
           echo "Installing remaining dependencies..."
           npm install --legacy-peer-deps
           
-          # Final verification of critical packages
-          echo "Final verification of installations..."
+          # Verify installations
+          echo "Verifying installations..."
           npm list typescript
+          npm list vite
           npm list react
           npm list react-dom
-          npm list vite
           
-          # Check node_modules structure
-          echo "Checking node_modules structure:"
+          # Show binary files
+          echo "Checking binary files..."
           ls -la node_modules/.bin
-          
+      
       - name: Build
         run: |
           echo "Starting build process..."
