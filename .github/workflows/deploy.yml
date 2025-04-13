@@ -30,8 +30,12 @@ jobs:
         with:
           node-version: '18'
       
-      - name: Clean Install
+      - name: Install Dependencies
         run: |
+          # Install Vite globally first
+          npm install -g vite
+          
+          # Clean install project dependencies
           rm -rf node_modules package-lock.json
           npm install
           
@@ -39,12 +43,16 @@ jobs:
         run: |
           echo "Node version: $(node -v)"
           echo "NPM version: $(npm -v)"
+          echo "Vite version: $(vite --version)"
           echo "Installed packages:"
           npm list --depth=0
           
       - name: Build
         run: |
-          npm run build
+          # Run TypeScript compile
+          npx tsc
+          # Run Vite build
+          vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
