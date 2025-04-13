@@ -46,6 +46,11 @@ jobs:
           
       - name: Install Dependencies
         run: |
+          # Debug npm version and cache
+          echo "NPM Version:"
+          npm --version
+          npm cache clean --force
+          
           # Initialize fresh package.json
           echo "Creating package.json..."
           cat > package.json << 'EOL'
@@ -73,36 +78,57 @@ jobs:
           }
           EOL
           
-          # Create vite.config.ts
-          echo "Creating vite.config.ts..."
-          cat > vite.config.ts << 'EOL'
-          import { defineConfig } from "vite";
-          import react from "@vitejs/plugin-react";
-
-          export default defineConfig({
-            plugins: [react()],
-            base: "/Hessam-Mamagani/",
-            build: {
-              outDir: "dist",
-              assetsDir: "assets",
-            },
-          });
-          EOL
+          # Show package.json contents
+          echo "Package.json contents:"
+          cat package.json
           
-          # Clean install
+          # Clean install environment
           echo "Cleaning environment..."
           rm -rf node_modules package-lock.json
           
-          # Install dependencies
-          echo "Installing dependencies with clean slate..."
-          npm ci || npm install
+          # Install each dependency explicitly
+          echo "Installing dependencies explicitly..."
           
-          # Verify Vite installation
-          echo "Verifying Vite installation..."
-          npm list vite
-          echo "Vite binary location:"
-          which vite || echo "Vite binary not found in PATH"
-          ls -la node_modules/.bin/vite || echo "Vite binary not found in node_modules"
+          echo "Installing Vite..."
+          npm install vite@4.4.7 --save-dev --no-package-lock
+          
+          echo "Installing React plugin..."
+          npm install @vitejs/plugin-react@4.0.3 --save-dev --no-package-lock
+          
+          echo "Installing React..."
+          npm install react@18.2.0 react-dom@18.2.0 --save --no-package-lock
+          
+          echo "Installing TypeScript and types..."
+          npm install typescript@5.1.6 @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --no-package-lock
+          
+          # Create vite.config.js (using .js instead of .ts)
+          echo "Creating vite.config.js..."
+          cat > vite.config.js << 'EOL'
+          import { defineConfig } from 'vite'
+          import react from '@vitejs/plugin-react'
+
+          export default defineConfig({
+            plugins: [react()],
+            base: '/Hessam-Mamagani/',
+            build: {
+              outDir: 'dist',
+              assetsDir: 'assets',
+            },
+          })
+          EOL
+          
+          # Verify installations
+          echo "Verifying installations..."
+          echo "node_modules contents:"
+          ls -la node_modules || echo "No node_modules directory"
+          echo "node_modules/.bin contents:"
+          ls -la node_modules/.bin || echo "No .bin directory"
+          echo "Installed packages:"
+          npm list || true
+          
+          # Try to run vite --version
+          echo "Checking Vite version:"
+          ./node_modules/.bin/vite --version || echo "Failed to get Vite version"
           
       - name: Build
         run: |
@@ -110,17 +136,12 @@ jobs:
           
           echo "Current directory:"
           pwd
-          
-          echo "Package.json contents:"
-          cat package.json
+          ls -la
           
           echo "Vite config contents:"
-          cat vite.config.ts
+          cat vite.config.js
           
-          echo "Node modules status:"
-          ls -la node_modules/.bin/
-          
-          # Run build using local vite
+          # Run build using local vite with debug
           echo "Running Vite build..."
           ./node_modules/.bin/vite build --debug
       
