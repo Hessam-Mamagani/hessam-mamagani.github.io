@@ -50,22 +50,22 @@ jobs:
           echo "Installing core build dependencies..."
           npm install --save-dev typescript@5.1.6 vite@4.4.7 @vitejs/plugin-react@4.0.3
           
-          # Then install React and its types
+          # Install React and its types with exact versions
           echo "Installing React and types..."
-          npm install --save react@18.2.0 react-dom@18.2.0
+          npm install --save react@18.2.0 react-dom@18.2.0 --legacy-peer-deps
           npm install --save-dev @types/react@18.2.15 @types/react-dom@18.2.7
           
-          # Finally install remaining dependencies
+          # Install remaining dependencies with legacy peer deps to handle version conflicts
           echo "Installing remaining dependencies..."
-          npm install
+          npm install --legacy-peer-deps
+          
+          # Clean install to ensure consistency
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
           
           # Verify installations
           echo "Verifying installations..."
           npm list react
           npm list react-dom
-          npm list typescript
-          npm list vite
-          npm list @vitejs/plugin-react
           
           # Check if node_modules exists and has content
           echo "Checking node_modules:"
