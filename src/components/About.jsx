@@ -7,11 +7,18 @@ export default function About() {
         <h2 className="text-3xl font-bold text-center mb-12">About Me</h2>
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="rounded-lg shadow-lg max-w-full mx-auto overflow-hidden bg-gray-200 aspect-square flex items-center justify-center">
+            <div className="rounded-lg shadow-lg max-w-full mx-auto overflow-hidden bg-white aspect-square">
               <img
-                src="/profile.jpg"
-                alt="Hessam Mamagani"
-                className="w-full h-full object-cover"
+                src="/assets/workspace.png"
+                alt="Modern Development Workspace"
+                className="w-full h-full object-cover hover:scale-102 transition-transform duration-500"
+                style={{
+                  objectPosition: '50% 50%',
+                  filter: 'contrast(1.02) brightness(1.02)',
+                }}
+                onError={(e) => {
+                  e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f8f9fa"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EDevelopment Workspace%3C/text%3E%3C/svg%3E';
+                }}
               />
             </div>
           </div>
