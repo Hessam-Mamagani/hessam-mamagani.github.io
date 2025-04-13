@@ -41,20 +41,19 @@ jobs:
           rm -rf node_modules package-lock.json
           mkdir -p src/types
           
-          # Install dependencies from package.json
-          npm install
-          
-          # Install specific versions
-          npm install --save react@18.2.0 react-dom@18.2.0
+          # Install core dependencies with specific versions
+          npm install --save react@18.3.1 react-dom@18.3.1
           npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
           
           # Install Vite and its plugins
           npm install --save-dev vite@4.4.7 @vitejs/plugin-react@4.0.3
           
+          # Install remaining dependencies
+          npm install
+          
           # Verify installations
           echo "Installed packages:"
-          npm list vite
-          npm list @vitejs/plugin-react
+          npm list react react-dom vite @vitejs/plugin-react
           
           # Check if vite.config.ts exists
           if [ -f "vite.config.ts" ]; then
