@@ -8,8 +8,6 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="rounded-lg shadow-lg max-w-full mx-auto overflow-hidden bg-gray-200 aspect-square flex items-center justify-center">
-              <span className="text-6xl">👨‍💻</span>
-              {/* Uncomment when you have a profile image */}
               <img 
                 src="/profile.jpg" 
                 alt="Hessam Mamagani" 

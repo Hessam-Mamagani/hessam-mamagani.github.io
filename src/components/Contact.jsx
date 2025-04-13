@@ -20,13 +20,13 @@ export default function Contact() {
               </div>
               <div className="flex items-center">
                 <Phone className="w-5 h-5 mr-3 text-blue-600" />
-                <a href="tel:+491234567890" className="hover:text-blue-600">
-                  +49 123 456 7890
+                <a href="tel:+905392294251" className="hover:text-blue-600">
+                  +90 539 229 4251
                 </a>
               </div>
               <div className="flex items-center">
                 <MapPin className="w-5 h-5 mr-3 text-blue-600" />
-                <span>Tübingen, Germany</span>
+                <span>Istanbul, Turkey</span>
               </div>
               <div className="flex items-center">
                 <Github className="w-5 h-5 mr-3 text-blue-600" />

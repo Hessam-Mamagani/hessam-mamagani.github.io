@@ -100,6 +100,13 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
     host: true,
+    hmr: {
+      overlay: true,
+      clientPort: 3000
+    },
+    watch: {
+      usePolling: true
+    }
   },
   preview: {
     port: 4173,
