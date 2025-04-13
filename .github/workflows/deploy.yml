@@ -14,150 +14,24 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-env:
-  NODE_ENV: production
-  BASE_URL: /
-
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Debug Environment
-        run: |
-          echo "Current directory:"
-          pwd
-          echo "Directory contents:"
-          ls -la
-          echo "Package.json contents:"
-          cat package.json
-      
-      - name: Clean Environment
-        run: |
-          echo "Cleaning node_modules and package-lock.json"
-          rm -rf node_modules package-lock.json
-          
-      - name: Install Dependencies
-        run: |
-          # Debug npm version and cache
-          echo "NPM Version:"
-          npm --version
-          npm cache clean --force
-          
-          # Initialize fresh package.json
-          echo "Creating package.json..."
-          cat > package.json << 'EOL'
-          {
-            "name": "hessam_portfolio",
-            "private": true,
-            "version": "1.0.0",
-            "type": "module",
-            "scripts": {
-              "dev": "vite",
-              "build": "vite build",
-              "preview": "vite preview"
-            },
-            "dependencies": {
-              "react": "18.2.0",
-              "react-dom": "18.2.0"
-            },
-            "devDependencies": {
-              "@types/react": "18.2.15",
-              "@types/react-dom": "18.2.7",
-              "@vitejs/plugin-react": "4.0.3",
-              "typescript": "5.1.6",
-              "vite": "4.4.7"
-            }
-          }
-          EOL
-          
-          # Show package.json contents
-          echo "Package.json contents:"
-          cat package.json
-          
-          # Clean install environment
-          echo "Cleaning environment..."
-          rm -rf node_modules package-lock.json
-          
-          # Install each dependency explicitly
-          echo "Installing dependencies explicitly..."
-          
-          echo "Installing Vite..."
-          npm install vite@4.4.7 --save-dev --no-package-lock
-          
-          echo "Installing React plugin..."
-          npm install @vitejs/plugin-react@4.0.3 --save-dev --no-package-lock
-          
-          echo "Installing React..."
-          npm install react@18.2.0 react-dom@18.2.0 --save --no-package-lock
-          
-          echo "Installing TypeScript and types..."
-          npm install typescript@5.1.6 @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --no-package-lock
-          
-          # Create vite.config.js (using .js instead of .ts)
-          echo "Creating vite.config.js..."
-          cat > vite.config.js << 'EOL'
-          import { defineConfig } from 'vite'
-          import react from '@vitejs/plugin-react'
-
-          export default defineConfig({
-            plugins: [react()],
-            base: '/Hessam-Mamagani/',
-            build: {
-              outDir: 'dist',
-              assetsDir: 'assets',
-            },
-          })
-          EOL
-          
-          # Verify installations
-          echo "Verifying installations..."
-          echo "node_modules contents:"
-          ls -la node_modules || echo "No node_modules directory"
-          echo "node_modules/.bin contents:"
-          ls -la node_modules/.bin || echo "No .bin directory"
-          echo "Installed packages:"
-          npm list || true
-          
-          # Try to run vite --version
-          echo "Checking Vite version:"
-          ./node_modules/.bin/vite --version || echo "Failed to get Vite version"
-          
-      - name: Build
-        run: |
-          echo "Starting build process..."
-          
-          echo "Current directory:"
-          pwd
-          ls -la
-          
-          echo "Vite config contents:"
-          cat vite.config.js
-          
-          # Run build using local vite with debug
-          echo "Running Vite build..."
-          ./node_modules/.bin/vite build --debug
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    runs-on: ubuntu-latest
-    name: Deploy
-    steps:
+      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4 
