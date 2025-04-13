@@ -41,36 +41,52 @@ jobs:
           rm -rf node_modules package-lock.json
           mkdir -p src/types
           
-          # First install Vite and its plugin explicitly
-          npm install --save-dev vite@4.4.7
-          npm install --save-dev @vitejs/plugin-react@4.0.3
+          # Install exact versions from package.json
+          npm install --save-exact \
+            react@18.2.0 \
+            react-dom@18.2.0 \
+            @radix-ui/react-slot@1.0.2 \
+            framer-motion@10.15.0 \
+            lucide-react@0.263.1 \
+            react-intersection-observer@9.5.2
           
-          # Install React and React DOM
-          npm install --save react@18.3.1 react-dom@18.3.1
-          npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
+          npm install --save-dev --save-exact \
+            @types/fs-extra@11.0.4 \
+            @types/node@20.4.5 \
+            @types/react@18.2.15 \
+            @types/react-dom@18.2.7 \
+            @vitejs/plugin-react@4.0.3 \
+            autoprefixer@10.4.14 \
+            fs-extra@11.3.0 \
+            gh-pages@5.0.0 \
+            postcss@8.4.27 \
+            tailwindcss@3.3.3 \
+            terser@5.19.2 \
+            typescript@5.1.6 \
+            vite@4.4.7
           
-          # Install remaining dependencies
-          npm install --no-package-lock
-          
-          # Verify installations
-          echo "Checking installed versions:"
-          npm list vite
-          npm list @vitejs/plugin-react
+          # Verify critical dependencies
+          echo "Verifying critical dependencies:"
           npm list react
           npm list react-dom
+          npm list vite
+          npm list @vitejs/plugin-react
+          npm list typescript
           
-          # Check if vite.config.ts exists and is readable
-          if [ -f "vite.config.ts" ]; then
-            echo "vite.config.ts contents:"
-            cat vite.config.ts
-          else
-            echo "vite.config.ts not found!"
-          fi
+          # Display package.json content
+          echo "Current package.json content:"
+          cat package.json
+          
+          # Check vite.config.ts
+          echo "Vite config content:"
+          cat vite.config.ts
       
       - name: Build
         run: |
-          # Ensure we're using the local vite installation
-          echo "Using local vite installation for build..."
+          # Run TypeScript compilation first
+          ./node_modules/.bin/tsc
+          
+          # Then run Vite build
           ./node_modules/.bin/vite build
           
       - name: Update index.html with production assets
