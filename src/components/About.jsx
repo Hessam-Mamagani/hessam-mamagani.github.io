@@ -8,30 +8,45 @@ export default function About() {
         <div className="grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="rounded-lg shadow-lg max-w-full mx-auto overflow-hidden bg-gray-200 aspect-square flex items-center justify-center">
-              <img 
-                src="/profile.jpg" 
-                alt="Hessam Mamagani" 
+              <img
+                src="/profile.jpg"
+                alt="Hessam Mamagani"
                 className="w-full h-full object-cover"
               />
             </div>
           </div>
           <div>
-            <h3 className="text-2xl font-semibold mb-4">Full-Stack Developer</h3>
+            <h3 className="text-2xl font-semibold mb-4">
+              Full-Stack Developer
+            </h3>
             <p className="mb-4">
-              I specialize in building modern, responsive, and scalable web applications 
-              using cutting-edge technologies. With experience in both frontend and backend 
-              development, I bring ideas to life with clean, maintainable code.
+              I specialize in building modern, responsive, and scalable web
+              applications using cutting-edge technologies. With experience in
+              both frontend and backend development, I bring ideas to life with
+              clean, maintainable code.
             </p>
             <p className="mb-4">
-              My focus areas include React, .NET, cloud architecture, and AI integration. 
-              I'm passionate about creating intuitive user experiences and efficient, 
-              reliable systems.
+              My focus areas include React, .NET, cloud architecture, and AI
+              integration. I'm passionate about creating intuitive user
+              experiences and efficient, reliable systems.
             </p>
             <div className="mt-6">
               <h4 className="text-xl font-semibold mb-2">Key Skills:</h4>
               <div className="flex flex-wrap gap-2">
-                {["React", "TypeScript", ".NET", "Cloud Architecture", "Azure", "SQL", "NoSQL", "AI Integration"].map((skill) => (
-                  <span key={skill} className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                {[
+                  "React",
+                  "TypeScript",
+                  ".NET",
+                  "Cloud Architecture",
+                  "Azure",
+                  "SQL",
+                  "NoSQL",
+                  "AI Integration",
+                ].map((skill) => (
+                  <span
+                    key={skill}
+                    className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                  >
                     {skill}
                   </span>
                 ))}
@@ -42,4 +57,4 @@ export default function About() {
       </div>
     </section>
   );
-} 
+}
