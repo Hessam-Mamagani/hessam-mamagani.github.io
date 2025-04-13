@@ -74,17 +74,24 @@ jobs:
       - name: Build
         run: |
           echo "Starting build process..."
+          
+          # Debug node_modules
+          echo "Checking node_modules structure:"
+          ls -la node_modules/.bin || echo "/.bin directory not found"
+          echo "Checking typescript installation:"
+          npm list typescript
+          
           # First run TypeScript compilation
           echo "Running TypeScript compilation..."
           echo "TypeScript version:"
-          ./node_modules/.bin/tsc --version
-          ./node_modules/.bin/tsc --project tsconfig.json
+          npx --no-install typescript --version
+          npx --no-install typescript --project tsconfig.json
           
           # Then run Vite build
           echo "Running Vite build..."
           echo "Vite version:"
-          ./node_modules/.bin/vite --version
-          ./node_modules/.bin/vite build
+          npx --no-install vite --version
+          npx --no-install vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
