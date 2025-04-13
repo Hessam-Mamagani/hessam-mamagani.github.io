@@ -91,7 +91,11 @@ export default defineConfig({
           vendor: ["react", "react-dom", "framer-motion"],
           ui: ["lucide-react", "@radix-ui/react-slot"],
         },
-        assetFileNames: "assets/[name].[hash].[ext]",
+        assetFileNames: (assetInfo) => {
+          return `assets/[name].[hash].[ext]`;
+        },
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
       },
     },
   },
@@ -99,6 +103,12 @@ export default defineConfig({
     port: 3000,
     strictPort: true,
     host: true,
+    watch: {
+      usePolling: true,
+    },
+    headers: {
+      'Cache-Control': 'no-store',
+    },
   },
   preview: {
     port: 4173,

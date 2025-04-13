@@ -8,6 +8,20 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 export default function Portfolio() {
+  // Handle direct hash navigation
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      // Wait for the page to load and then scroll
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, []);
+
   // Handle errors gracefully for images and resources
   useEffect(() => {
     // Add error handler for images

@@ -14,6 +14,10 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+env:
+  NODE_ENV: production
+  BASE_URL: /
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,7 +35,99 @@ jobs:
         run: npm ci
       
       - name: Build
-        run: npm run build
+        run: |
+          npm run build
+          
+      - name: Update index.html with production assets
+        run: |
+          # Get the generated asset files
+          JS_FILE=$(find dist/assets -name "index.*.js" -type f)
+          VENDOR_FILE=$(find dist/assets -name "vendor.*.js" -type f)
+          UI_FILE=$(find dist/assets -name "ui.*.js" -type f)
+          CSS_FILE=$(find dist/assets -name "index.*.css" -type f)
+          
+          # Remove the dist/ prefix for the asset paths
+          JS_FILE=$(echo $JS_FILE | sed 's|dist/||')
+          VENDOR_FILE=$(echo $VENDOR_FILE | sed 's|dist/||')
+          UI_FILE=$(echo $UI_FILE | sed 's|dist/||')
+          CSS_FILE=$(echo $CSS_FILE | sed 's|dist/||')
+          
+          # Update index.html with the production assets
+          cat > dist/index.html << EOL
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+              <meta http-equiv="Pragma" content="no-cache" />
+              <meta http-equiv="Expires" content="0" />
+              <meta
+                name="description"
+                content="Hessam Mamagani - Full-Stack Developer specializing in AI & Cloud Solutions"
+              />
+              <meta name="theme-color" content="#0ea5e9" />
+              <base href="/" />
+              
+              <!-- Favicon -->
+              <link rel="icon" href="data:image/x-icon;base64,//48ACEALQAtACAAUwBpAG0AcABsAGUAIABiAGEAcwBlADYANAAgAGUAbgBjAG8AZABlAGQAIABmAGEAdgBpAGMAbwBuACAALQAtAD4ADQAKAA==" type="image/x-icon" />
+              <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+              
+              <!-- Preload fonts -->
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+              <link
+                href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+                rel="stylesheet"
+              />
+              
+              <title>Hessam Mamagani | Full-Stack Developer</title>
+              
+              <!-- Start Single Page Apps for GitHub Pages -->
+              <script type="text/javascript">
+                // Single Page Apps for GitHub Pages
+                // MIT License
+                // https://github.com/rafgraph/spa-github-pages
+                (function (l) {
+                  if (l.search[1] === "/") {
+                    var decoded = l.search
+                      .slice(1)
+                      .split("&")
+                      .map(function (s) {
+                        return s.replace(/~and~/g, "&");
+                      })
+                      .join("?");
+                    window.history.replaceState(
+                      null,
+                      null,
+                      l.pathname.slice(0, -1) + decoded + l.hash
+                    );
+                  }
+                })(window.location);
+              </script>
+              <!-- End Single Page Apps for GitHub Pages -->
+              
+              <!-- Production Assets -->
+              <link rel="modulepreload" crossorigin href="/$VENDOR_FILE" />
+              <link rel="modulepreload" crossorigin href="/$UI_FILE" />
+              <script type="module" crossorigin src="/$JS_FILE"></script>
+              <link rel="stylesheet" href="/$CSS_FILE">
+            </head>
+            <body>
+              <div id="root"></div>
+            </body>
+          </html>
+          EOL
+          
+          # Replace the placeholders with actual file paths
+          sed -i "s|\$VENDOR_FILE|$VENDOR_FILE|g" dist/index.html
+          sed -i "s|\$UI_FILE|$UI_FILE|g" dist/index.html
+          sed -i "s|\$JS_FILE|$JS_FILE|g" dist/index.html
+          sed -i "s|\$CSS_FILE|$CSS_FILE|g" dist/index.html
+          
+          echo "✅ Updated index.html with production assets"
+          echo "Final index.html content:"
+          cat dist/index.html
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
