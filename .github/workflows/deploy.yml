@@ -54,6 +54,22 @@ jobs:
           echo "Cleaning environment..."
           rm -rf node_modules package-lock.json
           
+          # Create vite.config.ts
+          echo "Creating vite.config.ts..."
+          cat > vite.config.ts << 'EOL'
+          import { defineConfig } from "vite";
+          import react from "@vitejs/plugin-react";
+
+          export default defineConfig({
+            plugins: [react()],
+            base: "/Hessam-Mamagani/",
+            build: {
+              outDir: "dist",
+              assetsDir: "assets",
+            },
+          });
+          EOL
+          
           # Install dependencies one by one
           echo "Installing dependencies..."
           
@@ -71,7 +87,8 @@ jobs:
           
           # Create tsconfig.json
           echo "Creating tsconfig.json..."
-          echo '{
+          cat > tsconfig.json << 'EOL'
+          {
             "compilerOptions": {
               "target": "ES2020",
               "useDefineForClassFields": true,
@@ -89,13 +106,15 @@ jobs:
               "noUnusedParameters": true,
               "noFallthroughCasesInSwitch": true
             },
-            "include": ["src"],
+            "include": ["src", "vite.config.ts"],
             "references": [{ "path": "./tsconfig.node.json" }]
-          }' > tsconfig.json
+          }
+          EOL
           
           # Create tsconfig.node.json
           echo "Creating tsconfig.node.json..."
-          echo '{
+          cat > tsconfig.node.json << 'EOL'
+          {
             "compilerOptions": {
               "composite": true,
               "skipLibCheck": true,
@@ -104,12 +123,13 @@ jobs:
               "allowSyntheticDefaultImports": true
             },
             "include": ["vite.config.ts"]
-          }' > tsconfig.node.json
+          }
+          EOL
           
           # Update package.json
           echo "Updating package.json..."
           npm pkg set type="module"
-          npm pkg set scripts.build="npx typescript --project tsconfig.json && npx vite build"
+          npm pkg set scripts.build="npx vite build"
           npm pkg set scripts.dev="npx vite"
           npm pkg set scripts.preview="npx vite preview"
           
@@ -117,8 +137,8 @@ jobs:
           echo "Installed packages:"
           npm list || true
           
-          echo "TypeScript installation:"
-          npm list typescript || true
+          echo "Vite installation:"
+          npm list vite || true
           
           echo "Directory structure:"
           ls -la
@@ -137,15 +157,12 @@ jobs:
           echo "Package.json contents:"
           cat package.json
           
-          # First run TypeScript compilation
-          echo "Running TypeScript compilation..."
-          echo "TypeScript version:"
-          npx typescript --version || echo "Failed to get TypeScript version"
-          npx typescript --project tsconfig.json || echo "TypeScript compilation failed"
+          echo "Vite config contents:"
+          cat vite.config.ts
           
-          # Then run Vite build
+          # Run Vite build
           echo "Running Vite build..."
-          npx vite build
+          npm run build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
