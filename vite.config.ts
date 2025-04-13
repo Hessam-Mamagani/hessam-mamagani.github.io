@@ -1,62 +1,61 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import path from 'path';
-import fs from 'fs-extra';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import fs from "fs-extra";
 
 // Plugin to copy .nojekyll and other files with logging
 const copyExtraFiles = () => {
   return {
-    name: 'copy-extra-files',
+    name: "copy-extra-files",
     closeBundle: async () => {
-      console.log('🔍 Starting file copy process...');
-      
+      console.log("🔍 Starting file copy process...");
+
       try {
         // Log current working directory
-        console.log('📂 Current working directory:', process.cwd());
-        
+        console.log("📂 Current working directory:", process.cwd());
+
         // Ensure the dist directory exists
-        await fs.ensureDir('dist');
-        console.log('✅ Dist directory ensured');
-        
+        await fs.ensureDir("dist");
+        console.log("✅ Dist directory ensured");
+
         // List contents of public directory
-        const publicContents = await fs.readdir('public');
-        console.log('📁 Public directory contents:', publicContents);
-        
+        const publicContents = await fs.readdir("public");
+        console.log("📁 Public directory contents:", publicContents);
+
         // Copy .nojekyll
-        if (await fs.exists('public/.nojekyll')) {
-          await fs.copy('public/.nojekyll', 'dist/.nojekyll');
-          console.log('✅ Copied .nojekyll file');
+        if (await fs.exists("public/.nojekyll")) {
+          await fs.copy("public/.nojekyll", "dist/.nojekyll");
+          console.log("✅ Copied .nojekyll file");
         } else {
-          console.log('⚠️ .nojekyll not found in public directory');
+          console.log("⚠️ .nojekyll not found in public directory");
           // Create it if it doesn't exist
-          await fs.writeFile('dist/.nojekyll', '');
-          console.log('✅ Created new .nojekyll file');
+          await fs.writeFile("dist/.nojekyll", "");
+          console.log("✅ Created new .nojekyll file");
         }
-        
+
         // Copy favicon files if they exist
-        if (await fs.exists('public/favicon.ico')) {
-          await fs.copy('public/favicon.ico', 'dist/favicon.ico');
-          console.log('✅ Copied favicon.ico');
+        if (await fs.exists("public/favicon.ico")) {
+          await fs.copy("public/favicon.ico", "dist/favicon.ico");
+          console.log("✅ Copied favicon.ico");
         } else {
-          console.log('⚠️ favicon.ico not found');
+          console.log("⚠️ favicon.ico not found");
         }
-        
-        if (await fs.exists('public/favicon.svg')) {
-          await fs.copy('public/favicon.svg', 'dist/favicon.svg');
-          console.log('✅ Copied favicon.svg');
+
+        if (await fs.exists("public/favicon.svg")) {
+          await fs.copy("public/favicon.svg", "dist/favicon.svg");
+          console.log("✅ Copied favicon.svg");
         } else {
-          console.log('⚠️ favicon.svg not found');
+          console.log("⚠️ favicon.svg not found");
         }
-        
+
         // List contents of dist directory after copying
-        const distContents = await fs.readdir('dist');
-        console.log('📁 Final dist directory contents:', distContents);
-        
+        const distContents = await fs.readdir("dist");
+        console.log("📁 Final dist directory contents:", distContents);
       } catch (error) {
-        console.error('❌ Error during file copy:', error);
+        console.error("❌ Error during file copy:", error);
         throw error;
       }
-    }
+    },
   };
 };
 
@@ -66,33 +65,33 @@ export default defineConfig({
     react(),
     copyExtraFiles(),
     {
-      name: 'log-build-info',
+      name: "log-build-info",
       configResolved(config) {
-        console.log('📝 Build Configuration:');
-        console.log('- Base URL:', config.base);
-        console.log('- Output Directory:', config.build.outDir);
-        console.log('- Public Directory:', config.publicDir);
-      }
-    }
+        console.log("📝 Build Configuration:");
+        console.log("- Base URL:", config.base);
+        console.log("- Output Directory:", config.build.outDir);
+        console.log("- Public Directory:", config.publicDir);
+      },
+    },
   ],
   resolve: {
     alias: {
-      '@': '/src',
+      "@": "/src",
     },
   },
   build: {
-    outDir: 'dist',
-    minify: 'terser',
+    outDir: "dist",
+    minify: "terser",
     sourcemap: false,
     assetsInlineLimit: 4096, // 4kb
     copyPublicDir: true, // Ensure public directory is copied
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom', 'framer-motion'],
-          ui: ['lucide-react', '@radix-ui/react-slot'],
+          vendor: ["react", "react-dom", "framer-motion"],
+          ui: ["lucide-react", "@radix-ui/react-slot"],
         },
-        assetFileNames: 'assets/[name].[hash].[ext]',
+        assetFileNames: "assets/[name].[hash].[ext]",
       },
     },
   },
@@ -106,7 +105,7 @@ export default defineConfig({
     strictPort: true,
     host: true,
   },
-  base: '/',
-  publicDir: 'public',
-  assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf', '**/*.jpg', '**/*.png'],
+  base: "/",
+  publicDir: "public",
+  assetsInclude: ["**/*.svg", "**/*.ico", "**/*.pdf", "**/*.jpg", "**/*.png"],
 });
