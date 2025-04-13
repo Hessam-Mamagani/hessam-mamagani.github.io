@@ -32,25 +32,25 @@ jobs:
       
       - name: Install Dependencies
         run: |
-          # Install Vite globally first
-          npm install -g vite
-          
-          # Clean install project dependencies
-          rm -rf node_modules package-lock.json
+          # Install dependencies
           npm install
+          
+          # Install TypeScript and Vite globally
+          npm install -g typescript vite
           
       - name: Verify Installation
         run: |
           echo "Node version: $(node -v)"
           echo "NPM version: $(npm -v)"
+          echo "TypeScript version: $(./node_modules/.bin/tsc --version)"
           echo "Vite version: $(vite --version)"
           echo "Installed packages:"
           npm list --depth=0
           
       - name: Build
         run: |
-          # Run TypeScript compile
-          npx tsc
+          # Run TypeScript compile using local installation
+          ./node_modules/.bin/tsc
           # Run Vite build
           vite build
       
