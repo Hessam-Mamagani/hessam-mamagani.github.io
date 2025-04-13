@@ -46,13 +46,32 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # Initialize npm with defaults
-          echo "Initializing npm project..."
-          npm init -y
-          
-          # Clean environment
-          echo "Cleaning environment..."
-          rm -rf node_modules package-lock.json
+          # Initialize fresh package.json
+          echo "Creating package.json..."
+          cat > package.json << 'EOL'
+          {
+            "name": "hessam_portfolio",
+            "private": true,
+            "version": "1.0.0",
+            "type": "module",
+            "scripts": {
+              "dev": "vite",
+              "build": "vite build",
+              "preview": "vite preview"
+            },
+            "dependencies": {
+              "react": "18.2.0",
+              "react-dom": "18.2.0"
+            },
+            "devDependencies": {
+              "@types/react": "18.2.15",
+              "@types/react-dom": "18.2.7",
+              "@vitejs/plugin-react": "4.0.3",
+              "typescript": "5.1.6",
+              "vite": "4.4.7"
+            }
+          }
+          EOL
           
           # Create vite.config.ts
           echo "Creating vite.config.ts..."
@@ -70,89 +89,27 @@ jobs:
           });
           EOL
           
-          # Install dependencies one by one
-          echo "Installing dependencies..."
+          # Clean install
+          echo "Cleaning environment..."
+          rm -rf node_modules package-lock.json
           
-          echo "Installing TypeScript..."
-          npm install typescript@5.1.6 --save-dev
+          # Install dependencies
+          echo "Installing dependencies with clean slate..."
+          npm ci || npm install
           
-          echo "Installing Vite and React plugin..."
-          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev
+          # Verify Vite installation
+          echo "Verifying Vite installation..."
+          npm list vite
+          echo "Vite binary location:"
+          which vite || echo "Vite binary not found in PATH"
+          ls -la node_modules/.bin/vite || echo "Vite binary not found in node_modules"
           
-          echo "Installing React..."
-          npm install react@18.2.0 react-dom@18.2.0 --save
-          
-          echo "Installing React types..."
-          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev
-          
-          # Create tsconfig.json
-          echo "Creating tsconfig.json..."
-          cat > tsconfig.json << 'EOL'
-          {
-            "compilerOptions": {
-              "target": "ES2020",
-              "useDefineForClassFields": true,
-              "lib": ["ES2020", "DOM", "DOM.Iterable"],
-              "module": "ESNext",
-              "skipLibCheck": true,
-              "moduleResolution": "bundler",
-              "allowImportingTsExtensions": true,
-              "resolveJsonModule": true,
-              "isolatedModules": true,
-              "noEmit": true,
-              "jsx": "react-jsx",
-              "strict": true,
-              "noUnusedLocals": true,
-              "noUnusedParameters": true,
-              "noFallthroughCasesInSwitch": true
-            },
-            "include": ["src", "vite.config.ts"],
-            "references": [{ "path": "./tsconfig.node.json" }]
-          }
-          EOL
-          
-          # Create tsconfig.node.json
-          echo "Creating tsconfig.node.json..."
-          cat > tsconfig.node.json << 'EOL'
-          {
-            "compilerOptions": {
-              "composite": true,
-              "skipLibCheck": true,
-              "module": "ESNext",
-              "moduleResolution": "bundler",
-              "allowSyntheticDefaultImports": true
-            },
-            "include": ["vite.config.ts"]
-          }
-          EOL
-          
-          # Update package.json
-          echo "Updating package.json..."
-          npm pkg set type="module"
-          npm pkg set scripts.build="npx vite build"
-          npm pkg set scripts.dev="npx vite"
-          npm pkg set scripts.preview="npx vite preview"
-          
-          # Debug installed packages
-          echo "Installed packages:"
-          npm list || true
-          
-          echo "Vite installation:"
-          npm list vite || true
-          
-          echo "Directory structure:"
-          ls -la
-          ls -la node_modules/.bin || echo "No .bin directory"
-      
       - name: Build
         run: |
           echo "Starting build process..."
           
-          echo "Debugging environment:"
+          echo "Current directory:"
           pwd
-          ls -la
-          echo "Node modules:"
-          ls -la node_modules || echo "No node_modules directory"
           
           echo "Package.json contents:"
           cat package.json
@@ -160,9 +117,12 @@ jobs:
           echo "Vite config contents:"
           cat vite.config.ts
           
-          # Run Vite build
+          echo "Node modules status:"
+          ls -la node_modules/.bin/
+          
+          # Run build using local vite
           echo "Running Vite build..."
-          npm run build
+          ./node_modules/.bin/vite build --debug
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
