@@ -30,9 +30,26 @@ const createHtaccessPlugin = () => {
   };
 };
 
+// Custom plugin to create _headers file for GitHub Pages
+const createHeadersPlugin = () => {
+  return {
+    name: 'create-headers',
+    closeBundle: () => {
+      const headersContent = `/*
+  Content-Type: application/javascript
+*.js
+  Content-Type: application/javascript
+*.mjs
+  Content-Type: application/javascript
+`;
+      fs.writeFileSync(path.resolve(__dirname, 'dist', '_headers'), headersContent);
+    }
+  };
+};
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), createHtaccessPlugin()],
+  plugins: [react(), createHtaccessPlugin(), createHeadersPlugin()],
   resolve: {
     alias: {
       '@': '/src',
