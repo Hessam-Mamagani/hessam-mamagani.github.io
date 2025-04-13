@@ -41,21 +41,25 @@ jobs:
           rm -rf node_modules package-lock.json
           mkdir -p src/types
           
-          # Install core dependencies with specific versions
+          # First install Vite and its plugin explicitly
+          npm install --save-dev vite@4.4.7
+          npm install --save-dev @vitejs/plugin-react@4.0.3
+          
+          # Install React and React DOM
           npm install --save react@18.3.1 react-dom@18.3.1
           npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
           
-          # Install Vite and its plugins
-          npm install --save-dev vite@4.4.7 @vitejs/plugin-react@4.0.3
-          
           # Install remaining dependencies
-          npm install
+          npm install --no-package-lock
           
           # Verify installations
-          echo "Installed packages:"
-          npm list react react-dom vite @vitejs/plugin-react
+          echo "Checking installed versions:"
+          npm list vite
+          npm list @vitejs/plugin-react
+          npm list react
+          npm list react-dom
           
-          # Check if vite.config.ts exists
+          # Check if vite.config.ts exists and is readable
           if [ -f "vite.config.ts" ]; then
             echo "vite.config.ts contents:"
             cat vite.config.ts
@@ -65,8 +69,9 @@ jobs:
       
       - name: Build
         run: |
-          # Use npx to run vite
-          npx vite build
+          # Ensure we're using the local vite installation
+          echo "Using local vite installation for build..."
+          ./node_modules/.bin/vite build
           
       - name: Update index.html with production assets
         run: |
