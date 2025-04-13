@@ -324,7 +324,7 @@ export default function Portfolio() {
             </div>
             <div className="flex gap-6">
               <a
-                href="https://github.com/hessammamagani"
+                href="https://github.com/hessam-mamagani"
                 target="_blank"
                 rel="noreferrer"
                 className="text-gray-400 hover:text-white transition-colors hover:scale-110 transform"
