@@ -1,55 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import fs from 'fs';
 import path from 'path';
-
-// Custom plugin to create .htaccess for MIME types
-const createHtaccessPlugin = () => {
-  return {
-    name: 'create-htaccess',
-    closeBundle: () => {
-      const htaccessContent = `
-# Serve JS modules with the correct MIME type
-<IfModule mod_mime.c>
-  AddType application/javascript .js
-  AddType application/javascript .mjs
-</IfModule>
-
-# For Vercel and other platforms that use headers
-<IfModule mod_headers.c>
-  <FilesMatch "\\.js$">
-    Header set Content-Type "application/javascript"
-  </FilesMatch>
-  <FilesMatch "\\.mjs$">
-    Header set Content-Type "application/javascript"
-  </FilesMatch>
-</IfModule>
-      `;
-      fs.writeFileSync(path.resolve(__dirname, 'dist', '.htaccess'), htaccessContent.trim());
-    }
-  };
-};
-
-// Custom plugin to create _headers file for GitHub Pages
-const createHeadersPlugin = () => {
-  return {
-    name: 'create-headers',
-    closeBundle: () => {
-      const headersContent = `/*
-  Content-Type: application/javascript
-*.js
-  Content-Type: application/javascript
-*.mjs
-  Content-Type: application/javascript
-`;
-      fs.writeFileSync(path.resolve(__dirname, 'dist', '_headers'), headersContent);
-    }
-  };
-};
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), createHtaccessPlugin(), createHeadersPlugin()],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': '/src',
@@ -82,5 +37,5 @@ export default defineConfig({
   },
   base: '/',
   publicDir: 'public',
-  assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf'],
+  assetsInclude: ['**/*.svg', '**/*.ico', '**/*.pdf', '**/*.jpg', '**/*.png'],
 });
