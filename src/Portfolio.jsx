@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Navigation from "./components/Navigation";
 import About from "./components/About";
 import Skills from "./components/Skills";
@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 export default function Portfolio() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   // Handle direct hash navigation
   useEffect(() => {
     const hash = window.location.hash;
@@ -43,6 +45,15 @@ export default function Portfolio() {
 
     return () =>
       document.removeEventListener("DOMContentLoaded", handleImageErrors);
+  }, []);
+
+  // Add this near the other useEffect hooks
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? 1 : 0));
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const fadeInUp = {
@@ -197,8 +208,15 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
-                <span className="text-6xl">🚀</span>
+              <div className="h-52 overflow-hidden">
+                <img
+                  src="/assets/insightful_ai.png"
+                  alt="InsightfulAI Dashboard"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
+                  }}
+                />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
@@ -220,16 +238,13 @@ export default function Portfolio() {
                   ))}
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-gray-400 flex items-center">
+                    <Github className="w-4 h-4 mr-2" /> Private Code
+                  </span>
                   <a
-                    href="https://github.com/hessammamagani/insightful-ai"
+                    href="https://insightfulai.online/"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-indigo-600 font-medium hover:text-indigo-800 flex items-center transition-colors"
-                  >
-                    <Github className="w-4 h-4 mr-2" /> View Code
-                  </a>
-                  <a
-                    href="#"
                     className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
                   >
                     Live Demo
@@ -247,19 +262,53 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
-                <span className="text-6xl">🛠️</span>
+              <div className="h-52 overflow-hidden relative">
+                <img
+                  src="/assets/pilz_cons_services.png"
+                  alt="Pilz Consulting Services"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    currentImageIndex === 0 ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
+                  }}
+                />
+                <img
+                  src="/assets/pilz_training_services.png"
+                  alt="Pilz Training Services"
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+                    currentImageIndex === 1 ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
+                  }}
+                />
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  <button
+                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                      currentImageIndex === 0 ? 'bg-white' : 'bg-white/50'
+                    }`}
+                    onClick={() => setCurrentImageIndex(0)}
+                    aria-label="Show first image"
+                  />
+                  <button
+                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                      currentImageIndex === 1 ? 'bg-white' : 'bg-white/50'
+                    }`}
+                    onClick={() => setCurrentImageIndex(1)}
+                    aria-label="Show second image"
+                  />
+                </div>
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  Pilz Services Automation
+                  Pilz Services Portal
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Automated inquiry and response platform with secure access
-                  control. Handles complex service workflows efficiently.
+                  Comprehensive service portal for industrial safety solutions, featuring automated inquiry handling, documentation management, and expert consultation scheduling.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {[".NET", "Azure", "SQL", "API"].map((tag) => (
+                  {["Azure", "SQL Server", "ASP.NET", "REST API"].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
@@ -272,7 +321,14 @@ export default function Portfolio() {
                   <span className="text-gray-400 flex items-center">
                     <Github className="w-4 h-4 mr-2" /> Private Code
                   </span>
-                  <span className="text-gray-400">Private Demo</span>
+                  <a
+                    href="https://www.pilz.biz.tr/services/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-green-600 font-medium hover:text-green-800 transition-colors"
+                  >
+                    Live Site
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -286,19 +342,25 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-6xl">📱</span>
+              <div className="h-52 overflow-hidden">
+                <img
+                  src="/assets/safety_expert_ai.png"
+                  alt="Safety Expert AI Dashboard"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
+                  }}
+                />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  Safety Expert App
+                  Safety Expert AI
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Offline-first mobile app for safety engineering with
-                  multilingual support. Used by professionals worldwide.
+                  AI-powered safety engineering platform with advanced analytics and real-time insights. Helps professionals make informed safety decisions.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["Flutter", ".NET", "SQL", "Offline-First"].map((tag) => (
+                  {["React", "AI", "Cloud", "Analytics"].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
@@ -312,10 +374,12 @@ export default function Portfolio() {
                     <Github className="w-4 h-4 mr-2" /> Private Code
                   </span>
                   <a
-                    href="#"
+                    href="https://insightful.safetyexpert.online/"
+                    target="_blank"
+                    rel="noreferrer"
                     className="text-purple-600 font-medium hover:text-purple-800 transition-colors"
                   >
-                    App Store
+                    Live Demo
                   </a>
                 </div>
               </div>
