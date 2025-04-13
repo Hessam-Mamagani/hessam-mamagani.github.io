@@ -32,27 +32,25 @@ jobs:
       
       - name: Install Dependencies
         run: |
-          # Install dependencies
+          # Install all dependencies including devDependencies
           npm install
           
-          # Install TypeScript and Vite globally
-          npm install -g typescript vite
+          # Install build tools globally
+          npm install -g typescript@5.1.6 vite@4.4.7
           
       - name: Verify Installation
         run: |
           echo "Node version: $(node -v)"
           echo "NPM version: $(npm -v)"
-          echo "TypeScript version: $(./node_modules/.bin/tsc --version)"
-          echo "Vite version: $(vite --version)"
           echo "Installed packages:"
-          npm list --depth=0
+          npm list typescript vite @vitejs/plugin-react
           
       - name: Build
         run: |
-          # Run TypeScript compile using local installation
-          ./node_modules/.bin/tsc
-          # Run Vite build
-          vite build
+          # Run TypeScript compile with explicit package
+          npx typescript@5.1.6 tsc
+          # Run Vite build with explicit package
+          npx vite@4.4.7 build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
