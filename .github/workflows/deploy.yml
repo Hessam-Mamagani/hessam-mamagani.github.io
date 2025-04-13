@@ -46,10 +46,6 @@ jobs:
           
       - name: Install Dependencies
         run: |
-          # Debug npm configuration
-          echo "NPM Configuration:"
-          npm config list
-          
           # Initialize npm with defaults
           echo "Initializing npm project..."
           npm init -y
@@ -58,20 +54,20 @@ jobs:
           echo "Cleaning environment..."
           rm -rf node_modules package-lock.json
           
-          # Install dependencies one by one with verbose logging
-          echo "Installing dependencies with verbose logging..."
+          # Install dependencies one by one
+          echo "Installing dependencies..."
           
           echo "Installing TypeScript..."
-          npm install typescript@5.1.6 --save-dev --verbose
+          npm install typescript@5.1.6 --save-dev
           
           echo "Installing Vite and React plugin..."
-          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev --verbose
+          npm install vite@4.4.7 @vitejs/plugin-react@4.0.3 --save-dev
           
           echo "Installing React..."
-          npm install react@18.2.0 react-dom@18.2.0 --save --verbose
+          npm install react@18.2.0 react-dom@18.2.0 --save
           
           echo "Installing React types..."
-          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev --verbose
+          npm install @types/react@18.2.15 @types/react-dom@18.2.7 --save-dev
           
           # Create tsconfig.json
           echo "Creating tsconfig.json..."
@@ -110,41 +106,46 @@ jobs:
             "include": ["vite.config.ts"]
           }' > tsconfig.node.json
           
-          # Add build script to package.json
-          echo "Updating package.json scripts..."
-          npm pkg set scripts.build="./node_modules/.bin/tsc && ./node_modules/.bin/vite build"
-          npm pkg set scripts.dev="vite"
-          npm pkg set scripts.preview="vite preview"
+          # Update package.json
+          echo "Updating package.json..."
           npm pkg set type="module"
+          npm pkg set scripts.build="npx typescript --project tsconfig.json && npx vite build"
+          npm pkg set scripts.dev="npx vite"
+          npm pkg set scripts.preview="npx vite preview"
           
-          # Show final package.json
-          echo "Final package.json contents:"
-          cat package.json
+          # Debug installed packages
+          echo "Installed packages:"
+          npm list || true
           
-          # Verify installation
-          echo "Verifying installation..."
-          npm list
+          echo "TypeScript installation:"
+          npm list typescript || true
           
-          # Show binary files
-          echo "Checking binary files..."
-          ls -la node_modules/.bin || echo "No .bin directory found"
-          
-          # Display TypeScript version using local installation
-          echo "TypeScript version:"
-          ./node_modules/.bin/tsc --version || echo "TypeScript binary not found"
+          echo "Directory structure:"
+          ls -la
+          ls -la node_modules/.bin || echo "No .bin directory"
       
       - name: Build
         run: |
           echo "Starting build process..."
+          
+          echo "Debugging environment:"
+          pwd
+          ls -la
+          echo "Node modules:"
+          ls -la node_modules || echo "No node_modules directory"
+          
+          echo "Package.json contents:"
+          cat package.json
+          
           # First run TypeScript compilation
           echo "Running TypeScript compilation..."
-          ./node_modules/.bin/tsc --version
-          ./node_modules/.bin/tsc --project tsconfig.json
+          echo "TypeScript version:"
+          npx typescript --version || echo "Failed to get TypeScript version"
+          npx typescript --project tsconfig.json || echo "TypeScript compilation failed"
           
           # Then run Vite build
           echo "Running Vite build..."
-          ./node_modules/.bin/vite --version
-          ./node_modules/.bin/vite build
+          npx vite build
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
