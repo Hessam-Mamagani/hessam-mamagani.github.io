@@ -32,7 +32,12 @@ jobs:
           cache: 'npm'
       
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm ci
+          npm i --save-dev @types/react @types/react-dom
+      
+      - name: Type Check
+        run: npx tsc --noEmit
       
       - name: Build
         run: |
