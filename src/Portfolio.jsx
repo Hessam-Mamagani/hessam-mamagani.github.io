@@ -210,7 +210,7 @@ export default function Portfolio() {
             >
               <div className="h-52 overflow-hidden">
                 <img
-                  src="/assets/insightful_ai.png"
+                  src="/images/insightful_ai.png"
                   alt="InsightfulAI Dashboard"
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -264,7 +264,7 @@ export default function Portfolio() {
             >
               <div className="h-52 overflow-hidden relative">
                 <img
-                  src="/assets/pilz_cons_services.png"
+                  src="/images/pilz_cons_services.png"
                   alt="Pilz Consulting Services"
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                     currentImageIndex === 0 ? 'opacity-100' : 'opacity-0'
@@ -274,7 +274,7 @@ export default function Portfolio() {
                   }}
                 />
                 <img
-                  src="/assets/pilz_training_services.png"
+                  src="/images/pilz_training_services.png"
                   alt="Pilz Training Services"
                   className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
                     currentImageIndex === 1 ? 'opacity-100' : 'opacity-0'
@@ -344,7 +344,7 @@ export default function Portfolio() {
             >
               <div className="h-52 overflow-hidden">
                 <img
-                  src="/assets/safety_expert_ai.png"
+                  src="/images/safety_expert_ai.png"
                   alt="Safety Expert AI Dashboard"
                   className="w-full h-full object-cover"
                   onError={(e) => {

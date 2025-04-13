@@ -84,7 +84,8 @@ export default defineConfig({
     minify: "terser",
     sourcemap: false,
     assetsInlineLimit: 4096, // 4kb
-    copyPublicDir: true, // Ensure public directory is copied
+    copyPublicDir: true,
+    assetsDir: "assets",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -92,10 +93,22 @@ export default defineConfig({
           ui: ["lucide-react", "@radix-ui/react-slot"],
         },
         assetFileNames: (assetInfo) => {
-          return `assets/[name].[hash].[ext]`;
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          
+          // Special handling for images
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+            return `images/[name].[hash][extname]`;
+          }
+          
+          // Other assets
+          return `assets/[name].[hash][extname]`;
         },
-        entryFileNames: 'assets/[name].[hash].js',
-        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'js/[name].[hash].js',
+        chunkFileNames: 'js/[name].[hash].js',
+      },
+      input: {
+        main: './index.html',
       },
     },
   },
@@ -117,5 +130,13 @@ export default defineConfig({
   },
   base: "/",
   publicDir: "public",
-  assetsInclude: ["**/*.svg", "**/*.ico", "**/*.pdf", "**/*.jpg", "**/*.png"],
+  assetsInclude: [
+    "**/*.png",
+    "**/*.jpg",
+    "**/*.jpeg",
+    "**/*.gif",
+    "**/*.svg",
+    "**/*.ico",
+    "**/*.pdf",
+  ],
 });

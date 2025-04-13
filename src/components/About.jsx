@@ -9,7 +9,7 @@ export default function About() {
           <div>
             <div className="rounded-lg shadow-lg max-w-full mx-auto overflow-hidden bg-white aspect-square">
               <img
-                src="/assets/workspace.png"
+                src="/images/workspace.png"
                 alt="Modern Development Workspace"
                 className="w-full h-full object-cover hover:scale-102 transition-transform duration-500"
                 style={{
