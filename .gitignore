@@ -55,3 +55,4 @@ coverage
 .temp
 .cache 
 .vite/deps_temp_d4a6ae26/package.json
+/.vite
