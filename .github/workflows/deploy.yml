@@ -31,12 +31,13 @@ jobs:
           node-version: '18'
           cache: 'npm'
       
-      - name: Clean Install
+      - name: Setup TypeScript Environment
         run: |
           rm -rf node_modules package-lock.json
+          mkdir -p src/types
           npm install
-          npm install --save-exact react@18.2.0 react-dom@18.2.0
-          npm install --save-dev --save-exact @types/react@18.2.0 @types/react-dom@18.2.0
+          npm install --save react@18.2.0 react-dom@18.2.0
+          npm install --save-dev @types/react@18.2.0 @types/react-dom@18.2.0 typescript@5.0.2
       
       - name: Build
         run: |
