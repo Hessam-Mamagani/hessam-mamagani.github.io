@@ -1,0 +1,43 @@
+{
+  "short_name": "Hessam",
+  "name": "Hessam Mamagani Portfolio",
+  "description": "Full-Stack Developer specializing in .NET, React.js, and Azure cloud solutions with AI integration",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "favicon-16x16.png",
+      "type": "image/png",
+      "sizes": "16x16"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "profile.jpg",
+      "type": "image/jpeg",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#4169E1",
+  "background_color": "#ffffff",
+  "orientation": "portrait",
+  "categories": ["portfolio", "developer", "software", "technology"],
+  "screenshots": [
+    {
+      "src": "screenshot.jpg",
+      "type": "image/jpeg",
+      "sizes": "1280x720"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+} 

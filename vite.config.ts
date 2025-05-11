@@ -34,18 +34,27 @@ const copyExtraFiles = () => {
         }
 
         // Copy favicon files if they exist
-        if (await fs.exists("public/favicon.ico")) {
-          await fs.copy("public/favicon.ico", "dist/favicon.ico");
-          console.log("✅ Copied favicon.ico");
-        } else {
-          console.log("⚠️ favicon.ico not found");
+        const faviconFiles = [
+          'favicon.ico',
+          'favicon-16x16.png',
+          'favicon-32x32.png'
+        ];
+        
+        for (const faviconFile of faviconFiles) {
+          if (await fs.exists(`public/${faviconFile}`)) {
+            await fs.copy(`public/${faviconFile}`, `dist/${faviconFile}`);
+            console.log(`✅ Copied ${faviconFile}`);
+          } else {
+            console.log(`⚠️ ${faviconFile} not found`);
+          }
         }
 
-        if (await fs.exists("public/favicon.svg")) {
-          await fs.copy("public/favicon.svg", "dist/favicon.svg");
-          console.log("✅ Copied favicon.svg");
+        // Copy profile.jpg for OG tags
+        if (await fs.exists("public/profile.jpg")) {
+          await fs.copy("public/profile.jpg", "dist/profile.jpg");
+          console.log("✅ Copied profile.jpg");
         } else {
-          console.log("⚠️ favicon.svg not found");
+          console.log("⚠️ profile.jpg not found");
         }
 
         // List contents of dist directory after copying
