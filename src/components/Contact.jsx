@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { Mail, Github, Linkedin, MapPin, Phone } from "lucide-react";
-import { Button } from "./ui/button";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
@@ -8,6 +7,13 @@ export default function Contact() {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
+  });
+  
+  const formRef = useRef();
+  const [formStatus, setFormStatus] = useState({
+    isSubmitting: false,
+    isSubmitted: false,
+    error: null
   });
 
   const fadeIn = {
@@ -27,6 +33,59 @@ export default function Contact() {
         staggerChildren: 0.1,
       },
     },
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const message = formData.get('message');
+    
+    if (!name || !email || !message) {
+      setFormStatus({
+        isSubmitting: false,
+        isSubmitted: false,
+        error: "Please fill out all fields"
+      });
+      return;
+    }
+    
+    setFormStatus({
+      isSubmitting: true,
+      isSubmitted: false,
+      error: null
+    });
+
+    try {
+      // Create the email content
+      const mailtoUrl = `mailto:hessam.mamagani@gmail.com?subject=Contact from ${encodeURIComponent(name)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+      
+      // Open the default mail client
+      window.open(mailtoUrl, '_blank');
+      
+      // Reset the form
+      e.target.reset();
+      
+      setFormStatus({
+        isSubmitting: false,
+        isSubmitted: true,
+        error: null
+      });
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setFormStatus(prev => ({...prev, isSubmitted: false}));
+      }, 5000);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setFormStatus({
+        isSubmitting: false,
+        isSubmitted: false,
+        error: "Failed to send message. Please try again or contact me directly via email."
+      });
+    }
   };
 
   return (
@@ -95,11 +154,16 @@ export default function Contact() {
             <motion.h3 className="text-xl font-semibold mb-6" variants={fadeIn}>
               Send Me a Message
             </motion.h3>
-            <motion.form className="space-y-4" variants={staggerContainer}>
+            <motion.form 
+              className="space-y-4" 
+              variants={staggerContainer}
+              ref={formRef}
+              onSubmit={handleSubmit}
+            >
               {[
-                { id: "name", label: "Name", type: "text" },
-                { id: "email", label: "Email", type: "email" },
-                { id: "message", label: "Message", type: "textarea", rows: 4 }
+                { id: "name", label: "Name", type: "text", name: "name" },
+                { id: "email", label: "Email", type: "email", name: "email" },
+                { id: "message", label: "Message", type: "textarea", rows: 4, name: "message" }
               ].map((field, index) => (
                 <motion.div 
                   key={field.id}
@@ -121,6 +185,7 @@ export default function Contact() {
                   {field.type === "textarea" ? (
                     <textarea
                       id={field.id}
+                      name={field.name}
                       rows={field.rows}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       required
@@ -129,12 +194,34 @@ export default function Contact() {
                     <input
                       type={field.type}
                       id={field.id}
+                      name={field.name}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       required
                     />
                   )}
                 </motion.div>
               ))}
+              
+              {formStatus.error && (
+                <motion.div 
+                  className="text-red-500 text-sm"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {formStatus.error}
+                </motion.div>
+              )}
+              
+              {formStatus.isSubmitted && (
+                <motion.div 
+                  className="text-green-500 text-sm"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  Message sent successfully! I'll get back to you soon.
+                </motion.div>
+              )}
+              
               <motion.div
                 variants={{
                   hidden: { opacity: 0, y: 15 },
@@ -150,11 +237,12 @@ export default function Contact() {
               >
                 <motion.button 
                   type="submit" 
-                  className="w-full px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 bg-blue-600 text-white hover:bg-blue-700"
+                  className="w-full px-4 py-2 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
+                  disabled={formStatus.isSubmitting}
                 >
-                  Send Message
+                  {formStatus.isSubmitting ? "Sending..." : "Send Message"}
                 </motion.button>
               </motion.div>
             </motion.form>
