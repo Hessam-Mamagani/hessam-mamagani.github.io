@@ -3,12 +3,13 @@ import Navigation from "./components/Navigation";
 import About from "./components/About";
 import Skills from "./components/Skills";
 import Contact from "./components/Contact";
-import { Github, Linkedin, Mail, FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import { Github, Linkedin, Mail, FileText, ArrowUp } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 export default function Portfolio() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   // Handle direct hash navigation
   useEffect(() => {
@@ -23,6 +24,24 @@ export default function Portfolio() {
       }, 100);
     }
   }, []);
+
+  // Show/hide back to top button based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Handle scroll to top
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
 
   // Handle errors gracefully for images and resources
   useEffect(() => {
@@ -438,6 +457,24 @@ export default function Portfolio() {
           </div>
         </div>
       </footer>
+
+      {/* Back to Top Button */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            className="fixed right-6 bottom-6 p-3 rounded-full bg-primary-600 text-white shadow-lg z-50"
+            onClick={scrollToTop}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Back to top"
+          >
+            <ArrowUp className="w-6 h-6" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
