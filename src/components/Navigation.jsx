@@ -41,7 +41,7 @@ export default function Navigation() {
           className="text-2xl font-bold tracking-tight flex items-center"
         >
           <motion.span 
-            className="text-primary-600"
+            className={`${isScrolled ? "text-primary-600" : "text-primary-400"}`}
             whileHover={{ scale: 1.1 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
