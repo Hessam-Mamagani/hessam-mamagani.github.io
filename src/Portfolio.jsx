@@ -154,7 +154,7 @@ export default function Portfolio() {
                 <Mail className="w-6 h-6" />
               </a>
               <a
-                href="./cv/Hessam_Mamagani_CV_04.2026.pdf"
+                href="/cv/Hessam_Mamagani_CV_04.2026.pdf"
                 target="_blank"
                 rel="noreferrer"
                 className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"

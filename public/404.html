@@ -7,17 +7,24 @@
     // Single Page Apps for GitHub Pages
     // MIT License
     // https://github.com/rafgraph/spa-github-pages
-    var segmentCount = 1;
-    var l = window.location;
-    var repo = '/hessam-mamagani';
     
-    l.replace(
-      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-      l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + repo + '/?/' +
-      l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
-      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-      l.hash
-    );
+    // Skip redirect for static files
+    var staticExts = /\.(pdf|png|jpg|jpeg|gif|svg|ico|webp|json|xml|txt|css|js|woff2?)$/i;
+    if (staticExts.test(window.location.pathname)) {
+      // Let the browser handle the 404 naturally for static files
+    } else {
+      var segmentCount = 1;
+      var l = window.location;
+      var repo = '/hessam-mamagani';
+      
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + repo + '/?/' +
+        l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    }
   </script>
 </head>
 <body>
