@@ -4,7 +4,14 @@ import About from "./components/About";
 import Experience from "./components/Experience";
 import Skills from "./components/Skills";
 import Contact from "./components/Contact";
-import { Github, Linkedin, Mail, FileText, ArrowUp, ExternalLink } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  FileText,
+  ArrowUp,
+  ExternalLink,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
@@ -20,7 +27,7 @@ export default function Portfolio() {
       setTimeout(() => {
         const element = document.querySelector(hash);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
+          element.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
     }
@@ -31,7 +38,7 @@ export default function Portfolio() {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 500);
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -40,7 +47,7 @@ export default function Portfolio() {
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
@@ -116,9 +123,9 @@ export default function Portfolio() {
               Senior Full-Stack Developer | AI Solutions Engineer
             </p>
             <p className="text-lg mb-8 text-primary-100 max-w-2xl leading-relaxed">
-              Sole developer of 3 enterprise-grade platforms at Pilz Turkey. I architect
-              production systems with .NET 10, React, AI integration (OpenAI + Claude),
-              and Azure cloud — serving real users at scale.
+              Sole developer of 3 enterprise-grade platforms at Pilz Turkey. I
+              architect production systems with .NET 10, React, AI integration
+              (OpenAI + Claude), and Azure cloud — serving real users at scale.
             </p>
             <div className="flex gap-6 mb-8">
               <a
@@ -177,20 +184,22 @@ export default function Portfolio() {
             className="md:w-1/3 flex justify-center"
           >
             <div className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden bg-white bg-opacity-20 shadow-2xl">
-              <img 
+              <img
                 src="/profile.jpg"
-                alt="Hessam Mamagani" 
+                alt="Hessam Mamagani"
                 className="w-full h-full object-cover"
                 style={{
-                  display: 'block',
-                  minWidth: '100%',
-                  minHeight: '100%',
+                  display: "block",
+                  minWidth: "100%",
+                  minHeight: "100%",
                 }}
                 loading="eager"
                 onError={(e) => {
-                  console.log('First image failed to load, trying alternate path');
+                  console.log(
+                    "First image failed to load, trying alternate path",
+                  );
                   e.target.onerror = null;
-                  e.target.src = '/images/profile.jpg';
+                  e.target.src = "/images/profile.jpg";
                 }}
               />
             </div>
@@ -214,8 +223,9 @@ export default function Portfolio() {
               Featured Projects
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Enterprise platforms I built as sole developer — each serving real users
-              in production with AI, cloud infrastructure, and complex business workflows.
+              Enterprise platforms I built as sole developer — each serving real
+              users in production with AI, cloud infrastructure, and complex
+              business workflows.
             </p>
           </motion.div>
 
@@ -229,19 +239,26 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 overflow-hidden relative bg-gray-100 group">
-                <div className="absolute inset-0" style={{ width: '1280px', height: '832px', transform: 'scale(0.3)', transformOrigin: 'top left' }}>
+              <div className="h-52 overflow-hidden relative bg-gray-50 group">
+                <div
+                  className="absolute top-0 left-0"
+                  style={{
+                    width: "1280px",
+                    height: "800px",
+                    transform: "scale(0.27)",
+                    transformOrigin: "top left",
+                  }}
+                >
                   <iframe
-                    src="https://insightfulai.online/"
+                    src="https://www.insightfulai.online/"
                     title="InsightfulAI Live Preview"
                     className="w-full h-full border-0"
                     loading="lazy"
-                    sandbox="allow-scripts allow-same-origin"
-                    style={{ pointerEvents: 'none' }}
+                    style={{ pointerEvents: "none" }}
                   />
                 </div>
                 <a
-                  href="https://insightfulai.online/"
+                  href="https://www.insightfulai.online/"
                   target="_blank"
                   rel="noreferrer"
                   className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
@@ -261,21 +278,23 @@ export default function Portfolio() {
                   Reduced inquiry response time by 80%.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["OpenAI", "Claude", "RAG", ".NET 10", "React"].map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {["OpenAI", "Claude", "RAG", ".NET 10", "React"].map(
+                    (tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ),
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400 flex items-center">
                     <Github className="w-4 h-4 mr-2" /> Private Code
                   </span>
                   <a
-                    href="https://insightfulai.online/"
+                    href="https://www.insightfulai.online/"
                     target="_blank"
                     rel="noreferrer"
                     className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
@@ -297,7 +316,7 @@ export default function Portfolio() {
             >
               <div className="h-52 overflow-hidden relative group">
                 <img
-                  src="/images/pilz_cons_services.png"
+                  src="/images/portal.webp"
                   alt="PilzPortal Dashboard"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -317,19 +336,21 @@ export default function Portfolio() {
                   PilzPortal (CRM + ERP)
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Enterprise platform managing consulting, training, product, and
-                  engineering lifecycles. AI onboarding, RPA-based SAP sync,
+                  Enterprise platform managing consulting, training, product,
+                  and engineering lifecycles. AI onboarding, RPA-based SAP sync,
                   automated document generation. Efficiency improved 70%+.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {[".NET 10", "React", "Azure", "SignalR", "SAP RPA"].map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {[".NET 10", "React", "Azure", "SignalR", "SAP RPA"].map(
+                    (tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ),
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400 flex items-center">
@@ -356,12 +377,24 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 overflow-hidden relative group">
-                <img
-                  src="/images/safety_expert_ai.png"
-                  alt="EventRacer Platform"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+              <div className="h-52 overflow-hidden relative bg-gray-50 group">
+                <div
+                  className="absolute top-0 left-0"
+                  style={{
+                    width: "1280px",
+                    height: "800px",
+                    transform: "scale(0.27)",
+                    transformOrigin: "top left",
+                  }}
+                >
+                  <iframe
+                    src="https://www.eventracer.com/en"
+                    title="EventRacer Live Preview"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    style={{ pointerEvents: "none" }}
+                  />
+                </div>
                 <a
                   href="https://www.eventracer.com/en"
                   target="_blank"
@@ -379,18 +412,20 @@ export default function Portfolio() {
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
                   Multi-tenant exhibition SaaS with dynamic form builder, badge
-                  editor, USB QR scanner check-in, and survey analytics.
-                  1,200+ registered visitors served.
+                  editor, USB QR scanner check-in, and survey analytics. 1,200+
+                  registered visitors served.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["Next.js 16", "TypeScript", ".NET 10", "CQRS"].map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                  {["Next.js 16", "TypeScript", ".NET 10", "CQRS"].map(
+                    (tag) => (
+                      <span
+                        key={tag}
+                        className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ),
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-400 flex items-center">
