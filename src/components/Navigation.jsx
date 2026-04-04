@@ -32,7 +32,7 @@ export default function Navigation() {
       transition={{ duration: 0.5 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? "bg-white shadow-md text-gray-800 py-3" 
+          ? "bg-white/80 backdrop-blur-lg shadow-md text-gray-800 py-3" 
           : "bg-transparent text-white py-6"
       }`}
     >

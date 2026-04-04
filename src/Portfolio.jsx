@@ -299,7 +299,7 @@ export default function Portfolio() {
                     rel="noreferrer"
                     className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
                   >
-                    Live Demo
+                    Live Site
                   </a>
                 </div>
               </div>

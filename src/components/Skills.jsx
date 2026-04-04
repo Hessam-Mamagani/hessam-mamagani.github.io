@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useInView } from "react-intersection-observer";
+import { Layers, Users, Plug, GraduationCap } from "lucide-react";
 
 const skillCategories = [
   {
@@ -36,13 +37,13 @@ const skillCategories = [
 ];
 
 const stats = [
-  { value: 3, label: "Enterprise Platforms", icon: "🚀" },
-  { value: 1200, label: "Users Served", suffix: "+", icon: "👥" },
-  { value: 130, label: "API Endpoints", suffix: "+", icon: "🔌" },
-  { value: 640, label: "Teaching Hours", suffix: "+", icon: "🎓" },
+  { value: 3, label: "Enterprise Platforms", icon: Layers },
+  { value: 1200, label: "Users Served", suffix: "+", icon: Users },
+  { value: 130, label: "API Endpoints", suffix: "+", icon: Plug },
+  { value: 640, label: "Teaching Hours", suffix: "+", icon: GraduationCap },
 ];
 
-const AnimatedCounter = ({ value, label, suffix = "", icon }) => {
+const AnimatedCounter = ({ value, label, suffix = "", icon: Icon }) => {
   const [count, setCount] = useState(0);
   const { ref, inView } = useInView({
     triggerOnce: true,
@@ -72,7 +73,9 @@ const AnimatedCounter = ({ value, label, suffix = "", icon }) => {
 
   return (
     <div ref={ref} className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-      <div className="text-4xl mb-2">{icon}</div>
+      <div className="w-10 h-10 mb-3 rounded-full bg-primary-100 flex items-center justify-center">
+        <Icon className="w-5 h-5 text-primary-600" />
+      </div>
       <h3 className="text-4xl font-bold mb-2 text-primary-600 flex items-center">
         {count}
         <span>{suffix}</span>
