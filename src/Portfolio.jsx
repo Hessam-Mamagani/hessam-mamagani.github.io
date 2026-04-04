@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Navigation from "./components/Navigation";
 import About from "./components/About";
+import Experience from "./components/Experience";
 import Skills from "./components/Skills";
 import Contact from "./components/Contact";
-import { Github, Linkedin, Mail, FileText, ArrowUp } from "lucide-react";
+import { Github, Linkedin, Mail, FileText, ArrowUp, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
@@ -112,12 +113,12 @@ export default function Portfolio() {
               Hessam Mamagani
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              Full-Stack Developer | AI & Cloud Solutions
+              Senior Full-Stack Developer | AI Solutions Engineer
             </p>
             <p className="text-lg mb-8 text-primary-100 max-w-2xl leading-relaxed">
-              I craft modern, scalable applications with cutting-edge
-              technologies, focusing on exceptional user experiences and robust
-              backend systems.
+              Sole developer of 3 enterprise-grade platforms at Pilz Turkey. I architect
+              production systems with .NET 10, React, AI integration (OpenAI + Claude),
+              and Azure cloud — serving real users at scale.
             </p>
             <div className="flex gap-6 mb-8">
               <a
@@ -146,7 +147,7 @@ export default function Portfolio() {
                 <Mail className="w-6 h-6" />
               </a>
               <a
-                href="./cv/Hessam_Mamagani_CV.pdf"
+                href="./cv/Hessam_Mamagani_CV_04.2026.pdf"
                 target="_blank"
                 rel="noreferrer"
                 className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
@@ -198,6 +199,7 @@ export default function Portfolio() {
       </motion.section>
 
       <About />
+      <Experience />
 
       {/* Projects Section */}
       <section id="projects" className="py-24 bg-white" ref={projectsRef}>
@@ -212,8 +214,8 @@ export default function Portfolio() {
               Featured Projects
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              A showcase of my recent work, demonstrating my expertise in
-              full-stack development, AI integration, and cloud solutions.
+              Enterprise platforms I built as sole developer — each serving real users
+              in production with AI, cloud infrastructure, and complex business workflows.
             </p>
           </motion.div>
 
@@ -227,27 +229,39 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 overflow-hidden">
-                <img
-                  src="/images/insightful_ai.png"
-                  alt="InsightfulAI Dashboard"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
-                  }}
-                />
+              <div className="h-52 overflow-hidden relative bg-gray-100 group">
+                <div className="absolute inset-0" style={{ width: '1280px', height: '832px', transform: 'scale(0.3)', transformOrigin: 'top left' }}>
+                  <iframe
+                    src="https://insightfulai.online/"
+                    title="InsightfulAI Live Preview"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    sandbox="allow-scripts allow-same-origin"
+                    style={{ pointerEvents: 'none' }}
+                  />
+                </div>
+                <a
+                  href="https://insightfulai.online/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4" /> Visit Site
+                  </span>
+                </a>
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
                   InsightfulAI
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  AI-powered workflow assistant built with .NET 9, React, and
-                  Azure. Streamlines business processes with intelligent
-                  automation.
+                  Multi-provider AI platform with RAG pipeline, vector stores,
+                  document analysis, and domain-specific safety assistants.
+                  Reduced inquiry response time by 80%.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["React", ".NET", "Azure", "AI"].map((tag) => (
+                  {["OpenAI", "Claude", "RAG", ".NET 10", "React"].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full"
@@ -281,53 +295,34 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 overflow-hidden relative">
+              <div className="h-52 overflow-hidden relative group">
                 <img
                   src="/images/pilz_cons_services.png"
-                  alt="Pilz Consulting Services"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                    currentImageIndex === 0 ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
-                  }}
+                  alt="PilzPortal Dashboard"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <img
-                  src="/images/pilz_training_services.png"
-                  alt="Pilz Training Services"
-                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-                    currentImageIndex === 1 ? 'opacity-100' : 'opacity-0'
-                  }`}
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
-                  }}
-                />
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  <button
-                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                      currentImageIndex === 0 ? 'bg-white' : 'bg-white/50'
-                    }`}
-                    onClick={() => setCurrentImageIndex(0)}
-                    aria-label="Show first image"
-                  />
-                  <button
-                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                      currentImageIndex === 1 ? 'bg-white' : 'bg-white/50'
-                    }`}
-                    onClick={() => setCurrentImageIndex(1)}
-                    aria-label="Show second image"
-                  />
-                </div>
+                <a
+                  href="https://www.pilztr.online/portal"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4" /> Visit Site
+                  </span>
+                </a>
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  Pilz Services Portal
+                  PilzPortal (CRM + ERP)
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Comprehensive service portal for industrial safety solutions, featuring automated inquiry handling, documentation management, and expert consultation scheduling.
+                  Enterprise platform managing consulting, training, product, and
+                  engineering lifecycles. AI onboarding, RPA-based SAP sync,
+                  automated document generation. Efficiency improved 70%+.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["Azure", "SQL Server", "ASP.NET", "REST API"].map((tag) => (
+                  {[".NET 10", "React", "Azure", "SignalR", "SAP RPA"].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
@@ -341,7 +336,7 @@ export default function Portfolio() {
                     <Github className="w-4 h-4 mr-2" /> Private Code
                   </span>
                   <a
-                    href="https://www.pilz.biz.tr/services/"
+                    href="https://www.pilztr.online/portal"
                     target="_blank"
                     rel="noreferrer"
                     className="text-green-600 font-medium hover:text-green-800 transition-colors"
@@ -352,7 +347,7 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            {/* Project 3 */}
+            {/* Project 3 - EventRacer */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={
@@ -361,25 +356,34 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: 0.6 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
             >
-              <div className="h-52 overflow-hidden">
+              <div className="h-52 overflow-hidden relative group">
                 <img
                   src="/images/safety_expert_ai.png"
-                  alt="Safety Expert AI Dashboard"
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EProject Screenshot%3C/text%3E%3C/svg%3E';
-                  }}
+                  alt="EventRacer Platform"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
+                <a
+                  href="https://www.eventracer.com/en"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4" /> Visit Site
+                  </span>
+                </a>
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  Safety Expert AI
+                  EventRacer
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  AI-powered safety engineering platform with advanced analytics and real-time insights. Helps professionals make informed safety decisions.
+                  Multi-tenant exhibition SaaS with dynamic form builder, badge
+                  editor, USB QR scanner check-in, and survey analytics.
+                  1,200+ registered visitors served.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {["React", "AI", "Cloud", "Analytics"].map((tag) => (
+                  {["Next.js 16", "TypeScript", ".NET 10", "CQRS"].map((tag) => (
                     <span
                       key={tag}
                       className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
@@ -393,12 +397,12 @@ export default function Portfolio() {
                     <Github className="w-4 h-4 mr-2" /> Private Code
                   </span>
                   <a
-                    href="https://insightful.safetyexpert.online/"
+                    href="https://www.eventracer.com/en"
                     target="_blank"
                     rel="noreferrer"
                     className="text-purple-600 font-medium hover:text-purple-800 transition-colors"
                   >
-                    Live Demo
+                    Live Site
                   </a>
                 </div>
               </div>
@@ -416,7 +420,7 @@ export default function Portfolio() {
             <div className="mb-6 md:mb-0">
               <h3 className="text-2xl font-bold mb-2">Hessam Mamagani</h3>
               <p className="text-gray-400">
-                Full-Stack Developer | AI & Cloud Solutions
+                Senior Full-Stack Developer | AI Solutions Engineer
               </p>
             </div>
             <div className="flex gap-6">

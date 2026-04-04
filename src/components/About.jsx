@@ -84,19 +84,18 @@ export default function About() {
             variants={staggerContainer}
           >
             <motion.h3 className="text-2xl font-semibold mb-4" variants={fadeIn}>
-              Full-Stack Developer
+              Senior Full-Stack Developer & AI Solutions Engineer
             </motion.h3>
             <motion.p className="mb-4" variants={fadeIn}>
-              I specialize in building modern, responsive, and scalable web
-              applications using cutting-edge technologies. With expertise in
-              .NET 9 and AI integration, I create robust enterprise solutions
-              that leverage the latest in cloud technology and artificial
-              intelligence.
+              I architect and deliver enterprise-grade platforms end-to-end. As the
+              sole developer of three production systems at Pilz Turkey — a CRM/ERP
+              portal, an AI knowledge platform, and an exhibition management SaaS —
+              I handle everything from database design to cloud deployment.
             </motion.p>
             <motion.p className="mb-4" variants={fadeIn}>
-              My core focus is on developing intelligent applications using .NET
-              9, React.js, and Azure cloud services. I excel at designing and
-              implementing RESTful APIs that power modern, scalable systems.
+              My work spans AI integration (OpenAI GPT, Anthropic Claude, RAG
+              pipelines), complex business workflow automation (RPA, SAP CRM sync),
+              and real-time systems — all built on .NET 10, React, and Azure.
             </motion.p>
             <div className="mt-6">
               <motion.h4 className="text-xl font-semibold mb-2" variants={fadeIn}>
@@ -104,10 +103,10 @@ export default function About() {
               </motion.h4>
               <motion.div className="flex flex-wrap gap-2 mb-6" variants={staggerContainer}>
                 {[
-                  ".NET 9",
-                  "Artificial Intelligence",
-                  "React.js",
-                  "REST APIs",
+                  ".NET 10",
+                  "OpenAI + Claude",
+                  "React / Next.js",
+                  "Clean Architecture",
                   "Microsoft Azure",
                 ].map((skill, index) => (
                   <motion.span
@@ -139,10 +138,11 @@ export default function About() {
               <motion.div className="flex flex-wrap gap-2" variants={staggerContainer}>
                 {[
                   "TypeScript",
-                  "Cloud Architecture",
+                  "CQRS / MediatR",
                   "SQL Server",
                   "SignalR",
-                  "CI/CD",
+                  "WebAuthn",
+                  "SAP RPA",
                   "Docker",
                 ].map((skill, index) => (
                   <motion.span

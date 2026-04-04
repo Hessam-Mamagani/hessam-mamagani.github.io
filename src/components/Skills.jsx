@@ -5,40 +5,41 @@ const skillCategories = [
   {
     title: "Frontend",
     skills: [
-      { name: "React", level: 90 },
+      { name: "React 19", level: 92 },
+      { name: "Next.js 16", level: 88 },
       { name: "TypeScript", level: 85 },
-      { name: "HTML/CSS", level: 95 },
       { name: "Tailwind CSS", level: 90 },
-      { name: "Flutter", level: 75 },
+      { name: "MUI / Shadcn", level: 88 },
     ],
   },
   {
-    title: "Backend",
+    title: "Backend & AI",
     skills: [
-      { name: ".NET Core/9", level: 90 },
-      { name: "Node.js", level: 80 },
-      { name: "SQL", level: 85 },
-      { name: "Azure Services", level: 85 },
-      { name: "API Design", level: 90 },
+      { name: ".NET 10 / ASP.NET", level: 95 },
+      { name: "OpenAI / Claude", level: 90 },
+      { name: "SQL Server", level: 88 },
+      { name: "Entity Framework", level: 90 },
+      { name: "SignalR / WebSockets", level: 85 },
     ],
   },
   {
-    title: "DevOps & Tools",
+    title: "Architecture & Cloud",
     skills: [
-      { name: "Git/GitHub", level: 90 },
-      { name: "Docker", level: 75 },
-      { name: "CI/CD", level: 80 },
-      { name: "Azure DevOps", level: 85 },
-      { name: "Jest/Testing", level: 75 },
+      { name: "Azure Services", level: 88 },
+      { name: "Clean Arch / CQRS", level: 90 },
+      { name: "CI/CD Pipelines", level: 82 },
+      { name: "Docker", level: 78 },
+      { name: "REST API Design", level: 95 },
     ],
   },
+
 ];
 
 const stats = [
-  { value: 5, label: "Years Experience", icon: "🚀" },
-  { value: 30, label: "Projects Completed", icon: "📊" },
-  { value: 15, label: "Happy Clients", icon: "🌟" },
-  { value: 99, label: "Problem Solving", suffix: "%", icon: "🧩" },
+  { value: 3, label: "Enterprise Platforms", icon: "🚀" },
+  { value: 1200, label: "Users Served", suffix: "+", icon: "👥" },
+  { value: 130, label: "API Endpoints", suffix: "+", icon: "🔌" },
+  { value: 640, label: "Teaching Hours", suffix: "+", icon: "🎓" },
 ];
 
 const AnimatedCounter = ({ value, label, suffix = "", icon }) => {
