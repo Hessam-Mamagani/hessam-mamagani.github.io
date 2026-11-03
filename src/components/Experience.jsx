@@ -6,17 +6,17 @@ import { Briefcase, GraduationCap, Code } from "lucide-react";
 const experiences = [
   {
     title: "Project Development Engineer",
-    subtitle: "Full-Stack & AI Solutions",
-    company: "Pilz GmbH & Co. KG",
-    location: "Istanbul, Turkey",
+    subtitle: "Senior Full-Stack & AI Solutions Architect",
+    company: "Pilz Türkiye (Pilz GmbH & Co. KG)",
+    location: "Istanbul, Türkiye",
     period: "Aug 2024 \u2013 Present",
     icon: Code,
     color: "bg-blue-600",
     highlights: [
-      "Sole developer of 3 enterprise platforms: PilzPortal, InsightfulAI, EventRacer",
-      "130+ API endpoints, 35+ controllers, JWT/WebAuthn biometric auth",
-      "AI orchestration with OpenAI GPT + Anthropic Claude, RAG pipelines",
-      "RPA-based SAP CRM automation, real-time features via SignalR",
+      "Sole architect & developer of 5 enterprise platforms: PilzPortal, WebRunner, InsightfulAI, EvenTracer, n8n AI",
+      "1,190+ RESTful API endpoints across 102 controllers & 215+ EF Core tables with JWT/WebAuthn biometric auth",
+      "Agentic AI & RAG orchestration (OpenAI GPT + Anthropic Claude) with autonomous tool-calling & NL-to-SQL agents",
+      "SAP GUI (COM Interop) & Playwright CRM RPA, Sovos/ISIS GİB e-Invoicing, and real-time SignalR hubs",
     ],
   },
   {

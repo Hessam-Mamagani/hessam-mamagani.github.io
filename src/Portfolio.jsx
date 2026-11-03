@@ -120,12 +120,13 @@ export default function Portfolio() {
               Hessam Mamagani
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              Senior Full-Stack Developer | AI Solutions Engineer
+              Senior Software Engineer | Full-Stack & AI Solutions Architect
             </p>
             <p className="text-lg mb-8 text-primary-100 max-w-2xl leading-relaxed">
-              Sole developer of 3 enterprise-grade platforms at Pilz Turkey. I
-              architect production systems with .NET 10, React, AI integration
-              (OpenAI + Claude), and Azure cloud — serving real users at scale.
+              Sole architect & developer of 5 enterprise platforms at Pilz Türkiye.
+              I design and deliver production systems with .NET 10, React 19,
+              Next.js 16, Agentic AI & RAG (OpenAI + Claude), and Azure — across
+              1,190+ API endpoints serving real users at scale.
             </p>
             <div className="flex gap-6 mb-8">
               <a
@@ -336,9 +337,9 @@ export default function Portfolio() {
                   PilzPortal (CRM + ERP)
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Enterprise platform managing consulting, training, product,
-                  and engineering lifecycles. AI onboarding, RPA-based SAP sync,
-                  automated document generation. Efficiency improved 70%+.
+                  Enterprise platform (804 API endpoints, 62 controllers, 120 DB tables)
+                  managing consulting, training, product & engineering lifecycles,
+                  Agentic AI tools, SAP RPA & Sovos e-Invoice sync.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {[".NET 10", "React", "Azure", "SignalR", "SAP RPA"].map(
@@ -411,9 +412,9 @@ export default function Portfolio() {
                   EventRacer
                 </h3>
                 <p className="text-gray-600 mb-6 line-clamp-3">
-                  Multi-tenant exhibition SaaS with dynamic form builder, badge
-                  editor, USB QR scanner check-in, and survey analytics. 1,200+
-                  registered visitors served.
+                  Multi-tenant exhibition & executive BI SaaS with YoY comparative
+                  analytics, 18-slide PPTX/PDF deck generator, Phygital QR/AI-voice
+                  campaigns & USB QR turnstile check-in across 11 events & 2,525+ visitors.
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {["Next.js 16", "TypeScript", ".NET 10", "CQRS"].map(
@@ -455,7 +456,7 @@ export default function Portfolio() {
             <div className="mb-6 md:mb-0">
               <h3 className="text-2xl font-bold mb-2">Hessam Mamagani</h3>
               <p className="text-gray-400">
-                Senior Full-Stack Developer | AI Solutions Engineer
+                Senior Software Engineer | Full-Stack & AI Solutions Architect
               </p>
             </div>
             <div className="flex gap-6">

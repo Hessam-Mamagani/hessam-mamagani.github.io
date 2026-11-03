@@ -37,9 +37,9 @@ const skillCategories = [
 ];
 
 const stats = [
-  { value: 3, label: "Enterprise Platforms", icon: Layers },
-  { value: 1200, label: "Users Served", suffix: "+", icon: Users },
-  { value: 130, label: "API Endpoints", suffix: "+", icon: Plug },
+  { value: 5, label: "Enterprise Platforms", icon: Layers },
+  { value: 2525, label: "Visitors & Users Served", suffix: "+", icon: Users },
+  { value: 1190, label: "API Endpoints", suffix: "+", icon: Plug },
   { value: 640, label: "Teaching Hours", suffix: "+", icon: GraduationCap },
 ];
 
