@@ -52,24 +52,52 @@ export default function Navigation() {
         </a>
         
         {/* Desktop Menu */}
-        <ul className="hidden md:flex space-x-8">
-          {menuItems.map((item) => (
-            <motion.li 
-              key={item.name}
-              whileHover={{ y: -2 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <a 
-                href={item.href} 
-                className={`hover:text-primary-500 transition-colors ${
-                  isScrolled ? "text-gray-800" : "text-white"
-                }`}
+        <div className="hidden md:flex items-center space-x-8">
+          <ul className="flex space-x-8">
+            {menuItems.map((item) => (
+              <motion.li 
+                key={item.name}
+                whileHover={{ y: -2 }}
+                transition={{ type: "spring", stiffness: 300 }}
               >
-                {item.name}
-              </a>
-            </motion.li>
-          ))}
-        </ul>
+                <a 
+                  href={item.href} 
+                  className={`hover:text-primary-500 transition-colors ${
+                    isScrolled ? "text-gray-800" : "text-white"
+                  }`}
+                >
+                  {item.name}
+                </a>
+              </motion.li>
+            ))}
+          </ul>
+          <div className="flex items-center gap-2">
+            <a
+              href="/cv/Hessam_Mamagani_CV_EN.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                isScrolled
+                  ? "bg-primary-600 text-white hover:bg-primary-700"
+                  : "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm"
+              }`}
+            >
+              CV (EN)
+            </a>
+            <a
+              href="/cv/Hessam_Mamagani_CV_TR.pdf"
+              target="_blank"
+              rel="noreferrer"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                isScrolled
+                  ? "bg-gray-100 text-gray-800 hover:bg-gray-200 border border-gray-200"
+                  : "bg-white/15 text-white hover:bg-white/25 backdrop-blur-sm border border-white/20"
+              }`}
+            >
+              CV (TR)
+            </a>
+          </div>
+        </div>
         
         {/* Mobile Menu Button */}
         <motion.button 
@@ -114,10 +142,28 @@ export default function Navigation() {
                   </a>
                 </motion.li>
               ))}
+              <li className="pt-2 px-4 flex gap-3">
+                <a
+                  href="/cv/Hessam_Mamagani_CV_EN.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center py-2 px-3 bg-primary-600 text-white rounded-lg text-sm font-medium"
+                >
+                  CV (EN)
+                </a>
+                <a
+                  href="/cv/Hessam_Mamagani_CV_TR.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1 text-center py-2 px-3 bg-gray-100 text-gray-800 border border-gray-200 rounded-lg text-sm font-medium"
+                >
+                  CV (TR)
+                </a>
+              </li>
             </ul>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.nav>
   );
-} 
+}

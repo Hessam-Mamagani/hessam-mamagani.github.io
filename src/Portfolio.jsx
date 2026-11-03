@@ -11,6 +11,9 @@ import {
   FileText,
   ArrowUp,
   ExternalLink,
+  Cpu,
+  Terminal,
+  Database,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -23,7 +26,6 @@ export default function Portfolio() {
   useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
-      // Wait for the page to load and then scroll
       setTimeout(() => {
         const element = document.querySelector(hash);
         if (element) {
@@ -53,12 +55,10 @@ export default function Portfolio() {
 
   // Handle errors gracefully for images and resources
   useEffect(() => {
-    // Add error handler for images
     const handleImageErrors = () => {
       const images = document.querySelectorAll("img");
       images.forEach((img) => {
         img.onerror = () => {
-          // Fixed SVG data URL
           img.src =
             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%23f0f0f0"/%3E%3Ctext x="50" y="50" font-family="Arial" font-size="12" fill="%23999" text-anchor="middle" dominant-baseline="middle"%3EImage%3C/text%3E%3C/svg%3E';
           img.alt = "Placeholder image";
@@ -66,7 +66,6 @@ export default function Portfolio() {
       });
     };
 
-    // Run after DOM is fully loaded
     handleImageErrors();
     document.addEventListener("DOMContentLoaded", handleImageErrors);
 
@@ -74,11 +73,10 @@ export default function Portfolio() {
       document.removeEventListener("DOMContentLoaded", handleImageErrors);
   }, []);
 
-  // Add this near the other useEffect hooks
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? 1 : 0));
-    }, 3000); // Change image every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -92,7 +90,6 @@ export default function Portfolio() {
     },
   };
 
-  // Section animations with intersection observer
   const [projectsRef, projectsInView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -126,14 +123,14 @@ export default function Portfolio() {
               Sole architect & developer of 5 enterprise platforms at Pilz Türkiye.
               I design and deliver production systems with .NET 10, React 19,
               Next.js 16, Agentic AI & RAG (OpenAI + Claude), and Azure — across
-              1,190+ API endpoints serving real users at scale.
+              1,190+ API endpoints serving 2,525+ visitors & corporate users at scale.
             </p>
-            <div className="flex gap-6 mb-8">
+            <div className="flex gap-5 mb-8 items-center">
               <a
                 href="https://github.com/hessam-mamagani"
                 target="_blank"
                 rel="noreferrer"
-                className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
+                className="bg-white bg-opacity-20 p-2.5 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
                 aria-label="GitHub Profile"
               >
                 <Github className="w-6 h-6" />
@@ -142,36 +139,51 @@ export default function Portfolio() {
                 href="https://linkedin.com/in/hessam-mamagani"
                 target="_blank"
                 rel="noreferrer"
-                className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
+                className="bg-white bg-opacity-20 p-2.5 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
                 aria-label="LinkedIn Profile"
               >
                 <Linkedin className="w-6 h-6" />
               </a>
               <a
                 href="mailto:hessam.mamagani@gmail.com"
-                className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
+                className="bg-white bg-opacity-20 p-2.5 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
                 aria-label="Email Contact"
               >
                 <Mail className="w-6 h-6" />
               </a>
-              <a
-                href="/cv/Hessam_Mamagani_CV_04.2026.pdf"
+            </div>
+            <div className="flex flex-wrap gap-4">
+              <motion.a
+                href="#projects"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition shadow-lg hover:shadow-xl"
+              >
+                View My Work
+              </motion.a>
+              <motion.a
+                href="/cv/Hessam_Mamagani_CV_EN.pdf"
                 target="_blank"
                 rel="noreferrer"
-                className="bg-white bg-opacity-20 p-2 rounded-full hover:bg-opacity-30 transition-all hover:scale-110"
-                aria-label="Download CV"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 bg-white/15 border border-white/30 backdrop-blur-sm text-white px-5 py-3 rounded-lg font-medium hover:bg-white/25 transition shadow-md"
               >
-                <FileText className="w-6 h-6" />
-              </a>
+                <FileText className="w-4 h-4" />
+                Download CV (EN)
+              </motion.a>
+              <motion.a
+                href="/cv/Hessam_Mamagani_CV_TR.pdf"
+                target="_blank"
+                rel="noreferrer"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="inline-flex items-center gap-2 bg-white/15 border border-white/30 backdrop-blur-sm text-white px-5 py-3 rounded-lg font-medium hover:bg-white/25 transition shadow-md"
+              >
+                <FileText className="w-4 h-4" />
+                CV İndir (TR)
+              </motion.a>
             </div>
-            <motion.a
-              href="#projects"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-medium hover:bg-opacity-90 transition shadow-lg hover:shadow-xl"
-            >
-              View My Work
-            </motion.a>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -196,9 +208,6 @@ export default function Portfolio() {
                 }}
                 loading="eager"
                 onError={(e) => {
-                  console.log(
-                    "First image failed to load, trying alternate path",
-                  );
                   e.target.onerror = null;
                   e.target.src = "/images/profile.jpg";
                 }}
@@ -224,98 +233,21 @@ export default function Portfolio() {
               Featured Projects
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Enterprise platforms I built as sole developer — each serving real
-              users in production with AI, cloud infrastructure, and complex
-              business workflows.
+              Enterprise platforms & open-source tools I architected and built as sole
+              developer — serving real operations in production with Agentic AI,
+              cloud infrastructure, and automated ERP/CRM workflows.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-10">
-            {/* Project 1 */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Project 1 - PilzPortal */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={
-                projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
             >
-              <div className="h-52 overflow-hidden relative bg-gray-50 group">
-                <div
-                  className="absolute top-0 left-0"
-                  style={{
-                    width: "1280px",
-                    height: "800px",
-                    transform: "scale(0.27)",
-                    transformOrigin: "top left",
-                  }}
-                >
-                  <iframe
-                    src="https://www.insightfulai.online/"
-                    title="InsightfulAI Live Preview"
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                    style={{ pointerEvents: "none" }}
-                  />
-                </div>
-                <a
-                  href="https://www.insightfulai.online/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
-                >
-                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
-                    <ExternalLink className="w-4 h-4" /> Visit Site
-                  </span>
-                </a>
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  InsightfulAI
-                </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  Multi-provider AI platform with RAG pipeline, vector stores,
-                  document analysis, and domain-specific safety assistants.
-                  Reduced inquiry response time by 80%.
-                </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {["OpenAI", "Claude", "RAG", ".NET 10", "React"].map(
-                    (tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ),
-                  )}
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400 flex items-center">
-                    <Github className="w-4 h-4 mr-2" /> Private Code
-                  </span>
-                  <a
-                    href="https://www.insightfulai.online/"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-indigo-600 font-medium hover:text-indigo-800 transition-colors"
-                  >
-                    Live Site
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Project 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={
-                projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
-            >
-              <div className="h-52 overflow-hidden relative group">
+              <div className="h-48 overflow-hidden relative group">
                 <img
                   src="/images/portal.webp"
                   alt="PilzPortal Dashboard"
@@ -332,70 +264,54 @@ export default function Portfolio() {
                   </span>
                 </a>
               </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-3 text-gray-800">
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
                   PilzPortal (CRM + ERP)
                 </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  Enterprise platform (804 API endpoints, 62 controllers, 120 DB tables)
-                  managing consulting, training, product & engineering lifecycles,
-                  Agentic AI tools, SAP RPA & Sovos e-Invoice sync.
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Enterprise operations platform (804 API endpoints, 62 controllers, 120 DB tables)
+                  uniting Consulting, Training, Engineering & Product lifecycles, 9 Agentic AI
+                  tools, OCR onboarding, Sovos e-Invoicing & fleet cost automation (Arvento GPS, OPET, HGS).
                 </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {[".NET 10", "React", "Azure", "SignalR", "SAP RPA"].map(
-                    (tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ),
-                  )}
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {[".NET 10", "React 19", "SQL Server", "SignalR", "Agentic AI", "Azure"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
                   <span className="text-gray-400 flex items-center">
-                    <Github className="w-4 h-4 mr-2" /> Private Code
+                    <Github className="w-4 h-4 mr-1.5" /> Enterprise Private
                   </span>
                   <a
                     href="https://www.pilztr.online/portal"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-green-600 font-medium hover:text-green-800 transition-colors"
+                    className="text-green-600 font-semibold hover:text-green-800 transition-colors flex items-center gap-1"
                   >
-                    Live Site
+                    Live Site <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
             </motion.div>
 
-            {/* Project 3 - EventRacer */}
+            {/* Project 2 - EvenTracer */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={
-                projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-              }
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-8px] transition-all duration-300 hover:shadow-xl border border-gray-100"
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
             >
-              <div className="h-52 overflow-hidden relative bg-gray-50 group">
-                <div
-                  className="absolute top-0 left-0"
-                  style={{
-                    width: "1280px",
-                    height: "800px",
-                    transform: "scale(0.27)",
-                    transformOrigin: "top left",
-                  }}
-                >
-                  <iframe
-                    src="https://www.eventracer.com/en"
-                    title="EventRacer Live Preview"
-                    className="w-full h-full border-0"
-                    loading="lazy"
-                    style={{ pointerEvents: "none" }}
-                  />
-                </div>
+              <div className="h-48 overflow-hidden relative group">
+                <img
+                  src="/images/eventracer.png"
+                  alt="EvenTracer Platform Dashboard"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                />
                 <a
                   href="https://www.eventracer.com/en"
                   target="_blank"
@@ -407,39 +323,265 @@ export default function Portfolio() {
                   </span>
                 </a>
               </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold mb-3 text-gray-800">
-                  EventRacer
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  EvenTracer (Event & BI SaaS)
                 </h3>
-                <p className="text-gray-600 mb-6 line-clamp-3">
-                  Multi-tenant exhibition & executive BI SaaS with YoY comparative
-                  analytics, 18-slide PPTX/PDF deck generator, Phygital QR/AI-voice
-                  campaigns & USB QR turnstile check-in across 11 events & 2,525+ visitors.
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Multi-tenant exhibition & C-Suite BI SaaS powering 11 industrial symposiums,
+                  2,525+ visitors, 1,301 check-ins, 9,045 CRM accounts, 3,108 Phygital VIP
+                  QR/ElevenLabs AI voice letters (4.9x B2B conversion), YoY comparative analytics
+                  & 18-slide PPTX/PDF executive report decks.
                 </p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {["Next.js 16", "TypeScript", ".NET 10", "CQRS"].map(
-                    (tag) => (
-                      <span
-                        key={tag}
-                        className="px-3 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ),
-                  )}
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["Next.js 16", "TypeScript", ".NET 10", "CQRS", "ElevenLabs AI", "Redis"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
                   <span className="text-gray-400 flex items-center">
-                    <Github className="w-4 h-4 mr-2" /> Private Code
+                    <Github className="w-4 h-4 mr-1.5" /> Enterprise SaaS
                   </span>
                   <a
                     href="https://www.eventracer.com/en"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-purple-600 font-medium hover:text-purple-800 transition-colors"
+                    className="text-purple-600 font-semibold hover:text-purple-800 transition-colors flex items-center gap-1"
                   >
-                    Live Site
+                    Live Site <ExternalLink className="w-3.5 h-3.5" />
                   </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Project 3 - InsightfulAI */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
+            >
+              <div className="h-48 overflow-hidden relative bg-gray-50 group">
+                <img
+                  src="/images/insightful_ai.png"
+                  alt="InsightfulAI Platform"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                />
+                <a
+                  href="https://www.insightfulai.online/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4" /> Visit Site
+                  </span>
+                </a>
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  InsightfulAI (LLM & RAG)
+                </h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Multi-provider AI orchestration platform (150 API endpoints, 20 controllers)
+                  integrating OpenAI GPT & Anthropic Claude with RAG vector search, Machinery
+                  Safety AI Wizard, document Q&A, FIDO2/WebAuthn biometric passkeys & QR login,
+                  reducing inquiry response time by 80%.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["OpenAI", "Claude", "RAG", ".NET 10", "React 19", "WebAuthn"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-indigo-100 text-indigo-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <span className="text-gray-400 flex items-center">
+                    <Github className="w-4 h-4 mr-1.5" /> Enterprise Private
+                  </span>
+                  <a
+                    href="https://www.insightfulai.online/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors flex items-center gap-1"
+                  >
+                    Live Site <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Project 4 - WebRunner (SAP GUI & Playwright RPA Engine) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
+            >
+              <div className="h-48 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-5 flex flex-col justify-between text-white relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded bg-blue-500/20 border border-blue-400/30 text-blue-300 text-xs font-mono">
+                    SAP GUI + Playwright RPA
+                  </span>
+                  <Cpu className="w-5 h-5 text-blue-400" />
+                </div>
+                <div className="font-mono text-xs text-slate-300 space-y-1 bg-black/30 p-3 rounded-lg border border-white/10">
+                  <div className="text-emerald-400">✓ SapHelper x86 COM Bridge Ready</div>
+                  <div>→ VA01 SalesOrder | VF01 Billing | XD01</div>
+                  <div className="text-blue-300">→ Sovos GİB e-Invoice WS 2.3 Synced</div>
+                </div>
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  WebRunner (SAP & e-Invoice RPA)
+                </h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Hybrid enterprise RPA engine combining a .NET 8 Worker (31 RPA commands),
+                  a 32-bit/64-bit .NET 4.8 COM Interop bridge (SapHelper) for native SAP GUI
+                  scripting (VA01, VF01, XD01, ZSD20), Playwright CRM bots, WPF scheduler,
+                  SignalR live telemetry & AI self-healing diagnostics — cutting processing time by 80%.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {[".NET 8", "SAP GUI COM", "Playwright", "WPF", "SignalR", "Sovos SOAP"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <span className="text-gray-400 flex items-center">
+                    <Github className="w-4 h-4 mr-1.5" /> Enterprise Core Engine
+                  </span>
+                  <span className="text-blue-600 font-semibold">
+                    Pilz Production
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Project 5 - Smart Commit Generator AI */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
+            >
+              <div className="h-48 bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-5 flex flex-col justify-between text-white relative overflow-hidden group">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-mono">
+                    VS Marketplace & Open VSX
+                  </span>
+                  <Terminal className="w-5 h-5 text-amber-400" />
+                </div>
+                <div className="font-mono text-xs text-slate-300 space-y-1 bg-black/30 p-3 rounded-lg border border-white/10">
+                  <div className="text-amber-300">★ Smart Commit Generator AI v1.4.7</div>
+                  <div>→ OpenAI · Gemini · DeepSeek · Groq · Grok · Ollama</div>
+                  <div className="text-emerald-400">✓ git merge-tree dry-run & secret scan</div>
+                </div>
+                <a
+                  href="https://marketplace.visualstudio.com/items?itemName=Hessam-Mamagani.smart-commit-generator-ai"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <ExternalLink className="w-4 h-4" /> View on Marketplace
+                  </span>
+                </a>
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  Smart Commit Generator AI
+                </h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Zero-dependency VS Code, Cursor & Antigravity IDE extension (4,200+ LOC)
+                  supporting 6 LLM providers, 14 Git/PR automation commands, custom Activity
+                  Bar Webview, in-memory conflict dry-runs (git merge-tree), and pre-commit
+                  DevSecOps secret & debug scanners.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["VS Code API", "Node.js", "6 LLM Providers", "Git SCM", "DevSecOps", "OIDC CI/CD"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <a
+                    href="https://github.com/Hessam-Mamagani/smart-commit-generator"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-gray-600 hover:text-gray-900 font-medium flex items-center"
+                  >
+                    <Github className="w-4 h-4 mr-1.5" /> Open Source
+                  </a>
+                  <a
+                    href="https://marketplace.visualstudio.com/items?itemName=Hessam-Mamagani.smart-commit-generator-ai"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-amber-600 font-semibold hover:text-amber-800 transition-colors flex items-center gap-1"
+                  >
+                    Marketplace <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Project 6 - n8n Enterprise AI Workflows & SafetyExpertAI */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
+            >
+              <div className="h-48 overflow-hidden relative group">
+                <img
+                  src="/images/safety_expert_ai.png"
+                  alt="n8n AI Agents & SafetyExpertAI"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  n8n AI Agents & SafetyExpertAI
+                </h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  Dockerized n8n + PostgreSQL 16 stack on Azure Container Apps hosting a
+                  5-skill Natural-Language-to-SQL (NL-to-SQL) Database AI Agent for live
+                  executive reporting (revenue, SAP backlog, engineering hours, fleet & HR)
+                  plus an automated ISO/IEC/EN machinery safety standards monitor.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["n8n", "NL-to-SQL Agent", "Azure Container Apps", "PostgreSQL", "Docker", "T-SQL"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-teal-100 text-teal-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <span className="text-gray-400 flex items-center">
+                    <Database className="w-4 h-4 mr-1.5" /> Enterprise AI
+                  </span>
+                  <span className="text-teal-600 font-semibold">
+                    Pilz Production
+                  </span>
                 </div>
               </div>
             </motion.div>
@@ -459,7 +601,23 @@ export default function Portfolio() {
                 Senior Software Engineer | Full-Stack & AI Solutions Architect
               </p>
             </div>
-            <div className="flex gap-6">
+            <div className="flex items-center gap-6">
+              <a
+                href="/cv/Hessam_Mamagani_CV_EN.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-gray-300 hover:text-white transition-colors border border-gray-700 px-3 py-1.5 rounded-lg"
+              >
+                CV (EN)
+              </a>
+              <a
+                href="/cv/Hessam_Mamagani_CV_TR.pdf"
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-gray-300 hover:text-white transition-colors border border-gray-700 px-3 py-1.5 rounded-lg"
+              >
+                CV (TR)
+              </a>
               <a
                 href="https://github.com/hessam-mamagani"
                 target="_blank"
