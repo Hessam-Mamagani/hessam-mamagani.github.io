@@ -15,20 +15,29 @@
   </style>
 </head>
 <body class="min-h-screen pb-16">
-  <!-- Cloud Auth Modal (Shown on Phone / Cloud URL until unlocked once) -->
+  <!-- Cloud Auth Modal (Shown on Phone / Cloud URL until unlocked with 6-Digit Authenticator Code) -->
   <div id="cloudAuthGate" class="fixed inset-0 bg-slate-950 z-50 hidden items-center justify-center p-4">
-    <div class="glass rounded-2xl p-6 max-w-md w-full space-y-4 border border-slate-800 shadow-2xl">
-      <div class="flex items-center gap-2">
-        <span class="px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white">PRIVATE CLOUD SYNC</span>
-        <h2 class="text-lg font-bold text-white">Unlock JobRadar</h2>
+    <div class="glass rounded-2xl p-6 max-w-sm w-full space-y-4 border border-slate-800 shadow-2xl text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-600/20 border border-blue-500/30 text-blue-300 text-xs font-bold">
+        🔐 2FA AUTHENTICATOR LOCK
       </div>
+      <h2 class="text-xl font-bold text-white">Enter 6-Digit Code</h2>
       <p class="text-xs text-slate-400 leading-relaxed">
-        Your applications, salary quotes, and live LinkedIn scans are stored privately inside your private GitHub repository (<code class="text-slate-200">Hessam-Mamagani/antigravity-chats</code>). Enter your GitHub Personal Access Token once to sync this device (saved locally on this browser/phone).
+        Open <strong>Google Authenticator</strong> or <strong>Microsoft Authenticator</strong> on your phone and enter the 6-digit code for <strong>JobRadar (Hessam)</strong>.
       </p>
-      <input id="ghTokenInput" type="password" placeholder="Paste GitHub Token (ghp_... or github_pat_...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500" />
+      <input
+        id="totpCodeInput"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        maxlength="6"
+        placeholder="000000"
+        oninput="if(this.value.replace(/\D/g,'').length===6) unlockWithTotp()"
+        class="w-full text-center tracking-[0.5em] text-2xl font-mono font-bold bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+      />
       <p id="authError" class="text-xs text-rose-400 hidden"></p>
-      <button onclick="unlockCloud()" class="w-full py-2.5 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition">
-        🔓 Unlock & Sync Device
+      <button onclick="unlockWithTotp()" class="w-full py-3 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition shadow-lg">
+        🔓 Verify & Unlock Device
       </button>
     </div>
   </div>
@@ -272,21 +281,64 @@
       }
     }
 
-    async function unlockCloud() {
-      const token = document.getElementById("ghTokenInput").value.trim();
-      const errEl = document.getElementById("authError");
-      if (!token) return;
-      localStorage.setItem("jr_gh_token", token);
-      try {
-        errEl.classList.add("hidden");
-        await loadState();
-        document.getElementById("cloudAuthGate").classList.add("hidden");
-        document.getElementById("cloudAuthGate").classList.remove("flex");
-      } catch (e) {
-        localStorage.removeItem("jr_gh_token");
-        errEl.textContent = "Invalid token or no access to private repo: " + e.message;
-        errEl.classList.remove("hidden");
+    const TOTP_SECRET = new Uint8Array([245,8,58,11,154,216,206,241,238,158,234,22,155,227,226,163,180,27,12,71]);
+    const ENC_BYTES = [146,69,31,59,122,32,100,139,132,187,193,207,127,52,166,251,133,63,231,157,39,100,82,12,144,33,59,68,155,201,209,57,117,19,60,201,180,13,7,134];
+
+    async function computeTotpBrowser(stepOffset = 0) {
+      const counter = Math.floor(Date.now() / 1000 / 30) + stepOffset;
+      const buf = new ArrayBuffer(8);
+      const view = new DataView(buf);
+      view.setUint32(0, Math.floor(counter / 0x100000000), false);
+      view.setUint32(4, counter >>> 0, false);
+      const key = await crypto.subtle.importKey(
+        "raw",
+        TOTP_SECRET,
+        { name: "HMAC", hash: "SHA-1" },
+        false,
+        ["sign"]
+      );
+      const sig = new Uint8Array(await crypto.subtle.sign("HMAC", key, buf));
+      const offset = sig[sig.length - 1] & 0x0f;
+      const code =
+        (((sig[offset] & 0x7f) << 24) |
+          ((sig[offset + 1] & 0xff) << 16) |
+          ((sig[offset + 2] & 0xff) << 8) |
+          (sig[offset + 3] & 0xff)) %
+        1000000;
+      return String(code).padStart(6, "0");
+    }
+
+    function decryptToken() {
+      const out = new Uint8Array(ENC_BYTES.length);
+      for (let i = 0; i < ENC_BYTES.length; i++) {
+        out[i] = ENC_BYTES[i] ^ TOTP_SECRET[i % TOTP_SECRET.length] ^ ((i * 37) & 0xff);
       }
+      return new TextDecoder().decode(out);
+    }
+
+    async function unlockWithTotp() {
+      const raw = (document.getElementById("totpCodeInput").value || "").replace(/\D/g, "");
+      const errEl = document.getElementById("authError");
+      if (raw.length !== 6) {
+        errEl.textContent = "Please enter the 6-digit code from your Authenticator app.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      const validCodes = await Promise.all([
+        computeTotpBrowser(-1),
+        computeTotpBrowser(0),
+        computeTotpBrowser(1)
+      ]);
+      if (!validCodes.includes(raw)) {
+        errEl.textContent = "Invalid or expired 6-digit Authenticator code. Please check your phone.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+      errEl.classList.add("hidden");
+      localStorage.setItem("jr_gh_token", decryptToken());
+      document.getElementById("cloudAuthGate").classList.add("hidden");
+      document.getElementById("cloudAuthGate").classList.remove("flex");
+      await loadState();
     }
 
     async function initApp() {
