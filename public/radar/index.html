@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>JobRadar — Career Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0b0f19; color: #e2e8f0; font-family: Inter, system-ui, -apple-system, sans-serif; }
+    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="min-h-screen pb-16">
+  <!-- Cloud Auth Modal (Shown on Phone / Cloud URL until unlocked once) -->
+  <div id="cloudAuthGate" class="fixed inset-0 bg-slate-950 z-50 hidden items-center justify-center p-4">
+    <div class="glass rounded-2xl p-6 max-w-md w-full space-y-4 border border-slate-800 shadow-2xl">
+      <div class="flex items-center gap-2">
+        <span class="px-2.5 py-1 text-xs font-bold rounded bg-blue-600 text-white">PRIVATE CLOUD SYNC</span>
+        <h2 class="text-lg font-bold text-white">Unlock JobRadar</h2>
+      </div>
+      <p class="text-xs text-slate-400 leading-relaxed">
+        Your applications, salary quotes, and live LinkedIn scans are stored privately inside your private GitHub repository (<code class="text-slate-200">Hessam-Mamagani/antigravity-chats</code>). Enter your GitHub Personal Access Token once to sync this device (saved locally on this browser/phone).
+      </p>
+      <input id="ghTokenInput" type="password" placeholder="Paste GitHub Token (ghp_... or github_pat_...)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500" />
+      <p id="authError" class="text-xs text-rose-400 hidden"></p>
+      <button onclick="unlockCloud()" class="w-full py-2.5 rounded-lg text-sm font-bold bg-blue-600 hover:bg-blue-500 text-white transition">
+        🔓 Unlock & Sync Device
+      </button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 glass border-b border-slate-800 px-4 md:px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <span id="modeBadge" class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-600 text-white tracking-wider">LIVE RADAR</span>
+          <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Hessam Mamagani — Daily Job Radar & CRM</h1>
+        </div>
+        <p class="text-xs text-slate-400 mt-1">
+          .NET 10 / C# • React 19 / Next.js 16 / TS • SQL / Redis • Azure • SAP RPA • Agentic AI / RAG &nbsp;|&nbsp; Target: 165K–240K+ TL Net or $5.5K–$7.5K USD
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
+          ⏳ Permit: <strong id="daysLeft" class="text-amber-200">14.12.2026</strong>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+          ✅ Applied: <strong id="totalAppliedCount" class="text-white text-sm">0</strong>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-medium">
+          ⭐ Signals: <strong id="activeSignalsCount" class="text-white text-sm">0</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 md:px-6 mt-5">
+    <!-- Navigation Tabs -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+      <div class="flex flex-wrap gap-2">
+        <button onclick="switchTab('radar')" id="tabBtn-radar" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white transition">
+          📡 1. Live Scanner
+        </button>
+        <button onclick="switchTab('crm')" id="tabBtn-crm" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+          🗂️ 2. My Applications CRM
+        </button>
+        <button onclick="switchTab('vault')" id="tabBtn-vault" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
+          ⚡ 3. Copy Vault & Kariyer.net
+        </button>
+      </div>
+
+      <!-- Scan Controls -->
+      <div id="scanControls" class="flex items-center gap-2 w-full md:w-auto">
+        <select id="tprSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs md:text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+          <option value="r3600">Last 1 Hour</option>
+          <option value="r21600">Last 6 Hours</option>
+          <option value="r86400" selected>Last 24 Hours (Daily)</option>
+          <option value="r259200">Last 3 Days</option>
+          <option value="r604800">Last 7 Days</option>
+        </select>
+        <button onclick="runScan()" id="scanBtn" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition flex items-center justify-center gap-2">
+          <span>🔍 Scan Fresh Jobs Now</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 1: LIVE RADAR -->
+    <section id="tab-radar" class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 space-y-3">
+        <div class="flex items-center justify-between text-xs text-slate-400 px-1">
+          <span id="scanStatusText">Ready to scan unseen jobs across Istanbul & Remote.</span>
+          <span id="scanCountBadge" class="font-semibold text-emerald-400"></span>
+        </div>
+        <div id="radarList" class="space-y-3"></div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div id="inspectorPanel" class="glass rounded-xl p-5 sticky top-24 max-h-[80vh] overflow-y-auto">
+          <p class="text-sm text-slate-400 text-center py-12">
+            👈 Tap <strong>"Inspect & Score"</strong> on any job card to read its full description, matched skills, watch-outs, recommended CV (EN vs TR), and exact salary band to quote.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: APPLICATIONS CRM -->
+    <section id="tab-crm" class="mt-5 hidden space-y-4">
+      <div class="glass rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2.5 flex-1">
+          <input id="crmSearch" oninput="renderCrm()" type="text" placeholder="Search company, role, location, or notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white w-full md:w-80 focus:outline-none focus:border-blue-500" />
+          <select id="crmStatusFilter" onchange="renderCrm()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200">
+            <option value="ALL">All Statuses</option>
+            <option value="CV Downloaded ⭐">CV Downloaded ⭐</option>
+            <option value="Viewed 👀">Viewed 👀</option>
+            <option value="HR Messaged 💬">HR Messaged 💬</option>
+            <option value="Interview 🎯">Interview 🎯</option>
+            <option value="Applied">Applied</option>
+          </select>
+        </div>
+        <button onclick="openAddModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white">
+          + Log Manual Application
+        </button>
+      </div>
+
+      <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 text-xs text-slate-400 bg-slate-900/60">
+                <th class="py-3 px-4">Company & Role</th>
+                <th class="py-3 px-4">Location / Platform</th>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Status</th>
+                <th class="py-3 px-4">CV / Salary Band</th>
+                <th class="py-3 px-4">Notes & Action</th>
+              </tr>
+            </thead>
+            <tbody id="crmTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: QUICK COPY VAULT & KARIYER.NET -->
+    <section id="tab-vault" class="mt-5 hidden space-y-6">
+      <div class="glass rounded-xl p-5">
+        <h2 class="text-base font-bold text-white mb-1">🚀 Kariyer.net — 1-Click "Last 24 Hours" Searches</h2>
+        <p class="text-xs text-slate-400 mb-4">Opens directly in your browser without triggering verification.</p>
+        <div class="flex flex-wrap gap-2.5">
+          <a href="https://www.kariyer.net/is-ilanlari?kw=.net+core&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 .NET Core (Last 24h)</a>
+          <a href="https://www.kariyer.net/is-ilanlari?kw=full+stack+developer&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Full Stack Developer (Last 24h)</a>
+          <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+mimari&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Yazılım Mimarı / Architect (Last 24h)</a>
+          <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+muduru&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Yazılım Müdürü / Team Lead (Last 24h)</a>
+          <a href="https://www.kariyer.net/is-ilanlari?kw=yapay+zeka+ai&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 AI / Yapay Zeka (Last 24h)</a>
+          <a href="https://www.kariyer.net/is-ilanlari?kw=react+typescript&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 React / TypeScript (Last 24h)</a>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="vaultCards"></div>
+    </section>
+  </main>
+
+  <!-- Manual Add Application Modal -->
+  <div id="addModal" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-50 p-4">
+    <div class="glass rounded-xl p-6 max-w-md w-full space-y-3 border border-slate-700">
+      <h3 class="text-base font-bold text-white">Log New Job Application</h3>
+      <input id="mCompany" placeholder="Company Name *" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <input id="mTitle" placeholder="Job Title *" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <input id="mLocation" placeholder="Location (e.g. Kartal / Hybrid / Remote)" value="Istanbul (Hybrid)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <input id="mUrl" placeholder="Job URL" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <div class="grid grid-cols-2 gap-2">
+        <select id="mPlatform" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+          <option>LinkedIn Easy Apply</option>
+          <option>External Portal</option>
+          <option>Kariyer.net</option>
+        </select>
+        <select id="mCv" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
+          <option value="EN">CV: EN</option>
+          <option value="TR">CV: TR</option>
+          <option value="EN+TR">CV: Both</option>
+        </select>
+      </div>
+      <input id="mSalary" placeholder="Salary Quoted (e.g. 175.000 TL Net)" value="170.000 - 200.000 TL Net" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <input id="mNotes" placeholder="Notes" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" />
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeAddModal()" class="px-4 py-2 rounded-lg text-xs bg-slate-800 text-slate-300">Cancel</button>
+        <button onclick="saveManualApp()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white">Save Application</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const IS_LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+    const GH_REPO = "Hessam-Mamagani/antigravity-chats";
+    const GH_DB_PATH = "2026-11-03_cv-portfolio-job-applications/job-radar/data/jobs-db.json";
+    const GH_FEED_PATH = "2026-11-03_cv-portfolio-job-applications/job-radar/data/cloud-feed.json";
+
+    let STATE = { applied: [], skipped: [] };
+    let DB_SHA = null;
+    let LAST_SCAN_JOBS = [];
+
+    const VAULT_ITEMS = [
+      {
+        title: "Links & Direct CV Downloads (Works on Phone & Laptop)",
+        text: "GitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/\nPortfolio: https://hessam-mamagani.github.io/\nDownload EN CV (PDF): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_EN.pdf\nDownload TR CV (PDF): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_TR.pdf"
+      },
+      {
+        title: "Production Web App Summary (2–3 Sentences)",
+        text: "As Lead Full-Stack Architect at Pilz Türkiye, I architected and built PilzPortal and EvenTracer end-to-end—enterprise CRM, quoting, e-invoicing, and event intelligence platforms spanning 830+ REST API endpoints and 180+ database tables. On the frontend, I engineered responsive React 19, Next.js 16, and TypeScript interfaces with real-time SignalR dashboards, complex multi-currency quoting builders, and WebAuthn/FIDO2 passkey authentication. On the backend, I designed the .NET 9/10 and Entity Framework Core architecture, automated SAP and Sovos e-Invoice integrations, and built multi-LLM Agentic RAG workflows."
+      },
+      {
+        title: "AI / LLM Feature Summary (2–3 Sentences)",
+        text: "I architected and built InsightfulAI and PilzPortal's embedded AI Copilot—production Agentic RAG and Natural Language-to-SQL (NL2SQL) systems that let enterprise users query live ERP/CRM databases in plain language and generate interactive analytical charts. As Lead Architect, I designed both the React 19/TypeScript streaming chat UI and the .NET 9/10 & Python backend APIs orchestrating OpenAI GPT-4o, Anthropic Claude, Microsoft Semantic Kernel, autonomous tool-calling, and vector embeddings."
+      },
+      {
+        title: "Daily AI Coding Harness & Tools (2–3 Sentences)",
+        text: "Day to day, I use Claude Code, Cursor, GitHub Copilot, custom MCP servers, and strict project-level rules/skills files to accelerate full-stack architecture and maintain zero-regression code quality. Recently, while building a 1,190+ endpoint enterprise ecosystem (.NET 9/10 + React 19/Next.js 16), I used custom agent skills and MCP database/API inspectors to trace cross-stack C#-to-TypeScript DTO contracts, audit multi-language i18n keys, and automate end-to-end invoice readiness validation."
+      }
+    ];
+
+    function getGhToken() {
+      return localStorage.getItem("jr_gh_token") || "";
+    }
+
+    function utf8ToB64(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+    function b64ToUtf8(b64) {
+      return decodeURIComponent(escape(atob(b64.replace(/\s/g, ""))));
+    }
+
+    async function ghFetchFile(filePath) {
+      const token = getGhToken();
+      const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${filePath}?t=${Date.now()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json"
+        }
+      });
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      const json = await res.json();
+      return { sha: json.sha, data: JSON.parse(b64ToUtf8(json.content)) };
+    }
+
+    async function ghSaveDb() {
+      if (IS_LOCAL) return;
+      const token = getGhToken();
+      if (!token) return;
+      const body = {
+        message: "chore(job-radar): sync applications & skipped state from web/mobile",
+        content: utf8ToB64(JSON.stringify(STATE, null, 2)),
+        sha: DB_SHA
+      };
+      const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_DB_PATH}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        const out = await res.json();
+        DB_SHA = out.content.sha;
+      }
+    }
+
+    async function unlockCloud() {
+      const token = document.getElementById("ghTokenInput").value.trim();
+      const errEl = document.getElementById("authError");
+      if (!token) return;
+      localStorage.setItem("jr_gh_token", token);
+      try {
+        errEl.classList.add("hidden");
+        await loadState();
+        document.getElementById("cloudAuthGate").classList.add("hidden");
+        document.getElementById("cloudAuthGate").classList.remove("flex");
+      } catch (e) {
+        localStorage.removeItem("jr_gh_token");
+        errEl.textContent = "Invalid token or no access to private repo: " + e.message;
+        errEl.classList.remove("hidden");
+      }
+    }
+
+    async function initApp() {
+      const urlParams = new URLSearchParams(location.search);
+      if (urlParams.get("key")) {
+        localStorage.setItem("jr_gh_token", urlParams.get("key"));
+        history.replaceState({}, document.title, location.pathname);
+      }
+
+      if (!IS_LOCAL) {
+        document.getElementById("modeBadge").textContent = "☁️ CLOUD + MOBILE SYNC";
+        if (!getGhToken()) {
+          document.getElementById("cloudAuthGate").classList.remove("hidden");
+          document.getElementById("cloudAuthGate").classList.add("flex");
+          return;
+        }
+      }
+      await loadState();
+    }
+
+    async function loadState() {
+      if (IS_LOCAL) {
+        const res = await fetch("/api/state");
+        STATE = await res.json();
+        updateHeaderCounts();
+        renderCrm();
+        renderVault();
+        runScan();
+      } else {
+        const dbFile = await ghFetchFile(GH_DB_PATH);
+        DB_SHA = dbFile.sha;
+        STATE = dbFile.data;
+        updateHeaderCounts();
+        renderCrm();
+        renderVault();
+        await loadCloudFeed();
+      }
+    }
+
+    async function loadCloudFeed() {
+      try {
+        const feedFile = await ghFetchFile(GH_FEED_PATH);
+        const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
+        const skippedIds = new Set(STATE.skipped.map(s => String(s)));
+        LAST_SCAN_JOBS = (feedFile.data.jobs || []).filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)));
+        const scannedTime = feedFile.data.scannedAt ? new Date(feedFile.data.scannedAt).toLocaleString() : "Recent";
+        document.getElementById("scanStatusText").textContent = `Cloud Feed (Last synced: ${scannedTime}). Tap "Scan Fresh Jobs Now" to trigger a live cloud scan.`;
+        document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Jobs`;
+        renderRadarList();
+      } catch (e) {
+        document.getElementById("scanStatusText").textContent = "Cloud feed ready. Tap 'Scan Fresh Jobs Now' to run a scan.";
+      }
+    }
+
+    function updateHeaderCounts() {
+      const target = new Date("2026-12-14T00:00:00");
+      const now = new Date();
+      const diffDays = Math.max(0, Math.ceil((target - now) / (1000 * 60 * 60 * 24)));
+      document.getElementById("daysLeft").textContent = `${diffDays}d left`;
+      document.getElementById("totalAppliedCount").textContent = STATE.applied.length;
+      const signals = STATE.applied.filter(a => a.status && a.status !== "Applied").length;
+      document.getElementById("activeSignalsCount").textContent = signals;
+    }
+
+    function switchTab(tab) {
+      ["radar", "crm", "vault"].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle("hidden", t !== tab);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        btn.className = t === tab
+          ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white transition"
+          : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+      });
+      document.getElementById("scanControls").classList.toggle("hidden", tab !== "radar");
+    }
+
+    async function runScan() {
+      const tpr = document.getElementById("tprSelect").value;
+      const btn = document.getElementById("scanBtn");
+      btn.disabled = true;
+
+      if (IS_LOCAL) {
+        btn.innerHTML = "⏳ Scanning 12 Feeds...";
+        document.getElementById("scanStatusText").textContent = "Querying LinkedIn Guest API in parallel & filtering out applied/skipped jobs...";
+        try {
+          const res = await fetch("/api/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tpr })
+          });
+          const data = await res.json();
+          LAST_SCAN_JOBS = data.jobs || [];
+          document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries} searches live. Showing only unseen matching roles.`;
+          document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Jobs`;
+          renderRadarList();
+        } catch (e) {
+          document.getElementById("scanStatusText").textContent = "Error scanning: " + e.message;
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = "🔍 Scan Fresh Jobs Now";
+        }
+      } else {
+        // Cloud mode: trigger GitHub Action workflow_dispatch and poll/reload feed
+        btn.innerHTML = "☁️ Triggering Cloud Scan...";
+        const token = getGhToken();
+        try {
+          await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/job-radar-scan.yml/dispatches`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ ref: "main", inputs: { tpr } })
+          });
+          document.getElementById("scanStatusText").textContent = "☁️ Cloud scanner started on GitHub Actions! Refreshing feed in ~18 seconds...";
+          setTimeout(async () => {
+            await loadCloudFeed();
+            btn.disabled = false;
+            btn.innerHTML = "🔍 Scan Fresh Jobs Now";
+          }, 18000);
+        } catch (e) {
+          await loadCloudFeed();
+          btn.disabled = false;
+          btn.innerHTML = "🔍 Scan Fresh Jobs Now";
+        }
+      }
+    }
+
+    function renderRadarList() {
+      const container = document.getElementById("radarList");
+      if (!LAST_SCAN_JOBS.length) {
+        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No unseen matching jobs in this time window. Try switching dropdown to "Last 3 Days" or "Last 7 Days".</div>`;
+        return;
+      }
+      container.innerHTML = LAST_SCAN_JOBS.map(job => {
+        const badgeColor = job.score >= 80 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" :
+                           job.score >= 65 ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
+                                             "bg-slate-700 text-slate-300 border-slate-600";
+        return `
+          <div id="jobcard-${job.id}" class="glass rounded-xl p-4 hover:border-blue-500/40 transition">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 text-xs font-bold rounded border ${badgeColor}">Match ${job.score}%</span>
+                  <span class="text-xs text-emerald-400 font-medium">${job.postedAgo || "Recent"}</span>
+                  ${(job.tags || []).map(t => `<span class="px-2 py-0.5 text-[11px] rounded bg-slate-800 text-slate-300">${t}</span>`).join("")}
+                </div>
+                <h3 class="text-base font-bold text-white mt-1.5">${job.title}</h3>
+                <p class="text-sm text-slate-300 font-medium">${job.company} &middot; <span class="text-slate-400">${job.location}</span></p>
+              </div>
+              <div class="flex flex-col gap-1.5 shrink-0">
+                <button onclick="inspectJob('${job.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white">
+                  🔎 Inspect & Score
+                </button>
+                <a href="${job.url}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 text-center">
+                  ↗ Open LinkedIn
+                </a>
+              </div>
+            </div>
+            <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500">ID: ${job.id}</span>
+              <div class="flex gap-2">
+                <button onclick="quickMarkApplied('${job.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-medium">
+                  ✅ Mark Applied
+                </button>
+                <button onclick="quickSkip('${job.id}')" class="px-2.5 py-1 rounded bg-rose-600/15 hover:bg-rose-600/25 text-rose-300 font-medium">
+                  ✕ Skip / Hide
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function inspectJob(id) {
+      const panel = document.getElementById("inspectorPanel");
+      const cached = LAST_SCAN_JOBS.find(j => String(j.id) === String(id));
+      let d = cached;
+
+      if (IS_LOCAL && (!d || !d.description)) {
+        panel.innerHTML = `<div class="py-12 text-center text-slate-300">⏳ Fetching full description & stack score for #${id}...</div>`;
+        const res = await fetch(`/api/job/${id}`);
+        d = await res.json();
+      } else if (!d) {
+        return;
+      }
+
+      const a = d.analysis || {
+        score: d.score || 75,
+        recommendedCv: "Hessam_Mamagani_CV_EN.pdf",
+        recommendedSalary: "170.000 – 210.000 TL Net / month",
+        matchedSkills: d.tags || [],
+        redFlags: []
+      };
+
+      panel.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              Deep Match Score: ${a.score || d.score || 75}%
+            </span>
+            <span class="px-2.5 py-1 rounded text-xs font-semibold ${a.easyApply ? 'bg-blue-500/20 text-blue-300' : 'bg-amber-500/20 text-amber-300'}">
+              ${a.easyApply ? '⚡ LinkedIn Easy Apply' : '🌐 Company Portal / LinkedIn'}
+            </span>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-white">${d.title || "Job Details"}</h2>
+            <p class="text-sm text-slate-300">${d.company || ""}</p>
+          </div>
+          <div class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5 text-xs">
+            <div><strong class="text-slate-300">📄 Recommended CV:</strong> <span class="text-emerald-300 font-semibold">${a.recommendedCv}</span></div>
+            <div><strong class="text-slate-300">💰 Salary to Quote:</strong> <span class="text-amber-300 font-semibold">${a.recommendedSalary}</span></div>
+          </div>
+          ${(a.matchedSkills && a.matchedSkills.length) ? `
+            <div>
+              <p class="text-xs font-semibold text-slate-400 mb-1.5">✅ Matched Skills & Location Signals:</p>
+              <div class="flex flex-wrap gap-1.5">
+                ${a.matchedSkills.map(s => `<span class="px-2 py-0.5 rounded text-xs bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">${s}</span>`).join("")}
+              </div>
+            </div>
+          ` : ""}
+          ${(a.redFlags && a.redFlags.length) ? `
+            <div>
+              <p class="text-xs font-semibold text-rose-400 mb-1.5">⚠️ Watch Outs:</p>
+              <div class="flex flex-wrap gap-1.5">
+                ${a.redFlags.map(r => `<span class="px-2 py-0.5 rounded text-xs bg-rose-500/15 text-rose-300 border border-rose-500/30">${r}</span>`).join("")}
+              </div>
+            </div>
+          ` : ""}
+          <div class="flex gap-2 pt-1">
+            <a href="https://www.linkedin.com/jobs/view/${id}/" target="_blank" class="flex-1 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white text-center">
+              ↗ Apply on LinkedIn
+            </a>
+            <button onclick="quickMarkApplied('${id}')" class="px-3 py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white">
+              ✅ Mark Applied
+            </button>
+            <button onclick="quickSkip('${id}')" class="px-3 py-2 rounded-lg text-xs font-bold bg-rose-600/30 hover:bg-rose-600/50 text-rose-200">
+              ✕ Skip
+            </button>
+          </div>
+          <div class="pt-3 border-t border-slate-800">
+            <p class="text-xs font-semibold text-slate-400 mb-2">Full Job Description:</p>
+            <pre class="whitespace-pre-wrap text-xs text-slate-300 leading-relaxed font-sans">${d.description || "Open on LinkedIn to view full description."}</pre>
+          </div>
+        </div>
+      `;
+      panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    async function quickMarkApplied(id) {
+      const job = LAST_SCAN_JOBS.find(j => String(j.id) === String(id)) || { id };
+      const newEntry = {
+        id: String(job.id),
+        company: job.company || "Company",
+        title: job.title || "Role",
+        location: job.location || "Istanbul",
+        platform: "LinkedIn",
+        appliedAt: new Date().toISOString().slice(0, 10),
+        status: "Applied",
+        cvUsed: "EN",
+        salaryQuote: "170.000 - 200.000 TL Net",
+        url: `https://www.linkedin.com/jobs/view/${job.id}/`,
+        notes: ""
+      };
+
+      if (IS_LOCAL) {
+        const res = await fetch("/api/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(newEntry)
+        });
+        const data = await res.json();
+        STATE.applied = data.applied;
+      } else {
+        STATE.applied.unshift(newEntry);
+        await ghSaveDb();
+      }
+      LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
+      updateHeaderCounts();
+      renderRadarList();
+      renderCrm();
+    }
+
+    async function quickSkip(id) {
+      if (IS_LOCAL) {
+        await fetch("/api/skip", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        });
+      } else {
+        if (!STATE.skipped.includes(String(id))) STATE.skipped.push(String(id));
+        await ghSaveDb();
+      }
+      LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
+      renderRadarList();
+    }
+
+    async function updateAppStatus(id, newStatus) {
+      const existing = STATE.applied.find(a => String(a.id) === String(id));
+      if (!existing) return;
+      existing.status = newStatus;
+      if (IS_LOCAL) {
+        const res = await fetch("/api/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(existing)
+        });
+        const data = await res.json();
+        STATE.applied = data.applied;
+      } else {
+        await ghSaveDb();
+      }
+      updateHeaderCounts();
+      renderCrm();
+    }
+
+    function renderCrm() {
+      const q = (document.getElementById("crmSearch")?.value || "").toLowerCase();
+      const statusFilter = document.getElementById("crmStatusFilter")?.value || "ALL";
+      const rows = STATE.applied.filter(item => {
+        if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+        if (!q) return true;
+        return `${item.company} ${item.title} ${item.location} ${item.notes}`.toLowerCase().includes(q);
+      });
+
+      const tbody = document.getElementById("crmTableBody");
+      tbody.innerHTML = rows.map(item => `
+        <tr class="hover:bg-slate-900/40">
+          <td class="py-3 px-4">
+            <div class="font-bold text-white">${item.company}</div>
+            <div class="text-xs text-slate-300">${item.title}</div>
+          </td>
+          <td class="py-3 px-4 text-xs">
+            <div class="text-slate-200">${item.location || ""}</div>
+            <div class="text-slate-500">${item.platform || ""}</div>
+          </td>
+          <td class="py-3 px-4 text-xs text-slate-400 whitespace-nowrap">${item.appliedAt || ""}</td>
+          <td class="py-3 px-4">
+            <select onchange="updateAppStatus('${item.id}', this.value)" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs font-semibold text-emerald-300">
+              ${["Applied", "Viewed 👀", "CV Downloaded ⭐", "HR Messaged 💬", "Interview 🎯", "Offer 🏆", "Rejected"].map(s =>
+                `<option value="${s}" ${item.status === s ? "selected" : ""}>${s}</option>`
+              ).join("")}
+            </select>
+          </td>
+          <td class="py-3 px-4 text-xs">
+            <span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-200 font-semibold">${item.cvUsed || "EN"}</span>
+            <div class="text-amber-300 mt-1">${item.salaryQuote || ""}</div>
+          </td>
+          <td class="py-3 px-4 text-xs">
+            <div class="text-slate-300 max-w-xs mb-1">${item.notes || ""}</div>
+            <a href="${item.url}" target="_blank" class="text-blue-400 hover:underline font-medium">↗ View Job</a>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function renderVault() {
+      const container = document.getElementById("vaultCards");
+      container.innerHTML = VAULT_ITEMS.map((item, idx) => `
+        <div class="glass rounded-xl p-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-sm font-bold text-white">${item.title}</h3>
+              <button onclick="copyVault(${idx}, this)" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold">
+                📋 Copy Text
+              </button>
+            </div>
+            <pre class="whitespace-pre-wrap text-xs text-slate-300 bg-slate-900/80 p-3 rounded-lg border border-slate-800 font-sans">${item.text}</pre>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function copyVault(idx, btn) {
+      navigator.clipboard.writeText(VAULT_ITEMS[idx].text);
+      const old = btn.textContent;
+      btn.textContent = "✅ Copied!";
+      setTimeout(() => (btn.textContent = old), 1500);
+    }
+
+    function openAddModal() {
+      document.getElementById("addModal").classList.remove("hidden");
+      document.getElementById("addModal").classList.add("flex");
+    }
+    function closeAddModal() {
+      document.getElementById("addModal").classList.add("hidden");
+      document.getElementById("addModal").classList.remove("flex");
+    }
+    async function saveManualApp() {
+      const company = document.getElementById("mCompany").value.trim();
+      const title = document.getElementById("mTitle").value.trim();
+      if (!company || !title) return alert("Company and Title are required");
+      const entry = {
+        id: `MANUAL-${Date.now()}`,
+        company,
+        title,
+        location: document.getElementById("mLocation").value.trim(),
+        url: document.getElementById("mUrl").value.trim() || "#",
+        platform: document.getElementById("mPlatform").value,
+        appliedAt: new Date().toISOString().slice(0, 10),
+        cvUsed: document.getElementById("mCv").value,
+        salaryQuote: document.getElementById("mSalary").value.trim(),
+        notes: document.getElementById("mNotes").value.trim(),
+        status: "Applied"
+      };
+      if (IS_LOCAL) {
+        const res = await fetch("/api/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(entry)
+        });
+        const data = await res.json();
+        STATE.applied = data.applied;
+      } else {
+        STATE.applied.unshift(entry);
+        await ghSaveDb();
+      }
+      closeAddModal();
+      updateHeaderCounts();
+      renderCrm();
+    }
+
+    initApp();
+  </script>
+</body>
+</html>
