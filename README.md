@@ -43,3 +43,4 @@ At **Pilz Türkiye (Pilz GmbH & Co. KG)**, I architected and delivered **5 missi
 - **English:** Full Professional Proficiency (C1)
 - **Turkish:** Full Professional Proficiency (C1)
 - **Persian & Azerbaijani:** Native / Bilingual
+
