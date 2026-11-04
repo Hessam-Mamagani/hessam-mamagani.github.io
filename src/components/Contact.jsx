@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, Github, Linkedin, MapPin, Phone, MessageCircle } from "lucide-react";
+import { Mail, Github, Linkedin, MapPin, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
@@ -55,7 +55,7 @@ export default function Contact() {
 
   const infoItems = [
     { icon: MapPin, text: "Istanbul, Turkey" },
-    { icon: Phone, text: "+90 539 229 4251" },
+    { icon: MapPin, text: "Istanbul, Türkiye · Open to Remote & Relocation" },
   ];
 
   return (

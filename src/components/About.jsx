@@ -88,7 +88,7 @@ export default function About() {
             </motion.h3>
             <motion.p className="mb-4" variants={fadeIn}>
               I architect and deliver enterprise-grade platforms end-to-end. As the
-              sole developer of five production systems at Pilz Türkiye — an enterprise
+              lead architect and developer of five production systems at Pilz Türkiye — an enterprise
               CRM/ERP portal, a hybrid SAP GUI & Playwright RPA engine, a multi-provider
               AI & RAG platform, a multi-tenant exhibition SaaS, and n8n AI workflows —
               I own everything from database architecture (215+ tables) to Azure deployment.

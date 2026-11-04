@@ -13,7 +13,7 @@ const experiences = [
     icon: Code,
     color: "bg-blue-600",
     highlights: [
-      "Sole architect & developer of 5 enterprise platforms: PilzPortal, WebRunner, InsightfulAI, EvenTracer, n8n AI",
+      "Architected, built end-to-end & led development of 5 enterprise platforms: PilzPortal, WebRunner, InsightfulAI, EvenTracer, n8n AI",
       "1,190+ RESTful API endpoints across 102 controllers & 215+ EF Core tables with JWT/WebAuthn biometric auth",
       "Agentic AI & RAG orchestration (OpenAI GPT + Anthropic Claude) with autonomous tool-calling & NL-to-SQL agents",
       "SAP GUI (COM Interop) & Playwright CRM RPA, Sovos/ISIS GİB e-Invoicing, and real-time SignalR hubs",

@@ -120,8 +120,8 @@ export default function Portfolio() {
               Senior Software Engineer | Full-Stack & AI Solutions Architect
             </p>
             <p className="text-lg mb-8 text-primary-100 max-w-2xl leading-relaxed">
-              Sole architect & developer of 5 enterprise platforms at Pilz Türkiye.
-              I design and deliver production systems with .NET 10, React 19,
+              Lead architect & developer of 5 enterprise platforms at Pilz Türkiye.
+              I design and deliver production systems end-to-end with .NET 10, React 19,
               Next.js 16, Agentic AI & RAG (OpenAI + Claude), and Azure — across
               1,190+ API endpoints serving 2,525+ visitors & corporate users at scale.
             </p>
@@ -233,8 +233,8 @@ export default function Portfolio() {
               Featured Projects
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Enterprise platforms & open-source tools I architected and built as sole
-              developer — serving real operations in production with Agentic AI,
+              Enterprise platforms & open-source tools I architected and built
+              end-to-end — serving real operations in production with Agentic AI,
               cloud infrastructure, and automated ERP/CRM workflows.
             </p>
           </motion.div>
