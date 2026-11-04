@@ -378,15 +378,44 @@
       }
     }
 
+    function isIstanbulOrRemoteClient(job) {
+      const combined = `${job.title || ""} ${job.location || ""}`.toLowerCase();
+      if (/\b(ankara|bursa|izmir|i̇zmir|antalya|kocaeli|gebze|sakarya|konya|adana|mersin|kayseri|eskisehir|eskişehir|gaziantep|trabzon|samsun|denizli|manisa|tekirdağ|çorlu|düzce)\b/i.test(combined)) {
+        return false;
+      }
+      return true;
+    }
+
+    function showToast(msg, isSuccess = true) {
+      let t = document.getElementById("jrToast");
+      if (!t) {
+        t = document.createElement("div");
+        t.id = "jrToast";
+        t.className = "fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl text-xs font-bold transition-all duration-300";
+        document.body.appendChild(t);
+      }
+      t.className = `fixed bottom-5 right-5 z-50 px-4 py-3 rounded-xl shadow-2xl text-xs font-bold transition-all duration-300 ${
+        isSuccess ? "bg-emerald-600 text-white border border-emerald-400" : "bg-slate-800 text-slate-200 border border-slate-600"
+      }`;
+      t.textContent = msg;
+      t.style.opacity = "1";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        t.style.opacity = "0";
+      }, 3200);
+    }
+
     async function loadCloudFeed() {
       try {
         const feedFile = await ghFetchFile(GH_FEED_PATH);
         const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
         const skippedIds = new Set(STATE.skipped.map(s => String(s)));
-        LAST_SCAN_JOBS = (feedFile.data.jobs || []).filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)));
+        LAST_SCAN_JOBS = (feedFile.data.jobs || []).filter(
+          j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
+        );
         const scannedTime = feedFile.data.scannedAt ? new Date(feedFile.data.scannedAt).toLocaleString() : "Recent";
         document.getElementById("scanStatusText").textContent = `Cloud Feed (Last synced: ${scannedTime}). Tap "Scan Fresh Jobs Now" to trigger a live cloud scan.`;
-        document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Jobs`;
+        document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
         renderRadarList();
       } catch (e) {
         document.getElementById("scanStatusText").textContent = "Cloud feed ready. Tap 'Scan Fresh Jobs Now' to run a scan.";
@@ -621,6 +650,7 @@
       updateHeaderCounts();
       renderRadarList();
       renderCrm();
+      showToast(`✅ Added "${newEntry.company}" to Tab 2 (My Applications CRM) & synced to private GitHub!`, true);
     }
 
     async function quickSkip(id) {
@@ -636,6 +666,7 @@
       }
       LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
       renderRadarList();
+      showToast(`✕ Hidden job #${id} permanently across all your devices.`, false);
     }
 
     async function updateAppStatus(id, newStatus) {
