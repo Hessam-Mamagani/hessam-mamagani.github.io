@@ -668,6 +668,78 @@
         badge: "👀 Application Viewed by HR!",
         lang: "TR",
         note: "LC Waikiki recruitment team already viewed your application on LinkedIn (.NET / React)."
+      },
+      {
+        match: /icterra/i,
+        phone: "+902162253345",
+        phoneDisplay: "+90 (216) 225 33 45",
+        email: "hr.tr@icterra.com",
+        badge: "📍 Pendik/Kurtköy Office + Direct HR Email",
+        lang: "EN",
+        note: "Direct HR email (hr.tr@icterra.com) & Pendik/Kurtköy office (+90 216 225 33 45) right next to Kartal!"
+      },
+      {
+        match: /enka/i,
+        phone: "+902123761000",
+        phoneDisplay: "+90 (212) 376 10 00",
+        email: "recruitment@enka.com",
+        badge: "🏗️ Global Giant + Direct HR Email",
+        lang: "EN",
+        note: "Direct HR recruitment email (recruitment@enka.com) & switchboard (+90 212 376 10 00) for Senior .NET / React!"
+      },
+      {
+        match: /hitachi/i,
+        phone: "08505281002",
+        phoneDisplay: "0850 528 10 02 / 0533 666 80 74",
+        email: "",
+        badge: "📍 Right in Kartal (Milangaz Cad. No:58)!",
+        lang: "EN",
+        note: "Hitachi Energy Transformer Hub is right in Kartal (Esentepe Mah. Milangaz Cad. No:58)! Call or drop by in person."
+      },
+      {
+        match: /siemens/i,
+        phone: "+902164592000",
+        phoneDisplay: "+90 (216) 459 20 00",
+        email: "info.tr@siemens.com",
+        badge: "🇩🇪 Right in Kartal (Yakacık Cad. No:111)!",
+        lang: "EN",
+        note: "Siemens Campus is right in Kartal (Yakacık Cad. No:111)! Strong match with your German Pilz GmbH background."
+      },
+      {
+        match: /btcturk/i,
+        phone: "4440611",
+        phoneDisplay: "444 06 11",
+        email: "support@btcturk.com",
+        badge: "💎 Top-Tier Fintech (.NET & React Architect)",
+        lang: "EN",
+        note: "Use '🔍 Find HR on LinkedIn' below to message BtcTurk Teknoloji Talent Acquisition directly."
+      },
+      {
+        match: /ray sigorta/i,
+        phone: "+902123632500",
+        phoneDisplay: "+90 (212) 363 25 00",
+        email: "",
+        badge: "🇦🇹 Vienna Insurance Group (.NET)",
+        lang: "TR",
+        note: "Call HQ switchboard (+90 212 363 25 00) and ask for İnsan Kaynakları / Bilgi Teknolojileri İK."
+      },
+      {
+        match: /sürat kargo|surat kargo/i,
+        phone: "+902124103030",
+        phoneDisplay: "+90 (212) 410 30 30",
+        email: "",
+        badge: "📦 Senior Full Stack (.NET Core + React/Next.js)",
+        lang: "TR",
+        note: "100% stack match (.NET Core + React/Next.js). Call +90 212 410 30 30 and ask for Yazılım / İK."
+      },
+      {
+        match: /randstad/i,
+        phone: "+902122828212",
+        phoneDisplay: "+90 (212) 282 82 12",
+        email: "",
+        badge: "🎯 Global IT Recruitment Agency (.NET)",
+        lang: "EN",
+        note: "Call Randstad Türkiye Istanbul office (+90 212 282 82 12) and ask for the Technology / IT Recruitment team."
       }
     ];
 
@@ -792,8 +864,11 @@
                 <button onclick="copyCallScript(${idx}, this)" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold">
                   🗣️ Call Script
                 </button>
+                <button onclick="autoDiscoverContact('${item.id}', '${item.company.replace(/'/g, "")}', this)" class="py-1.5 px-2.5 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 text-xs font-semibold" title="Auto-search web & LinkedIn for company phone, HR email & recruiter">
+                  🤖 Auto-Find Contact
+                </button>
                 <button onclick="promptContactInfo('${item.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold" title="Save Phone or Email">
-                  ✏️ Edit Contact
+                  ✏️ Edit
                 </button>
                 <button onclick="updateAppStatus('${item.id}', 'HR Messaged 💬'); showToast('Marked ${item.company.replace(/'/g, "")} as HR Messaged 💬', true)" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold">
                   ✅ Contacted
@@ -803,6 +878,35 @@
           </div>
         `;
       }).join("");
+    }
+
+    async function autoDiscoverContact(id, company, btn) {
+      const old = btn.textContent;
+      btn.textContent = "⏳ Searching...";
+      btn.disabled = true;
+      try {
+        const res = await fetch("http://localhost:4545/api/find-contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, company })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          STATE.applied = data.applied;
+          if (!IS_LOCAL) await ghSaveDb();
+          renderOutreach();
+          renderCrm();
+          const f = data.info || {};
+          showToast(
+            `🤖 Found for ${company}: ${f.contactPhoneDisplay || "No phone"} | ${f.contactEmail || "No email"} | ${f.contactPerson || ""}`,
+            true
+          );
+          return;
+        }
+      } catch {}
+      btn.disabled = false;
+      btn.textContent = old;
+      window.open(`https://www.google.com/search?q=${encodeURIComponent('"' + company + '" iletişim telefon insan kaynakları e-posta')}`, "_blank");
     }
 
     function copyOutreachEmail(idx, btn) {
@@ -1158,6 +1262,29 @@
         if (!STATE.applied.some(a => String(a.id) === String(id))) {
           STATE.applied.unshift(newEntry);
           await ghSaveDb();
+          // Also auto-enrich phone/email/HR via local PC server if running
+          fetch("http://localhost:4545/api/find-contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: newEntry.id, company: newEntry.company })
+          }).then(r => r.ok ? r.json() : null).then(async data => {
+            if (data && data.info && (data.info.contactPhone || data.info.contactEmail || data.info.contactPerson)) {
+              const target = STATE.applied.find(a => String(a.id) === String(newEntry.id));
+              if (target) {
+                if (data.info.contactPhone) {
+                  target.contactPhone = data.info.contactPhone;
+                  target.contactPhoneDisplay = data.info.contactPhoneDisplay;
+                }
+                if (data.info.contactEmail) target.contactEmail = data.info.contactEmail;
+                if (data.info.contactPerson && !target.notes.includes(data.info.contactPerson)) {
+                  target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
+                }
+                await ghSaveDb();
+                renderOutreach();
+                renderCrm();
+              }
+            }
+          }).catch(() => {});
         }
       }
       LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
