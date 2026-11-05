@@ -160,12 +160,25 @@
     </section>
 
     <!-- TAB 3: VIP CALL & EMAIL OUTREACH LIST -->
-    <section id="tab-outreach" class="mt-5 hidden space-y-5">
+    <section id="tab-outreach" class="mt-5 hidden space-y-4">
       <div class="glass rounded-xl p-5 border border-amber-500/30">
-        <h2 class="text-base font-bold text-white mb-1">📞 VIP Direct Call & Email Fast-Track List (Top Applied Companies)</h2>
-        <p class="text-xs text-slate-300 leading-relaxed">
-          You have only emailed <strong>PlusMinusOne (Gülay Aydın)</strong> so far. Below are the direct phones, emails, and 1-click pre-filled Turkish/English face-to-face intro requests for your best applied companies. Remember to attach <code class="text-emerald-300">Hessam_Mamagani_CV_TR.pdf</code> and <code class="text-emerald-300">Hessam_Mamagani_CV_EN.pdf</code> before hitting Send!
-        </p>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-white mb-1">📞 Dynamic Call & Email Fast-Track Center (Auto-Synced from CRM)</h2>
+            <p class="text-xs text-slate-300 leading-relaxed" id="outreachSummaryText">
+              Every job you mark as <strong>Applied</strong> automatically appears here with verified phone/email (or 1-click LinkedIn HR & Google Phone finders), a tailored Turkish/English intro email, and a 20-second call script. <strong>Rejected</strong> jobs are automatically hidden.
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <input id="outreachSearch" oninput="renderOutreach()" placeholder="Filter company or role..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200" />
+            <select id="outreachFilter" onchange="renderOutreach()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
+              <option value="ALL">All Active Applications</option>
+              <option value="DIRECT">Has Verified Phone / Email</option>
+              <option value="PENDING">Not Contacted Yet</option>
+              <option value="CONTACTED">Already Contacted 💬</option>
+            </select>
+          </div>
+        </div>
       </div>
       <div id="outreachGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
@@ -394,36 +407,63 @@
       }
     }
 
-    const VIP_OUTREACH_LIST = [
+    const COMPANY_CONTACT_DB = [
       {
-        id: "4469705963",
-        company: "Golf Dondurma (Natura Gıda)",
-        role: "İş Uygulamaları Müdürü (.NET, SQL, SAP & Web Apps)",
-        location: "İstanbul",
+        match: /tcm/i,
+        phone: "+902165742250",
+        phoneDisplay: "+90 (216) 574 22 50",
+        email: "gizemnur.masali@tcm.com.tr",
+        badge: "🔥 Direct HR Email & Ataşehir HQ",
+        lang: "TR",
+        note: "Ask for Gizemnur Masalı Hanım (İnsan Kaynakları / İşe Alım). Mention you just emailed your EN & TR CVs for Senior Software Developer & Back-end Developer (.NET)!"
+      },
+      {
+        match: /innovance/i,
+        phone: "+905495791443",
+        phoneDisplay: "+90 (549) 579 14 43",
+        email: "info@innovance.com.tr",
+        badge: "⚡ Applicant #1 + 1st-Deg HR Lead (Zuhal Öztürk)",
+        lang: "TR",
+        note: "You applied within 3 minutes as Applicant #1 and messaged your 1st-degree connection Zuhal Öztürk (HR BP Team Lead)."
+      },
+      {
+        match: /golf dondurma|natura/i,
         phone: "+902126296060",
         phoneDisplay: "+90 (212) 629 60 60",
         email: "",
         badge: "🏆 CV Downloaded Within 2 Hours!",
         lang: "TR",
-        note: "Call switchboard & ask for İnsan Kaynakları (İşe Alım). Mention they already downloaded your CV yesterday and offer a 15-min intro meeting!"
+        note: "Call switchboard & ask for İnsan Kaynakları (İşe Alım). Mention they already downloaded your CV and offer a 15-min intro meeting!"
       },
       {
-        id: "4475753955",
-        company: "arabam.com (iLab Group R&D Center)",
-        role: "Backend Developer / Kıdemli Yazılım Uzmanı (.Net Core – Agentic AI)",
-        location: "Ümraniye, İstanbul (Anel İş Merkezi — Asian Side!)",
+        match: /dünyagöz|dunyagoz/i,
+        phone: "+902123623232",
+        phoneDisplay: "+90 (212) 362 32 32",
+        email: "info@dunyagoz.com",
+        badge: "🎯 99% Stack Match (.NET Core / C# / React / SQL)",
+        lang: "TR",
+        note: "Etiler HQ (+90 212 362 32 32 / 444 4 469). Call & ask for Bilgi Teknolojileri / Yazılım İK."
+      },
+      {
+        match: /aras kargo/i,
+        phone: "+902165385500",
+        phoneDisplay: "+90 (216) 538 55 00",
+        email: "kariyer@araskargo.com.tr",
+        badge: "📍 Beykoz / Kavacık HQ + Direct HR Email",
+        lang: "TR",
+        note: "Direct HR email (kariyer@araskargo.com.tr) and Kavacık HQ switchboard (+90 216 538 55 00) on the Asian side!"
+      },
+      {
+        match: /arabam\.com/i,
         phone: "08507599000",
         phoneDisplay: "0850 759 90 00",
         email: "iletisim@arabam.com",
         badge: "🔥 Asian Side R&D + .NET Core & Agentic AI",
         lang: "TR",
-        note: "Exact match for your .NET Core + MSSQL + Redis + SignalR + Claude Code/Cursor/Agentic workflow stack!"
+        note: "Ümraniye Anel İş Merkezi R&D Center! Exact match for your .NET Core + MSSQL + Redis + SignalR + Agentic AI stack."
       },
       {
-        id: "4486042841",
-        company: "Turkish Technology (THY Teknoloji)",
-        role: "Senior Software Engineer / C# Backend REST APIs",
-        location: "Küçük Çamlıca, Üsküdar (Asian Side!) / İstanbul",
+        match: /turkish technology|thy/i,
         phone: "+902124636363",
         phoneDisplay: "+90 (212) 463 63 63",
         email: "turkishtechnology@thy.com",
@@ -432,10 +472,7 @@
         note: "Turkish Airlines tech subsidiary (2,600+ staff). Email turkishtechnology@thy.com with your TR & EN CVs!"
       },
       {
-        id: "4484384261",
-        company: "MultiSport Türkiye (Benefit Systems International)",
-        role: "AI & Automation Developer",
-        location: "Kozyatağı / Bostancı (Asian Side — 15 min from Kartal!)",
+        match: /multisport|benefit systems/i,
         phone: "08504770274",
         phoneDisplay: "0850 477 02 74",
         email: "info@benefitsystems.com.tr",
@@ -444,10 +481,7 @@
         note: "European multinational in 6 countries. Offer to drop by their Kozyatağı/Bostancı office for a 15-min coffee!"
       },
       {
-        id: "4484634702",
-        company: "QNB Türkiye / IBTech",
-        role: "AI Agent Developer",
-        location: "İstanbul / Kocaeli Teknoloji Üssü",
+        match: /qnb|ibtech/i,
         phone: "+902123185000",
         phoneDisplay: "+90 (212) 318 50 00",
         email: "ibtech.insankaynaklari@qnb.com.tr",
@@ -456,10 +490,7 @@
         note: "Direct HR email for QNB's tech arm (IBTech): ibtech.insankaynaklari@qnb.com.tr"
       },
       {
-        id: "4484649181",
-        company: "RDC Partner",
-        role: "Senior AI Engineer & Senior AI Platform Engineer",
-        location: "Ataşehir Dijitalpark Teknokent (Asian Side!)",
+        match: /rdc partner/i,
         phone: "+902164746404",
         phoneDisplay: "+90 (216) 474 64 04",
         email: "hr@rdc.com.tr",
@@ -468,22 +499,16 @@
         note: "Direct HR email (hr@rdc.com.tr) and Ataşehir phone (+90 216 474 64 04). Very close to Kartal!"
       },
       {
-        id: "4487278783",
-        company: "CTech Bilişim Teknolojileri",
-        role: "Bilgi ve Dijital Sistemler Yöneticisi",
-        location: "Teknopark İstanbul, Pendik/Kurtköy (10 min from Kartal!)",
+        match: /ctech/i,
         phone: "+902162905286",
         phoneDisplay: "+90 (216) 290 52 86",
         email: "infoctech@ctech.com.tr",
-        badge: "📍 Pendik Teknopark (Right Next to Kartal!)",
+        badge: "📍 Pendik Teknopark (10 min from Kartal!)",
         lang: "TR",
         note: "Located in Teknopark İstanbul (Kurtköy/Pendik). Call +90 216 290 52 86 and email infoctech@ctech.com.tr!"
       },
       {
-        id: "4480467279",
-        company: "Architecht (Kuveyt Türk Tech)",
-        role: "Senior Software Engineer (.NET / React)",
-        location: "Teknopark İstanbul, Pendik/Kurtköy (10 min from Kartal!)",
+        match: /architecht/i,
         phone: "+902165859970",
         phoneDisplay: "+90 (216) 585 99 70",
         email: "info@architecht.com",
@@ -492,22 +517,16 @@
         note: "Right next to Kartal in Teknopark İstanbul! Sponsors work permits & pays strong banking-tech packages."
       },
       {
-        id: "4472691700",
-        company: "Intertech (DenizBank Tech)",
-        role: "Kıdemli Yazılım Mühendisi - .Net",
-        location: "Teknopark İstanbul (Pendik) / Ümraniye",
+        match: /intertech/i,
         phone: "+902166642000",
         phoneDisplay: "+90 (216) 664 20 00",
         email: "info@intertech.com.tr",
         badge: "📍 Asian Side Banking Tech Giant",
         lang: "TR",
-        note: "Major .NET employer on the Asian side."
+        note: "DenizBank banking tech arm in Teknopark İstanbul (Pendik) / Ümraniye."
       },
       {
-        id: "4485079010",
-        company: "PATH - Product and Software House",
-        role: "Full Stack Developer (.Net + React.js)",
-        location: "İçerenköy Bay Plaza, Ataşehir (Asian Side!)",
+        match: /path/i,
         phone: "+905362402424",
         phoneDisplay: "+90 (536) 240 24 24",
         email: "info@path.com.tr",
@@ -516,10 +535,7 @@
         note: "Direct mobile/office line (+90 536 240 24 24) and email (info@path.com.tr) in Ataşehir."
       },
       {
-        id: "4484668778",
-        company: "Mirsis Bilgi Teknolojileri",
-        role: "Senior .NET Developer (Dış Ticaret)",
-        location: "Ataşehir / Ümraniye (Asian Side!)",
+        match: /mirsis/i,
         phone: "+902164647747",
         phoneDisplay: "+90 (216) 464 77 47",
         email: "info@mirsis.com.tr",
@@ -528,91 +544,259 @@
         note: "Located at Girne Cad. Ataşehir. Call +90 216 464 77 47 to ask for İK / İşe Alım."
       },
       {
-        id: "4459172925",
-        company: "adesso Turkey (German Multinational)",
-        role: "Senior AI/ML Engineer",
-        location: "İstanbul (Hybrid)",
+        match: /adesso/i,
         phone: "+902123462002",
         phoneDisplay: "+90 (212) 346 20 02",
         email: "info@adesso.com.tr",
-        badge: "🇩🇪 German Corporate ( matches Pilz GmbH background!)",
+        badge: "🇩🇪 German Corporate (Matches Pilz GmbH!)",
         lang: "EN",
-        note: "Since you currently work at German Pilz GmbH Türkiye, highlight your German corporate engineering standards!"
+        note: "Since you work at German Pilz GmbH Türkiye, highlight your German corporate engineering standards!"
       },
       {
-        id: "4485097319",
-        company: "Viennalife (Vienna Insurance Group)",
-        role: "Yazılım Kalite ve Teknik Kontrol Müdürü",
-        location: "Kozyatağı K2 Plaza, Kadıköy (Asian Side!)",
+        match: /viennalife/i,
         phone: "+902165797979",
         phoneDisplay: "+90 (216) 579 79 79",
         email: "",
         badge: "📍 Kozyatağı Asian Side HQ",
         lang: "TR",
-        note: "Austrian insurance multinational right in Kozyatağı on the Asian side."
+        note: "Austrian insurance multinational right in Kozyatağı K2 Plaza on the Asian side."
       },
       {
-        id: "4485506145",
-        company: "PEAKUP",
-        role: "Technical Team Lead",
-        location: "İstanbul",
+        match: /peakup/i,
         phone: "+902122660365",
         phoneDisplay: "+90 (212) 266 03 65",
         email: "info@peakup.org",
         badge: "🎯 Microsoft Cloud / .NET Partner",
         lang: "TR",
         note: "Major Microsoft partner in Türkiye; strong fit for your .NET + Azure + AI Agent architecture."
+      },
+      {
+        match: /obss/i,
+        phone: "+902166883436",
+        phoneDisplay: "+90 (216) 688 34 36",
+        email: "info@obss.com.tr",
+        badge: "📍 Ataşehir / Teknopark Enterprise Tech",
+        lang: "TR",
+        note: "Connected with Nilay Turgut at OBSS; Asian side office (+90 216 688 34 36)."
+      },
+      {
+        match: /pazarama/i,
+        phone: "08507247976",
+        phoneDisplay: "0850 724 79 76",
+        email: "",
+        badge: "📍 Kartal HQ (İş Bankası Group)",
+        lang: "TR",
+        note: "Right in Kartal! İş Bankası e-commerce subsidiary using .NET Core."
+      },
+      {
+        match: /pluxee|sodexo/i,
+        phone: "4447277",
+        phoneDisplay: "444 72 77",
+        email: "",
+        badge: "📍 Maltepe HQ (Next to Kartal!)",
+        lang: "EN",
+        note: "French multinational right next door in Maltepe using .NET."
+      },
+      {
+        match: /proemtia|proemti/i,
+        phone: "08507227122",
+        phoneDisplay: "0850 722 71 22",
+        email: "",
+        badge: "🏦 İş Bankası Group B2B Platform (.NET Architect)",
+        lang: "TR",
+        note: "İş Bankası group company; also reachable on WhatsApp support line 0545 279 19 29."
+      },
+      {
+        match: /hangikredi/i,
+        phone: "08506442644",
+        phoneDisplay: "0850 644 26 44",
+        email: "destek@hangikredi.com",
+        badge: "📍 Ümraniye Anel İş Merkezi (iLab Group)",
+        lang: "TR",
+        note: "iLab Group fintech on the Asian side (Ümraniye) hiring Senior .NET Core."
+      },
+      {
+        match: /aktek/i,
+        phone: "+902123930090",
+        phoneDisplay: "+90 (212) 393 00 90",
+        email: "",
+        badge: "🏢 Akkök Holding IT Subsidiary",
+        lang: "TR",
+        note: "Enterprise IT subsidiary of Akkök Holding (+90 212 393 00 90)."
+      },
+      {
+        match: /ingram micro/i,
+        phone: "+902124673800",
+        phoneDisplay: "+90 (212) 467 38 00",
+        email: "",
+        badge: "☁️ Global Cloud & Azure Distributor",
+        lang: "EN",
+        note: "Global US technology distributor in Istanbul (+90 212 467 38 00)."
+      },
+      {
+        match: /ias|canias/i,
+        phone: "+902124656560",
+        phoneDisplay: "+90 (212) 465 65 60",
+        email: "",
+        badge: "🇩🇪 ERP Software Multinational",
+        lang: "EN",
+        note: "Canias4.0 ERP software developer (+90 212 465 65 60)."
+      },
+      {
+        match: /gelecek varlık|gelecek varlik/i,
+        phone: "4444489",
+        phoneDisplay: "444 44 89",
+        email: "",
+        badge: "🏦 Leading Asset Management Fintech",
+        lang: "TR",
+        note: "Applied on both LinkedIn & Kariyer.net for Senior Full Stack Developer."
+      },
+      {
+        match: /turkcell/i,
+        phone: "05325320000",
+        phoneDisplay: "0532 532 00 00",
+        email: "",
+        badge: "📍 Maltepe Küçükyalı Plaza (10 min from Kartal!)",
+        lang: "TR",
+        note: "Küçükyalı Plaza is 10 minutes from Kartal. Already emailed Nursal Burcu Şengönül."
+      },
+      {
+        match: /lc waikiki/i,
+        phone: "4444529",
+        phoneDisplay: "444 4 529",
+        email: "",
+        badge: "👀 Application Viewed by HR!",
+        lang: "TR",
+        note: "LC Waikiki recruitment team already viewed your application on LinkedIn (.NET / React)."
       }
     ];
+
+    function getDynamicOutreachList() {
+      const seenCompanies = new Set();
+      const dynamicItems = [];
+
+      for (const app of STATE.applied) {
+        if (app.status === "Rejected") continue;
+        const compName = (app.company || "").trim();
+        if (!compName || /^gizli/i.test(compName) || /^yazılım şirketi$/i.test(compName)) continue;
+        const key = compName.toLowerCase();
+        if (seenCompanies.has(key)) continue;
+        seenCompanies.add(key);
+
+        const known = COMPANY_CONTACT_DB.find(c => c.match.test(compName)) || {};
+        const isEnglishRole = known.lang
+          ? known.lang === "EN"
+          : /\b(remote|global|emea|aws|amazon|deel|surgo|teleport|siemens|hitachi|accenture|ingram|adesso|multisport|flatiron|lucida|hilbert|ironstone)\b/i.test(`${compName} ${app.location || ""}`);
+
+        dynamicItems.push({
+          id: String(app.id),
+          company: compName,
+          role: app.title || "Senior Software Engineer",
+          location: app.location || "İstanbul",
+          status: app.status || "Applied",
+          appliedAt: app.appliedAt || "",
+          phone: app.contactPhone || known.phone || "",
+          phoneDisplay: app.contactPhoneDisplay || known.phoneDisplay || app.contactPhone || "",
+          email: app.contactEmail || known.email || "",
+          badge: known.badge || (app.status && app.status !== "Applied" ? `⭐ ${app.status}` : "🆕 Auto-Added from Applied CRM"),
+          lang: isEnglishRole ? "EN" : "TR",
+          note: app.notes || known.note || "Use 1-Click LinkedIn HR Finder or Google Phone Finder below, then call or send the tailored intro email!"
+        });
+      }
+      return dynamicItems;
+    }
 
     function buildOutreachEmail(item) {
       if (item.lang === "EN") {
         return {
           subject: `Application Follow-Up & Intro Request: ${item.role} — Hessam Mamagani`,
-          body: `Dear ${item.company} Recruitment & Technology Leadership Team,\n\nI recently submitted my application for the "${item.role}" position and wanted to reach out directly to share my CVs (English & Turkish attached) and portfolio.\n\nCurrently, as Project Development Engineer (Senior Full-Stack & AI Solutions Architect) at Pilz Türkiye (Pilz GmbH & Co. KG), I have architected and delivered 5 enterprise platforms end-to-end—spanning .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, SAP RPA, and enterprise Agentic AI/RAG workflows across 1,190+ API endpoints.\n\nAs I live on the Asian side in Kartal, I would be delighted to stop by your office for a brief 15-minute face-to-face introduction this week, or join a quick online call at your convenience.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 42 51\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          body: `Dear ${item.company} Recruitment & Technology Leadership Team,\n\nI recently submitted my application for the "${item.role}" position and wanted to reach out directly to share my CVs (English & Turkish attached) and portfolio.\n\nCurrently, as Project Development Engineer (Senior Full-Stack & AI Solutions Architect) at Pilz Türkiye (Pilz GmbH & Co. KG), I have architected and delivered 5 enterprise platforms end-to-end—spanning .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA, and enterprise Agentic AI/RAG workflows across 1,190+ API endpoints.\n\nAs I am based in Istanbul (Asian side, Kartal), I would be delighted to stop by your office for a brief 15-minute face-to-face introduction this week, or join a quick online call at your convenience.\n\nBest regards,\n\nHessam Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani-16572b107/`
         };
       }
       return {
-        subject: `Başvuru Takibi & Yüz Yüze Tanışma Talebi: ${item.role} — Hessam Mamagani`,
-        body: `Sayın ${item.company} İnsan Kaynakları ve Teknoloji Yönetimi Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu doğrudan dikkatinize sunmak ve uygun görürseniz kısa bir yüz yüze tanışma talep etmek amacıyla yazıyorum.\n\nHalihazırda Alman endüstriyel otomasyon firması Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı (Project Development Engineer) olarak görev yapmaktayım. Şirketin uçtan uca dijital dönüşümü kapsamında; .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, SAP RPA ve Kurumsal Agentic AI/RAG mimarisiyle 1.190'dan fazla API uç noktasına sahip 5 kurumsal platformu sıfırdan tasarlayıp canlıya aldım.\n\nİstanbul Anadolu Yakası'nda (Kartal) ikamet ediyorum. Ekibinizin takvimi uygun olduğunda 15-20 dakikalık yüz yüze bir tanışma görüşmesi için ofisinize memnuniyetle uğrayabilirim (veya dilerseniz kısa bir online görüşme gerçekleştirebiliriz).\n\nTürkçe ve İngilizce özgeçmişlerimi (CV) ekte, portfolyo ve GitHub bağlantılarımı ise aşağıda bilgilerinize sunarım.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 42 51\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Başvuru Takibi & Tanışma Talebi: ${item.role} — Hessam Mamagani`,
+        body: `Sayın ${item.company} İnsan Kaynakları ve Teknoloji Yönetimi Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu doğrudan dikkatinize sunmak ve uygun görürseniz kısa bir tanışma görüşmesi talep etmek amacıyla yazıyorum.\n\nHalihazırda Alman endüstriyel otomasyon firması Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı (Project Development Engineer) olarak görev yapmaktayım. Şirketin uçtan uca dijital dönüşümü kapsamında; .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP S/4HANA ve Kurumsal Agentic AI/RAG mimarisiyle 1.190'dan fazla API uç noktasına sahip 5 kurumsal platformu sıfırdan tasarlayıp canlıya aldım.\n\nİstanbul Anadolu Yakası'nda (Kartal) ikamet ediyorum. Ekibinizin takvimi uygun olduğunda 15-20 dakikalık yüz yüze bir tanışma görüşmesi için ofisinize memnuniyetle uğrayabilirim veya dilerseniz kısa bir online/telefon görüşmesi gerçekleştirebiliriz.\n\nTürkçe ve İngilizce özgeçmişlerimi (CV) ekte, portfolyo ve GitHub bağlantılarımı ise aşağıda bilgilerinize sunarım.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani-16572b107/`
       };
     }
+
+    function buildCallScript(item) {
+      return `📞 20-Second Call Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. İnsan Kaynakları / İşe Alım ekibinden yetkili kişiyle görüşebilir miyim acaba? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. Vaktinizi çok almayayım; ${item.role} pozisyonunuz için başvurumu ve CV'mi ilettim. Halihazırda Alman otomasyon firması Pilz Türkiye'de Kıdemli .NET, React ve AI Çözüm Mimarı olarak çalışıyorum — 1.190+ API uç noktasına sahip 5 kurumsal platformu uçtan uca geliştirdim. Başvurumun gözden kaçmaması ve uygun görürseniz bu hafta kısaca tanışmak için aramak istedim."`;
+    }
+
+    let CURRENT_OUTREACH_ITEMS = [];
 
     function renderOutreach() {
       const container = document.getElementById("outreachGrid");
       if (!container) return;
-      container.innerHTML = VIP_OUTREACH_LIST.map((item, idx) => {
+      const allItems = getDynamicOutreachList();
+      const rejectedCount = STATE.applied.filter(a => a.status === "Rejected").length;
+      const q = (document.getElementById("outreachSearch")?.value || "").toLowerCase();
+      const mode = document.getElementById("outreachFilter")?.value || "ALL";
+
+      CURRENT_OUTREACH_ITEMS = allItems.filter(item => {
+        if (mode === "DIRECT" && !item.phone && !item.email) return false;
+        if (mode === "PENDING" && item.status === "HR Messaged 💬") return false;
+        if (mode === "CONTACTED" && item.status !== "HR Messaged 💬") return false;
+        if (q && !`${item.company} ${item.role} ${item.location} ${item.email}`.toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      const summaryEl = document.getElementById("outreachSummaryText");
+      if (summaryEl) {
+        summaryEl.innerHTML = `Showing <strong>${CURRENT_OUTREACH_ITEMS.length} active companies</strong> dynamically synced from your Applications CRM (<strong>${rejectedCount} Rejected</strong> automatically hidden). Every new job you mark as Applied immediately appears here!`;
+      }
+
+      container.innerHTML = CURRENT_OUTREACH_ITEMS.map((item, idx) => {
         const mail = buildOutreachEmail(item);
         const mailtoHref = item.email
           ? `mailto:${item.email}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`
           : "#";
+        const liSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company + " HR OR Talent OR Recruiter OR İnsan Kaynakları")}`;
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('"' + item.company + '" iletişim telefon insan kaynakları e-posta')}`;
+        const isContacted = item.status === "HR Messaged 💬";
+
         return `
-          <div class="glass rounded-xl p-4 border border-slate-800 hover:border-amber-500/40 transition flex flex-col justify-between space-y-3">
+          <div class="glass rounded-xl p-4 border ${isContacted ? 'border-emerald-500/40' : 'border-slate-800 hover:border-amber-500/40'} transition flex flex-col justify-between space-y-3">
             <div>
               <div class="flex items-center justify-between gap-2 flex-wrap">
-                <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">${item.badge}</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isContacted ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${item.badge}</span>
                 <span class="text-xs text-slate-400">${item.location}</span>
               </div>
-              <h3 class="text-base font-bold text-white mt-1.5">${item.company}</h3>
+              <div class="flex items-center justify-between mt-1.5">
+                <h3 class="text-base font-bold text-white">${item.company}</h3>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">${item.status}</span>
+              </div>
               <p class="text-xs text-blue-300 font-medium">${item.role}</p>
               <p class="text-xs text-slate-400 mt-1.5">${item.note}</p>
             </div>
             <div class="pt-2.5 border-t border-slate-800/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between text-xs gap-2">
-                <a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>
-                ${item.email ? `<span class="text-slate-300 font-mono">${item.email}</span>` : `<span class="text-slate-500">Phone / LinkedIn HR</span>`}
+                ${item.phone
+                  ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`
+                  : `<a href="${googleSearchUrl}" target="_blank" class="text-amber-300 hover:underline font-semibold">🌐 Find Phone/Email on Google</a>`
+                }
+                ${item.email
+                  ? `<span class="text-slate-200 font-mono">${item.email}</span>`
+                  : `<a href="${liSearchUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold">🔍 Find HR on LinkedIn</a>`
+                }
               </div>
-              <div class="flex flex-wrap gap-2">
+              <div class="flex flex-wrap gap-1.5">
                 ${item.email ? `
-                  <a href="${mailtoHref}" class="flex-1 py-1.5 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold text-center">
-                    ✉️ Open Email App
+                  <a href="${mailtoHref}" class="py-1.5 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold text-center">
+                    ✉️ Email App
                   </a>
                 ` : ""}
-                <button onclick="copyOutreachEmail(${idx}, this)" class="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
-                  📋 Copy Email Text
+                <button onclick="copyOutreachEmail(${idx}, this)" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
+                  📋 Copy Email
                 </button>
-                <button onclick="updateAppStatus('${item.id}', 'HR Messaged 💬'); showToast('Marked ${item.company} as HR Messaged 💬', true)" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold">
-                  ✅ Mark Contacted
+                <button onclick="copyCallScript(${idx}, this)" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold">
+                  🗣️ Call Script
+                </button>
+                <button onclick="promptContactInfo('${item.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold" title="Save Phone or Email">
+                  ✏️ Edit Contact
+                </button>
+                <button onclick="updateAppStatus('${item.id}', 'HR Messaged 💬'); showToast('Marked ${item.company.replace(/'/g, "")} as HR Messaged 💬', true)" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold">
+                  ✅ Contacted
                 </button>
               </div>
             </div>
@@ -622,12 +806,47 @@
     }
 
     function copyOutreachEmail(idx, btn) {
-      const item = VIP_OUTREACH_LIST[idx];
+      const item = CURRENT_OUTREACH_ITEMS[idx];
+      if (!item) return;
       const mail = buildOutreachEmail(item);
       navigator.clipboard.writeText(`To: ${item.email || "HR"}\nSubject: ${mail.subject}\n\n${mail.body}`);
       const old = btn.textContent;
       btn.textContent = "✅ Copied!";
       setTimeout(() => (btn.textContent = old), 1500);
+    }
+
+    function copyCallScript(idx, btn) {
+      const item = CURRENT_OUTREACH_ITEMS[idx];
+      if (!item) return;
+      navigator.clipboard.writeText(buildCallScript(item));
+      const old = btn.textContent;
+      btn.textContent = "✅ Script Copied!";
+      setTimeout(() => (btn.textContent = old), 1500);
+    }
+
+    async function promptContactInfo(id) {
+      const existing = STATE.applied.find(a => String(a.id) === String(id));
+      if (!existing) return;
+      const phone = prompt(`Enter Phone Number for ${existing.company}:`, existing.contactPhoneDisplay || existing.contactPhone || "");
+      if (phone === null) return;
+      const email = prompt(`Enter HR / Contact Email for ${existing.company}:`, existing.contactEmail || "");
+      if (email === null) return;
+      existing.contactPhone = phone.replace(/[^\d+]/g, "");
+      existing.contactPhoneDisplay = phone.trim();
+      existing.contactEmail = email.trim();
+      if (IS_LOCAL) {
+        const res = await fetch("/api/apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(existing)
+        });
+        const data = await res.json();
+        STATE.applied = data.applied;
+      } else {
+        await ghSaveDb();
+      }
+      renderOutreach();
+      showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
     const CLIENT_NON_SOFTWARE_IT_REGEX = /\b(helpdesk|help desk|it support|teknik destek|sistem ve ağ|network engineer|network specialist|system administrator|sistem yöneticisi|bilgi işlem uzmanı|bilgi işlem sorumlusu|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|manual test|qa engineer|test automation|test uzmanı|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|flutter|react native|unity|unreal|game developer|php|laravel|golang|ruby|cobol|mainframe|embedded|gömülü|plc|scada|intern|stajyer|junior|jr\.)\b/i;
@@ -694,7 +913,7 @@
       const diffDays = Math.max(0, Math.ceil((target - now) / (1000 * 60 * 60 * 24)));
       document.getElementById("daysLeft").textContent = `${diffDays}d left`;
       document.getElementById("totalAppliedCount").textContent = STATE.applied.length;
-      const signals = STATE.applied.filter(a => a.status && a.status !== "Applied").length;
+      const signals = STATE.applied.filter(a => a.status && a.status !== "Applied" && a.status !== "Rejected").length;
       document.getElementById("activeSignalsCount").textContent = signals;
     }
 
@@ -945,7 +1164,8 @@
       updateHeaderCounts();
       renderRadarList();
       renderCrm();
-      showToast(`✅ Added "${newEntry.company}" to Tab 2 (My Applications CRM) & synced to private GitHub!`, true);
+      renderOutreach();
+      showToast(`✅ Added "${newEntry.company}" to CRM & Dynamic Call/Email List!`, true);
     }
 
     async function quickSkip(id) {
@@ -981,6 +1201,7 @@
       }
       updateHeaderCounts();
       renderCrm();
+      renderOutreach();
     }
 
     function renderCrm() {
@@ -1087,6 +1308,7 @@
       closeAddModal();
       updateHeaderCounts();
       renderCrm();
+      renderOutreach();
     }
 
     initApp();
