@@ -284,27 +284,77 @@
       return { sha: json.sha, data: JSON.parse(b64ToUtf8(json.content)) };
     }
 
+    function getLocalSkippedCache() {
+      try {
+        return JSON.parse(localStorage.getItem("jr_skipped_cache") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function addLocalSkippedCache(id) {
+      const list = new Set(getLocalSkippedCache().map(String));
+      list.add(String(id));
+      localStorage.setItem("jr_skipped_cache", JSON.stringify([...list]));
+    }
+
+    let IS_SAVING_GH = false;
+    let SAVE_QUEUED_GH = false;
+
     async function ghSaveDb() {
       if (IS_LOCAL) return;
       const token = getGhToken();
       if (!token) return;
-      const body = {
-        message: "chore(job-radar): sync applications & skipped state from web/mobile",
-        content: utf8ToB64(JSON.stringify(STATE, null, 2)),
-        sha: DB_SHA
-      };
-      const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_DB_PATH}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/vnd.github+json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-      if (res.ok) {
-        const out = await res.json();
-        DB_SHA = out.content.sha;
+      if (IS_SAVING_GH) {
+        SAVE_QUEUED_GH = true;
+        return;
+      }
+      IS_SAVING_GH = true;
+      try {
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const body = {
+            message: "chore(job-radar): sync applications & skipped state from web/mobile",
+            content: utf8ToB64(JSON.stringify(STATE, null, 2)),
+            sha: DB_SHA
+          };
+          const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_DB_PATH}`, {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: "application/vnd.github+json",
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(body)
+          });
+          if (res.ok) {
+            const out = await res.json();
+            DB_SHA = out.content.sha;
+            break;
+          } else if (res.status === 409 || res.status === 422) {
+            // SHA changed on GitHub (e.g. fast double-click or PC background sync) -> fetch latest & merge!
+            const latest = await ghFetchFile(GH_DB_PATH);
+            DB_SHA = latest.sha;
+            const mergedSkipped = new Set([
+              ...(latest.data.skipped || []).map(String),
+              ...(STATE.skipped || []).map(String),
+              ...getLocalSkippedCache().map(String)
+            ]);
+            STATE.skipped = [...mergedSkipped];
+            const existingMap = new Map((latest.data.applied || []).map(a => [String(a.id), a]));
+            for (const a of STATE.applied) {
+              existingMap.set(String(a.id), a);
+            }
+            STATE.applied = [...existingMap.values()];
+          } else {
+            break;
+          }
+        }
+      } finally {
+        IS_SAVING_GH = false;
+        if (SAVE_QUEUED_GH) {
+          SAVE_QUEUED_GH = false;
+          ghSaveDb();
+        }
       }
     }
 
@@ -399,6 +449,16 @@
         const dbFile = await ghFetchFile(GH_DB_PATH);
         DB_SHA = dbFile.sha;
         STATE = dbFile.data;
+        const mergedSkipped = new Set([
+          ...(STATE.skipped || []).map(String),
+          ...getLocalSkippedCache().map(String)
+        ]);
+        if (mergedSkipped.size > (STATE.skipped || []).length) {
+          STATE.skipped = [...mergedSkipped];
+          ghSaveDb();
+        } else {
+          STATE.skipped = [...mergedSkipped];
+        }
         updateHeaderCounts();
         renderCrm();
         renderOutreach();
@@ -991,7 +1051,7 @@
         const prevCount = LAST_SCAN_JOBS.length;
         const feedFile = await ghFetchFile(GH_FEED_PATH);
         const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
-        const skippedIds = new Set(STATE.skipped.map(s => String(s)));
+        const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
         LAST_SCAN_JOBS = (feedFile.data.jobs || []).filter(
           j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
         );
@@ -1296,6 +1356,13 @@
     }
 
     async function quickSkip(id) {
+      addLocalSkippedCache(id);
+      if (!STATE.skipped.includes(String(id))) STATE.skipped.push(String(id));
+      LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
+      document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
+      renderRadarList();
+      showToast(`✕ Hidden job #${id} permanently across all your devices.`, false);
+
       if (IS_LOCAL) {
         await fetch("/api/skip", {
           method: "POST",
@@ -1303,12 +1370,13 @@
           body: JSON.stringify({ id })
         });
       } else {
-        if (!STATE.skipped.includes(String(id))) STATE.skipped.push(String(id));
+        fetch("http://localhost:4545/api/skip", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        }).catch(() => {});
         await ghSaveDb();
       }
-      LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
-      renderRadarList();
-      showToast(`✕ Hidden job #${id} permanently across all your devices.`, false);
     }
 
     async function updateAppStatus(id, newStatus) {
