@@ -663,8 +663,9 @@
       }, 3200);
     }
 
-    async function loadCloudFeed() {
+    async function loadCloudFeed(isAutoPoll = false) {
       try {
+        const prevCount = LAST_SCAN_JOBS.length;
         const feedFile = await ghFetchFile(GH_FEED_PATH);
         const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
         const skippedIds = new Set(STATE.skipped.map(s => String(s)));
@@ -672,13 +673,20 @@
           j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
         );
         const scannedTime = feedFile.data.scannedAt ? new Date(feedFile.data.scannedAt).toLocaleString() : "Recent";
-        document.getElementById("scanStatusText").textContent = `Cloud Feed (Last synced: ${scannedTime}). Tap "Scan Fresh Jobs Now" to trigger a live cloud scan.`;
+        document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes automatically every 90s).`;
         document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
         renderRadarList();
+        if (isAutoPoll && LAST_SCAN_JOBS.length > prevCount) {
+          showToast(`🔔 ${LAST_SCAN_JOBS.length - prevCount} new matching job(s) just arrived!`, true);
+        }
       } catch (e) {
         document.getElementById("scanStatusText").textContent = "Cloud feed ready. Tap 'Scan Fresh Jobs Now' to run a scan.";
       }
     }
+
+    setInterval(() => {
+      if (!IS_LOCAL && getGhToken()) loadCloudFeed(true);
+    }, 90000);
 
     function updateHeaderCounts() {
       const target = new Date("2026-12-14T00:00:00");
@@ -729,7 +737,31 @@
           btn.innerHTML = "🔍 Scan Fresh Jobs Now";
         }
       } else {
-        // Cloud mode: trigger GitHub Action workflow_dispatch and poll/reload feed
+        // First try local PC server (http://localhost:4545) if user is on their PC -> 0 GitHub Action minutes!
+        btn.innerHTML = "⏳ Scanning...";
+        try {
+          const localRes = await fetch("http://localhost:4545/api/scan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tpr })
+          });
+          if (localRes.ok) {
+            const data = await localRes.json();
+            const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
+            const skippedIds = new Set(STATE.skipped.map(s => String(s)));
+            LAST_SCAN_JOBS = (data.jobs || []).filter(
+              j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
+            );
+            document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries} searches live via your local PC (0 GitHub Action mins used).`;
+            document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
+            renderRadarList();
+            btn.disabled = false;
+            btn.innerHTML = "🔍 Scan Fresh Jobs Now";
+            return;
+          }
+        } catch {}
+
+        // Fallback on Mobile (when away from PC): trigger GitHub Action workflow_dispatch
         btn.innerHTML = "☁️ Triggering Cloud Scan...";
         const token = getGhToken();
         try {
