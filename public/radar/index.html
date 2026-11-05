@@ -241,7 +241,7 @@
       return btoa(unescape(encodeURIComponent(str)));
     }
     function b64ToUtf8(b64) {
-      return decodeURIComponent(escape(atob(b64.replace(/\s/g, ""))));
+      return decodeURIComponent(escape(atob(b64.replace(/\s/g, "")))).replace(/^\uFEFF/, "");
     }
 
     async function ghFetchFile(filePath) {
