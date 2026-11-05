@@ -643,8 +643,10 @@
         const data = await res.json();
         STATE.applied = data.applied;
       } else {
-        STATE.applied.unshift(newEntry);
-        await ghSaveDb();
+        if (!STATE.applied.some(a => String(a.id) === String(id))) {
+          STATE.applied.unshift(newEntry);
+          await ghSaveDb();
+        }
       }
       LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
       updateHeaderCounts();
