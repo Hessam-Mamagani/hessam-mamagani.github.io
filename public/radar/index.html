@@ -1877,32 +1877,36 @@
           btn.innerHTML = "🔍 Scan Fresh Jobs Now";
         }
       } else {
-        // First try local PC server (http://localhost:4545) if user is on their PC -> 0 GitHub Action minutes!
-        btn.innerHTML = "⏳ Scanning...";
-        try {
-          const localRes = await fetch("http://localhost:4545/api/scan", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tpr })
-          });
-          if (localRes.ok) {
-            const data = await localRes.json();
-            const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
-            const skippedIds = new Set(STATE.skipped.map(s => String(s)));
-            LAST_SCAN_JOBS = (data.jobs || []).filter(
-              j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
-            );
-            document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries} searches live via your local PC (0 GitHub Action mins used).`;
-            document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
-            renderRadarList();
-            isScanRunning = false;
-            btn.disabled = false;
-            btn.innerHTML = "🔍 Scan Fresh Jobs Now";
-            return;
-          }
-        } catch {}
+        // 1. Try local PC server first, then 2. 24/7 Cloudflare Worker (3-4s instant scan), then 3. GitHub Actions fallback!
+        btn.innerHTML = "⏳ Scanning via Cloudflare 24/7...";
+        for (const scanUrl of ["http://localhost:4545/api/scan", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/scan"]) {
+          try {
+            const res = await fetch(scanUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tpr })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.mode !== "github-actions-fallback") {
+                const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
+                const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
+                LAST_SCAN_JOBS = (data.jobs || []).filter(
+                  j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
+                );
+                document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries} feeds live via 24/7 Cloudflare Edge (${data.newCount || 0} brand-new jobs).`;
+                document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
+                renderRadarList();
+                isScanRunning = false;
+                btn.disabled = false;
+                btn.innerHTML = "🔍 Scan Fresh Jobs Now";
+                return;
+              }
+            }
+          } catch {}
+        }
 
-        // Fallback on Mobile (when away from PC): trigger GitHub Action workflow_dispatch
+        // Fallback: trigger GitHub Action workflow_dispatch
         btn.innerHTML = "☁️ Triggering Cloud Scan...";
         const token = getGhToken();
         try {
