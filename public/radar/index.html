@@ -56,7 +56,7 @@
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <div class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium">
-          ⏳ Permit: <strong id="daysLeft" class="text-amber-200">14.12.2026</strong>
+          ⏳ Permit: <strong id="daysLeft" class="text-amber-200">31.12.2026</strong>
         </div>
         <div class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
           ✅ Applied: <strong id="totalAppliedCount" class="text-white text-sm">0</strong>
@@ -164,18 +164,20 @@
       <div class="glass rounded-xl p-5 border border-amber-500/30">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h2 class="text-base font-bold text-white mb-1">📞 Dynamic Call & Email Fast-Track Center (Auto-Synced from CRM)</h2>
+            <h2 class="text-base font-bold text-white mb-1">🌍 Global Tech Unicorns & VIP Outreach Command Center (Metro + Remote + Applied CRM)</h2>
             <p class="text-xs text-slate-300 leading-relaxed" id="outreachSummaryText">
-              Every job you mark as <strong>Applied</strong> automatically appears here with verified phone/email (or 1-click LinkedIn HR & Google Phone finders), a tailored Turkish/English intro email, and a 20-second call script. <strong>Rejected</strong> jobs are automatically hidden.
+              Combines your <strong>Applied CRM</strong> with <strong>Proactive Global Software Giants & Unicorns in Istanbul (Metro-Accessible) & Remote EMEA</strong>. Includes 1-Click Gmail Launcher, CTO/Engineering Director LinkedIn Finder, Live Website Contact Scraper, and Office/Call Strategy.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <input id="outreachSearch" oninput="renderOutreach()" placeholder="Filter company or role..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200" />
+            <input id="outreachSearch" oninput="renderOutreach()" placeholder="Filter company, metro, stack..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200" />
             <select id="outreachFilter" onchange="renderOutreach()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
-              <option value="ALL">All Active Applications</option>
-              <option value="DIRECT">Has Verified Phone / Email</option>
-              <option value="PENDING">Not Contacted Yet</option>
-              <option value="CONTACTED">Already Contacted 💬</option>
+              <option value="ALL">All (Applied + Global Tech Radar)</option>
+              <option value="GLOBAL_RADAR">🚀 Proactive Global Tech & Unicorns (Unapplied)</option>
+              <option value="SIGNALS">⭐ Top Signals & Dream Applied Roles</option>
+              <option value="DIRECT">📞 Has Verified Phone / Email</option>
+              <option value="PENDING">⏳ Not Contacted Yet</option>
+              <option value="CONTACTED">💬 Already Contacted</option>
             </select>
           </div>
         </div>
@@ -800,6 +802,222 @@
         badge: "🎯 Global IT Recruitment Agency (.NET)",
         lang: "EN",
         note: "Call Randstad Türkiye Istanbul office (+90 212 282 82 12) and ask for the Technology / IT Recruitment team."
+      },
+      {
+        match: /deel/i,
+        phone: "",
+        phoneDisplay: "",
+        email: "",
+        badge: "🦄 $17.3B Global FinTech & EOR Giant (USD Pay + Visa Sponsor)",
+        lang: "EN",
+        note: "Deel owns its own Turkish EOR entity and sponsors work permits directly. Role builds Accounting & Invoice ERP integrations (exact match to PilzPortal & WebRunner!). Message Deel EMEA Engineering Managers on LinkedIn."
+      },
+      {
+        match: /aws|amazon/i,
+        phone: "+902123711500",
+        phoneDisplay: "+90 (212) 371 15 00",
+        email: "",
+        badge: "☁️ Big Tech — Esentepe / Levent M2 Metro",
+        lang: "EN",
+        note: "AWS Istanbul office is right at Esentepe/Levent M2 Metro station (Ferko Signature). Follow up with Sueda Erkan & AWS Turkey Solutions Architecture Lead on LinkedIn."
+      }
+    ];
+
+    const PROACTIVE_GLOBAL_TARGETS = [
+      {
+        id: "PROACTIVE-INSIDER",
+        company: "Insider",
+        role: "Senior Full-Stack / AI Solutions Architect (Proactive Application)",
+        location: "🚇 Kağıthane / Levent (M2/M7 Metro) · Global Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "+902129881016",
+        phoneDisplay: "+90 (212) 988 10 16",
+        email: "talent@useinsider.com",
+        badge: "🦄 #1 Global AI SaaS Unicorn in Istanbul ($2B+ | 28 Countries)",
+        lang: "EN",
+        isProactive: true,
+        priority: 100,
+        note: "English-first global engineering hub in Istanbul that routinely sponsors foreign engineers' Çalışma İzni. Strategy: Send 1-Click Gmail to talent@useinsider.com + DM VP of Engineering / CTO on LinkedIn (do NOT walk in without appointment; plaza security requires QR pass)."
+      },
+      {
+        id: "PROACTIVE-MICROSOFT",
+        company: "Microsoft Türkiye",
+        role: "Senior Cloud & AI Solutions Architect (.NET 10 / Azure / Agentic AI)",
+        location: "🚇 Levent (M2 Metro — Bellevue Residence)",
+        status: "Proactive Target 🎯",
+        phone: "+902123705555",
+        phoneDisplay: "+90 (212) 370 55 55",
+        email: "",
+        badge: "🌍 #1 Global Tech Giant — .NET / Azure / Copilot AI",
+        lang: "EN",
+        isProactive: true,
+        priority: 99,
+        note: "Your 1,190+ endpoint Azure + .NET 10 + OpenAI/Claude RAG ecosystem + VS Marketplace AI extension is a textbook fit for Microsoft Customer Success Engineering (CSE) / Solutions Architecture. Use '🔎 Find CTO / Eng Lead' below to DM Microsoft Türkiye Engineering Leads."
+      },
+      {
+        id: "PROACTIVE-PAPARA",
+        company: "Papara",
+        role: "Senior .NET Core & React Architect / Principal Software Engineer",
+        location: "🚇 Üsküdar / Çamlıca (M5 Metro)",
+        status: "Proactive Target 🎯",
+        phone: "+908503400340",
+        phoneDisplay: "0850 340 03 40",
+        email: "kariyer@papara.com",
+        badge: "🦄 FinTech Unicorn — Largest High-Scale .NET 9/10 & C# Hub",
+        lang: "EN",
+        isProactive: true,
+        priority: 98,
+        note: "Papara runs one of EMEA's largest modern .NET Core + C# + React + Redis architectures on the Asian Side! Strategy: Email kariyer@papara.com with your EN & TR CVs + Pilz GM Reference Letter and message Papara CTO / Engineering Directors on LinkedIn."
+      },
+      {
+        id: "PROACTIVE-MIDAS",
+        company: "Midas",
+        role: "Senior Full-Stack / Backend Software Architect",
+        location: "🚇 Levent Kanyon (M2 Metro — Direct Exit!)",
+        status: "Proactive Target 🎯",
+        phone: "08502412241",
+        phoneDisplay: "0850 241 22 41",
+        email: "talent@getmidas.com",
+        badge: "🚀 Top FinTech Scale-Up in Istanbul (Top USD-Indexed Pay)",
+        lang: "EN",
+        isProactive: true,
+        priority: 97,
+        note: "Located right inside Kanyon Office (direct underground connection from Levent M2 Metro!). World-class engineering culture and top-of-market compensation. Email talent@getmidas.com + DM Midas Engineering Managers."
+      },
+      {
+        id: "PROACTIVE-SAHIBINDEN",
+        company: "sahibinden.com (Sahibinden Teknoloji)",
+        role: "Senior Software Architect / Lead Full-Stack & AI Engineer",
+        location: "🚇 Kozyatağı (M4 Metro — 20 min from Kartal!)",
+        status: "Proactive Target 🎯",
+        phone: "+902165777000",
+        phoneDisplay: "+90 (216) 577 70 00",
+        email: "ik@sahibinden.com",
+        badge: "🚇 20 Min on M4 Metro + Certified R&D Center (Fast-Track Permit!)",
+        lang: "TR",
+        isProactive: true,
+        priority: 96,
+        note: "DeBaren Plaza in Kozyatağı is a straight 20-minute ride on the M4 Metro from Kartal! Certified Ministry R&D Center (Ar-Ge Merkezi) with fast-track Çalışma İzni exemption. Call +90 216 577 70 00 & email ik@sahibinden.com."
+      },
+      {
+        id: "PROACTIVE-TRENDYOL",
+        company: "Trendyol Group (Trendyol Tech)",
+        role: "Senior Software Engineer / AI & Platform Architect",
+        location: "🚇 Maslak (M2 İTÜ Ayazağa Metro) · Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "+902123310200",
+        phoneDisplay: "+90 (212) 331 02 00",
+        email: "tech.talent@trendyol.com",
+        badge: "🌍 Global Decacorn ($16B+ | Europe & Gulf Expansion)",
+        lang: "EN",
+        isProactive: true,
+        priority: 95,
+        note: "Campus is right at İTÜ Ayazağa M2 Metro station. Massive engineering & AI/LLM teams building global e-commerce infrastructure. Email tech.talent@trendyol.com & DM Trendyol Tech Talent Acquisition."
+      },
+      {
+        id: "PROACTIVE-HEPSIBURADA",
+        company: "Hepsiburada (NASDAQ: HEPS)",
+        role: "Senior .NET Core & React Software Architect",
+        location: "🚇 Mecidiyeköy (M2 Metro — Trump Towers) · Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "+902123815200",
+        phoneDisplay: "+90 (212) 381 52 00",
+        email: "ik@hepsiburada.com",
+        badge: "📈 NASDAQ-Listed Tech Giant (.NET Core + React + AI)",
+        lang: "EN",
+        isProactive: true,
+        priority: 94,
+        note: "Direct underground access from Şişli-Mecidiyeköy M2 Metro (via Marmaray -> Yenikapı -> M2). Large .NET Core, C#, React, and AI engineering teams + certified R&D Center."
+      },
+      {
+        id: "PROACTIVE-IYZICO",
+        company: "iyzico (Prosus / PayU Global)",
+        role: "Senior Software Engineer / Solutions Architect",
+        location: "🚇 Altunizade (M5 Metro) · Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "+902165990100",
+        phoneDisplay: "+90 (216) 599 01 00",
+        email: "hr@iyzico.com",
+        badge: "💳 Global FinTech Giant on the Asian Side",
+        lang: "EN",
+        isProactive: true,
+        priority: 93,
+        note: "Owned by global tech giant Prosus ($100B+ group). Asian-side office in Altunizade (easy M4 -> Ünalan -> Metrobüs/M5). Email hr@iyzico.com and message Engineering Leads on LinkedIn."
+      },
+      {
+        id: "PROACTIVE-PARAM",
+        company: "Param Tech",
+        role: "Senior .NET Core / Full-Stack Architect",
+        location: "🚇 Ümraniye / Maslak Metro · Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "08509889999",
+        phoneDisplay: "0850 988 99 99",
+        email: "ik@param.com.tr",
+        badge: "🏦 Massive .NET Core + React FinTech Ecosystem",
+        lang: "TR",
+        isProactive: true,
+        priority: 92,
+        note: "Param Tech is one of Turkey's largest .NET Core & C# financial technology employers expanding across Europe (UK/Czechia/Germany). Email ik@param.com.tr with your TR+Ref PDF."
+      },
+      {
+        id: "PROACTIVE-DELIVERYHERO",
+        company: "Yemeksepeti / Delivery Hero Tech Hub",
+        role: "Senior Full-Stack / AI Engineer",
+        location: "🚇 Levent (M2 Metro — Park Dedeman) · Hybrid",
+        status: "Proactive Target 🎯",
+        phone: "+902123591800",
+        phoneDisplay: "+90 (212) 359 18 00",
+        email: "ik@yemeksepeti.com",
+        badge: "🇩🇪 German DAX Tech Giant (Delivery Hero SE)",
+        lang: "EN",
+        isProactive: true,
+        priority: 91,
+        note: "Part of Berlin-based Delivery Hero SE! Right at Levent M2 Metro. Your German corporate track record at Pilz GmbH + modern Full-Stack/AI stack is a strong fit."
+      },
+      {
+        id: "PROACTIVE-COLENDI",
+        company: "Colendi",
+        role: "Senior .NET / Full-Stack & AI Architect",
+        location: "🚇 Levent (M2 Metro) · Global FinTech",
+        status: "Proactive Target 🎯",
+        phone: "+902129093593",
+        phoneDisplay: "+90 (212) 909 35 93",
+        email: "hr@colendi.com",
+        badge: "🦄 $700M+ AI & FinTech Scale-Up (Istanbul / London)",
+        lang: "EN",
+        isProactive: true,
+        priority: 90,
+        note: "Fast-growing global AI credit/banking fintech headquartered in London & Levent M2 Metro. Email hr@colendi.com + DM Engineering Directors."
+      },
+      {
+        id: "PROACTIVE-CANONICAL",
+        company: "Canonical (Ubuntu)",
+        role: "Senior Full-Stack Engineer (React / TypeScript / Cloud / AI)",
+        location: "🌍 Global Remote in Türkiye (USD Compensation)",
+        status: "Proactive Target 🎯",
+        phone: "",
+        phoneDisplay: "",
+        email: "",
+        badge: "🐧 Global Open-Source & Cloud Giant (Hires Continuously in TR)",
+        lang: "EN",
+        isProactive: true,
+        priority: 89,
+        note: "Canonical actively hires across Istanbul for remote engineering roles paying in USD. Your published VS Code / Open VSX open-source AI extension + React 19/TS architecture stands out strongly."
+      },
+      {
+        id: "PROACTIVE-FESTO-BOSCH",
+        company: "Bosch Digital / Festo Türkiye",
+        role: "Lead Software Architect / Digital Transformation & AI Lead",
+        location: "🚇 Küçükyalı M4 Metro (Bosch) / Tuzla (Festo)",
+        status: "Proactive Target 🎯",
+        phone: "+902164320000",
+        phoneDisplay: "+90 (216) 432 00 00",
+        email: "info_tr@festo.com",
+        badge: "🇩🇪 Global Engineering Tech (10 min on M4 Metro at Küçükyalı!)",
+        lang: "EN",
+        isProactive: true,
+        priority: 88,
+        note: "Bosch Türkiye HQ is right at Küçükyalı M4 Metro (10 mins from Kartal!) and Festo is Pilz GmbH's direct German peer. Walk-in / reception drop-off with your signed Pilz GM letter actually works at industrial HQs!"
       }
     ];
 
@@ -818,7 +1036,13 @@
         const known = COMPANY_CONTACT_DB.find(c => c.match.test(compName)) || {};
         const isEnglishRole = known.lang
           ? known.lang === "EN"
-          : /\b(remote|global|emea|aws|amazon|deel|surgo|teleport|siemens|hitachi|accenture|ingram|adesso|multisport|flatiron|lucida|hilbert|ironstone)\b/i.test(`${compName} ${app.location || ""}`);
+          : /\b(remote|global|emea|aws|amazon|deel|surgo|teleport|siemens|hitachi|accenture|ingram|adesso|multisport|flatiron|lucida|hilbert|ironstone|btcturk|insider|midas)\b/i.test(`${compName} ${app.location || ""}`);
+
+        let priority = 50;
+        if (app.status === "CV Downloaded ⭐") priority = 110;
+        else if (app.status === "Viewed 👀") priority = 105;
+        else if (/hitachi|siemens|deel|aws|btcturk|turkcell|architecht|pazarama|enka|pluxee|obss|adesso/i.test(compName)) priority = 95;
+        else if (app.contactEmail || known.email || app.contactPhone || known.phone) priority = 75;
 
         dynamicItems.push({
           id: String(app.id),
@@ -832,27 +1056,51 @@
           email: app.contactEmail || known.email || "",
           badge: known.badge || (app.status && app.status !== "Applied" ? `⭐ ${app.status}` : "🆕 Auto-Added from Applied CRM"),
           lang: isEnglishRole ? "EN" : "TR",
-          note: app.notes || known.note || "Use 1-Click LinkedIn HR Finder or Google Phone Finder below, then call or send the tailored intro email!"
+          isProactive: false,
+          priority,
+          note: app.notes || known.note || "Use 1-Click CTO/HR LinkedIn Finder or Auto-Scrape Contact below, then send the executive intro email!"
         });
       }
-      return dynamicItems;
+
+      for (const target of PROACTIVE_GLOBAL_TARGETS) {
+        const key = target.company.toLowerCase().split("(")[0].trim();
+        const alreadyInCrm = [...seenCompanies].some(c => c.includes(key) || key.includes(c));
+        if (!alreadyInCrm) {
+          dynamicItems.push(target);
+        }
+      }
+
+      return dynamicItems.sort((a, b) => (b.priority || 50) - (a.priority || 50));
     }
 
     function buildOutreachEmail(item) {
+      if (item.isProactive) {
+        if (item.lang === "EN") {
+          return {
+            subject: `Senior Full-Stack & AI Solutions Architect (.NET 10 / React 19 / Agentic AI) — Hessam Mamagani`,
+            body: `Dear ${item.company} Engineering Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company} is at the top of my list of global technology companies in Istanbul where I want to contribute at scale.\n\nCurrently, as Senior Full-Stack & AI Solutions Architect (Project Development Engineer) at Pilz Türkiye (Pilz GmbH & Co. KG), I architected and built 5 production enterprise platforms end-to-end across 1,190+ REST API endpoints and 215+ database tables:\n• Modern Full-Stack & Cloud SaaS: .NET 10 (Clean Architecture, CQRS/MediatR), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SignalR, and Microsoft Azure.\n• Production Agentic AI & RAG: Multi-provider OpenAI GPT & Anthropic Claude orchestration, autonomous tool-calling, vector search, and NL-to-SQL agents (InsightfulAI.online), plus a published open-source AI extension on the VS Code Marketplace.\n• Engineering Leadership & Mentorship: Previously trained 150+ software engineers across 640+ hours of live full-stack coding cohorts from zero to production.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I hold an active work permit in Istanbul (Pilz Türkiye, valid through 31.12.2026) and can easily commute anywhere via Metro or join a quick 15-minute online call to demo my live platforms (eventracer.com/en, pilztr.online/portal).\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          };
+        }
+        return {
+          subject: `Kıdemli Full-Stack & AI Çözüm Mimarı (.NET 10 / React 19 / Agentic AI) — Hessam Mamagani`,
+          body: `Sayın ${item.company} Teknoloji Yönetimi (CTO / Mühendislik Liderliği) ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu ve mühendislik kültürünü yakından takip ediyor; ekibinizdeki mevcut veya açılacak Kıdemli Yazılım Mimarı / Full-Stack & AI Mühendisi pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Pilz Türkiye (Pilz GmbH) bünyesinde Kıdemli Full-Stack & AI Çözüm Mimarı olarak; .NET 10 (Clean Architecture, CQRS), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA ve OpenAI/Claude tabanlı Agentic AI/RAG mimarisiyle 1.190+ REST API endpoint ve 215+ tabloya sahip 5 kurumsal platformu uçtan uca tasarlayıp canlıya aldım. Ayrıca daha önce 640+ saat canlı yazılım eğitimiyle 150'den fazla mühendisi sıfırdan ileri seviye Full-Stack geliştirici olarak yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz canlı sistemlerimi (eventracer.com/en, pilztr.online/portal) göstermek üzere 15 dakikalık bir online görüşme veya ofisinizde yüz yüze tanışma talep ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        };
+      }
+
       if (item.lang === "EN") {
         return {
-          subject: `Application Follow-Up & Intro Request: ${item.role} — Hessam Mamagani`,
-          body: `Dear ${item.company} Recruitment & Technology Leadership Team,\n\nI recently submitted my application for the "${item.role}" position and wanted to reach out directly to share my CVs (English & Turkish attached) and portfolio.\n\nCurrently, as Project Development Engineer (Senior Full-Stack & AI Solutions Architect) at Pilz Türkiye (Pilz GmbH & Co. KG), I have architected and delivered 5 enterprise platforms end-to-end—spanning .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA, and enterprise Agentic AI/RAG workflows across 1,190+ API endpoints.\n\nAs I am based in Istanbul (Asian side, Kartal), I would be delighted to stop by your office for a brief 15-minute face-to-face introduction this week, or join a quick online call at your convenience.\n\nBest regards,\n\nHessam Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani-16572b107/`
+          subject: `Application Follow-Up & Live Architecture Demo: ${item.role} — Hessam Mamagani`,
+          body: `Dear ${item.company} Engineering Leadership & Talent Acquisition Team,\n\nI recently applied for the "${item.role}" position and wanted to follow up directly with my CV and the signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nAs Senior Full-Stack & AI Solutions Architect at Pilz Türkiye (Pilz GmbH & Co. KG), I have architected and delivered 5 production platforms end-to-end—spanning .NET 10 (CQRS/Clean Architecture), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA, and multi-LLM Agentic AI/RAG workflows across 1,190+ API endpoints and 215+ DB tables, in addition to mentoring 150+ engineers across 640+ hours of live coding instruction.\n\nI am based in Istanbul with an active work permit (valid through 31.12.2026) and can easily reach your office by Metro for a 15-minute introduction or demo my live systems (eventracer.com/en, pilztr.online/portal) on a brief call this week.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
       return {
-        subject: `Başvuru Takibi & Tanışma Talebi: ${item.role} — Hessam Mamagani`,
-        body: `Sayın ${item.company} İnsan Kaynakları ve Teknoloji Yönetimi Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu doğrudan dikkatinize sunmak ve uygun görürseniz kısa bir tanışma görüşmesi talep etmek amacıyla yazıyorum.\n\nHalihazırda Alman endüstriyel otomasyon firması Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı (Project Development Engineer) olarak görev yapmaktayım. Şirketin uçtan uca dijital dönüşümü kapsamında; .NET 9/10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP S/4HANA ve Kurumsal Agentic AI/RAG mimarisiyle 1.190'dan fazla API uç noktasına sahip 5 kurumsal platformu sıfırdan tasarlayıp canlıya aldım.\n\nİstanbul Anadolu Yakası'nda (Kartal) ikamet ediyorum. Ekibinizin takvimi uygun olduğunda 15-20 dakikalık yüz yüze bir tanışma görüşmesi için ofisinize memnuniyetle uğrayabilirim veya dilerseniz kısa bir online/telefon görüşmesi gerçekleştirebiliriz.\n\nTürkçe ve İngilizce özgeçmişlerimi (CV) ekte, portfolyo ve GitHub bağlantılarımı ise aşağıda bilgilerinize sunarım.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani-16572b107/`
+        subject: `Başvuru Takibi & Referans Mektubu: ${item.role} — Hessam Mamagani`,
+        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu, özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu (ekte) doğrudan dikkatinize sunmak istedim.\n\nHalihazırda Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı olarak; .NET 10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA ve Kurumsal Agentic AI/RAG mimarisiyle 1.190+ API uç noktası ve 215+ tabloya sahip 5 kurumsal platformu sıfırdan tasarlayıp canlıya aldım. Bunun öncesinde 640+ saat canlı eğitimle 150+ yazılım mühendisi yetiştirdim.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim (31.12.2026'ya kadar geçerli) bulunmaktadır. Uygun görürseniz bu hafta 15 dakikalık bir online görüşmede canlı sistemlerimi (eventracer.com/en, pilztr.online/portal) paylaşmak veya Metro ile ofisinize uğrayarak yüz yüze tanışmak isterim.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
 
     function buildCallScript(item) {
-      return `📞 20-Second Call Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. İnsan Kaynakları / İşe Alım ekibinden yetkili kişiyle görüşebilir miyim acaba? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. Vaktinizi çok almayayım; ${item.role} pozisyonunuz için başvurumu ve CV'mi ilettim. Halihazırda Alman otomasyon firması Pilz Türkiye'de Kıdemli .NET, React ve AI Çözüm Mimarı olarak çalışıyorum — 1.190+ API uç noktasına sahip 5 kurumsal platformu uçtan uca geliştirdim. Başvurumun gözden kaçmaması ve uygun görürseniz bu hafta kısaca tanışmak için aramak istedim."`;
+      return `📞 20-Second Call & Work-Permit Qualification Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. Yazılım / Teknoloji İK (Talent Acquisition) ekibinden yetkili kişiyle görüşebilir miyim? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. ${item.role} pozisyonu için CV'mi ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubunu ilettim. Pilz Türkiye'de .NET 10, React 19 ve AI mimarisiyle 1.190+ API'lik 5 kurumsal sistemi uçtan uca geliştirdim. Şu an 31 Aralık'a kadar aktif çalışma iznim mevcut — İK süreciniz yabancı uzman çalışma izni transferini destekliyor mu ve bu hafta 15 dakikalık bir tanışma görüşmesi planlayabilir miyiz?"`;
     }
 
     let CURRENT_OUTREACH_ITEMS = [];
@@ -866,71 +1114,84 @@
       const mode = document.getElementById("outreachFilter")?.value || "ALL";
 
       CURRENT_OUTREACH_ITEMS = allItems.filter(item => {
+        if (mode === "GLOBAL_RADAR" && !item.isProactive) return false;
+        if (mode === "SIGNALS" && !item.isProactive && (item.priority || 50) < 90) return false;
         if (mode === "DIRECT" && !item.phone && !item.email) return false;
         if (mode === "PENDING" && item.status === "HR Messaged 💬") return false;
         if (mode === "CONTACTED" && item.status !== "HR Messaged 💬") return false;
-        if (q && !`${item.company} ${item.role} ${item.location} ${item.email}`.toLowerCase().includes(q)) return false;
+        if (q && !`${item.company} ${item.role} ${item.location} ${item.email} ${item.badge} ${item.note}`.toLowerCase().includes(q)) return false;
         return true;
       });
 
       const summaryEl = document.getElementById("outreachSummaryText");
       if (summaryEl) {
-        summaryEl.innerHTML = `Showing <strong>${CURRENT_OUTREACH_ITEMS.length} active companies</strong> dynamically synced from your Applications CRM (<strong>${rejectedCount} Rejected</strong> automatically hidden). Every new job you mark as Applied immediately appears here!`;
+        const proactiveCount = allItems.filter(i => i.isProactive).length;
+        summaryEl.innerHTML = `Showing <strong>${CURRENT_OUTREACH_ITEMS.length} target companies</strong> (including <strong>${proactiveCount} Proactive Global Tech Giants & Unicorns</strong> accessible via Metro/Remote + your active Applied CRM; <strong>${rejectedCount} Rejected</strong> hidden). Attach <code>Hessam_Mamagani_CV_EN.pdf</code> or <code>Hessam_Mamagani_CV_ve_Referans_TR.pdf</code> when sending!`;
       }
 
       container.innerHTML = CURRENT_OUTREACH_ITEMS.map((item, idx) => {
         const mail = buildOutreachEmail(item);
-        const mailtoHref = item.email
-          ? `mailto:${item.email}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`
-          : "#";
-        const liSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company + " HR OR Talent OR Recruiter OR İnsan Kaynakları")}`;
-        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('"' + item.company + '" iletişim telefon insan kaynakları e-posta')}`;
+        const mailtoHref = `mailto:${item.email || ""}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+        const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+        const liCtoUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company.split("(")[0].trim() + " CTO OR VP Engineering OR Engineering Manager OR Yazılım Müdürü")}`;
+        const liSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company.split("(")[0].trim() + " Talent Acquisition OR Technical Recruiter OR İnsan Kaynakları")}`;
+        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('"' + item.company.split("(")[0].trim() + '" iletişim telefon insan kaynakları kariyer e-posta')}`;
         const isContacted = item.status === "HR Messaged 💬";
+        const isProactive = !!item.isProactive;
 
         return `
-          <div class="glass rounded-xl p-4 border ${isContacted ? 'border-emerald-500/40' : 'border-slate-800 hover:border-amber-500/40'} transition flex flex-col justify-between space-y-3">
+          <div class="glass rounded-xl p-4 border ${isContacted ? 'border-emerald-500/40' : isProactive ? 'border-blue-500/40 hover:border-blue-400' : 'border-slate-800 hover:border-amber-500/40'} transition flex flex-col justify-between space-y-3">
             <div>
               <div class="flex items-center justify-between gap-2 flex-wrap">
-                <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isContacted ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${item.badge}</span>
+                <span class="px-2 py-0.5 rounded text-[11px] font-bold ${isContacted ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : isProactive ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${item.badge}</span>
                 <span class="text-xs text-slate-400">${item.location}</span>
               </div>
               <div class="flex items-center justify-between mt-1.5">
                 <h3 class="text-base font-bold text-white">${item.company}</h3>
-                <span class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">${item.status}</span>
+                <span class="text-[11px] px-2 py-0.5 rounded ${isProactive ? 'bg-indigo-950 text-indigo-300 border border-indigo-500/30' : 'bg-slate-800 text-slate-300'}">${item.status}</span>
               </div>
               <p class="text-xs text-blue-300 font-medium">${item.role}</p>
-              <p class="text-xs text-slate-400 mt-1.5">${item.note}</p>
+              <p class="text-xs text-slate-300/90 mt-1.5 leading-relaxed">${item.note}</p>
             </div>
             <div class="pt-2.5 border-t border-slate-800/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between text-xs gap-2">
                 ${item.phone
                   ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`
-                  : `<a href="${googleSearchUrl}" target="_blank" class="text-amber-300 hover:underline font-semibold">🌐 Find Phone/Email on Google</a>`
+                  : `<a href="${googleSearchUrl}" target="_blank" class="text-amber-300 hover:underline font-semibold">🌐 Find Phone/Email</a>`
                 }
                 ${item.email
                   ? `<span class="text-slate-200 font-mono">${item.email}</span>`
-                  : `<a href="${liSearchUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold">🔍 Find HR on LinkedIn</a>`
+                  : `<span class="text-slate-400 text-[11px]">Click 🤖 Auto-Find or LinkedIn below</span>`
                 }
               </div>
+              <div class="flex flex-wrap gap-1.5 pt-0.5">
+                <a href="${liCtoUrl}" target="_blank" class="py-1 px-2 rounded bg-indigo-600/25 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/30 text-[11px] font-semibold">
+                  🔎 Find CTO / Eng Lead
+                </a>
+                <a href="${liSearchUrl}" target="_blank" class="py-1 px-2 rounded bg-blue-600/20 hover:bg-blue-600/35 text-blue-300 border border-blue-500/30 text-[11px] font-semibold">
+                  👩‍💼 Find Tech Recruiter
+                </a>
+              </div>
               <div class="flex flex-wrap gap-1.5">
-                ${item.email ? `
-                  <a href="${mailtoHref}" class="py-1.5 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold text-center">
-                    ✉️ Email App
-                  </a>
-                ` : ""}
+                <a href="${gmailHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-red-600/85 hover:bg-red-500 text-white text-xs font-semibold text-center" title="Open pre-filled email in Gmail Web (attach your CV PDF!)">
+                  ✉️ Open Gmail
+                </a>
+                <a href="${mailtoHref}" class="py-1.5 px-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold text-center">
+                  📨 Mail App
+                </a>
                 <button onclick="copyOutreachEmail(${idx}, this)" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold">
                   📋 Copy Email
                 </button>
                 <button onclick="copyCallScript(${idx}, this)" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold">
                   🗣️ Call Script
                 </button>
-                <button onclick="autoDiscoverContact('${item.id}', '${item.company.replace(/'/g, "")}', this)" class="py-1.5 px-2.5 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 text-xs font-semibold" title="Auto-search web & LinkedIn for company phone, HR email & recruiter">
-                  🤖 Auto-Find Contact
+                <button onclick="autoDiscoverContact('${item.id}', '${item.company.replace(/'/g, "")}', this)" class="py-1.5 px-2.5 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 text-xs font-semibold" title="Scrape web & LinkedIn for company phone, HR email & CTO/recruiter">
+                  🤖 Scrape Contact
                 </button>
-                <button onclick="promptContactInfo('${item.id}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold" title="Save Phone or Email">
+                <button onclick="promptContactInfo('${item.id}', '${item.company.replace(/'/g, "")}', '${item.role.replace(/'/g, "")}', '${item.location.replace(/'/g, "")}')" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold" title="Save Phone or Email">
                   ✏️ Edit
                 </button>
-                <button onclick="updateAppStatus('${item.id}', 'HR Messaged 💬'); showToast('Marked ${item.company.replace(/'/g, "")} as HR Messaged 💬', true)" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold">
+                <button onclick="markOutreachContacted(${idx})" class="py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold">
                   ✅ Contacted
                 </button>
               </div>
@@ -953,10 +1214,21 @@
         if (res.ok) {
           const data = await res.json();
           STATE.applied = data.applied;
+          const f = data.info || {};
+          const pItem = PROACTIVE_GLOBAL_TARGETS.find(t => String(t.id) === String(id));
+          if (pItem) {
+            if (f.contactPhone && !pItem.phone) {
+              pItem.phone = f.contactPhone;
+              pItem.phoneDisplay = f.contactPhoneDisplay;
+            }
+            if (f.contactEmail && !pItem.email) pItem.email = f.contactEmail;
+            if (f.contactPerson && !pItem.note.includes(f.contactPerson)) {
+              pItem.note = `${pItem.note} | 👤 Found on LinkedIn: ${f.contactPerson}`;
+            }
+          }
           if (!IS_LOCAL) await ghSaveDb();
           renderOutreach();
           renderCrm();
-          const f = data.info || {};
           showToast(
             `🤖 Found for ${company}: ${f.contactPhoneDisplay || "No phone"} | ${f.contactEmail || "No email"} | ${f.contactPerson || ""}`,
             true
@@ -988,13 +1260,70 @@
       setTimeout(() => (btn.textContent = old), 1500);
     }
 
-    async function promptContactInfo(id) {
-      const existing = STATE.applied.find(a => String(a.id) === String(id));
-      if (!existing) return;
-      const phone = prompt(`Enter Phone Number for ${existing.company}:`, existing.contactPhoneDisplay || existing.contactPhone || "");
+    async function markOutreachContacted(idx) {
+      const item = CURRENT_OUTREACH_ITEMS[idx];
+      if (!item) return;
+      const existing = STATE.applied.find(a => String(a.id) === String(item.id));
+      if (existing) {
+        await updateAppStatus(item.id, "HR Messaged 💬");
+      } else {
+        const newEntry = {
+          id: String(item.id),
+          company: item.company,
+          title: item.role,
+          location: item.location,
+          platform: "Direct Executive Outreach",
+          appliedAt: new Date().toISOString().slice(0, 10),
+          status: "HR Messaged 💬",
+          cvUsed: item.lang === "EN" ? "EN" : "TR",
+          salaryQuote: "190.000 - 240.000 TL Net",
+          url: "#",
+          contactPhone: item.phone || "",
+          contactPhoneDisplay: item.phoneDisplay || "",
+          contactEmail: item.email || "",
+          notes: item.note || ""
+        };
+        if (IS_LOCAL) {
+          const res = await fetch("/api/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newEntry)
+          });
+          const data = await res.json();
+          STATE.applied = data.applied;
+        } else {
+          STATE.applied.unshift(newEntry);
+          await ghSaveDb();
+        }
+        updateHeaderCounts();
+        renderCrm();
+        renderOutreach();
+      }
+      showToast(`✅ Marked ${item.company} as HR Messaged 💬 in CRM!`, true);
+    }
+
+    async function promptContactInfo(id, fallbackCompany = "", fallbackRole = "", fallbackLocation = "") {
+      let existing = STATE.applied.find(a => String(a.id) === String(id));
+      const compLabel = existing ? existing.company : fallbackCompany;
+      const phone = prompt(`Enter Phone Number for ${compLabel}:`, existing?.contactPhoneDisplay || existing?.contactPhone || "");
       if (phone === null) return;
-      const email = prompt(`Enter HR / Contact Email for ${existing.company}:`, existing.contactEmail || "");
+      const email = prompt(`Enter HR / CTO Contact Email for ${compLabel}:`, existing?.contactEmail || "");
       if (email === null) return;
+      if (!existing) {
+        existing = {
+          id: String(id),
+          company: fallbackCompany,
+          title: fallbackRole || "Senior Full-Stack & AI Architect",
+          location: fallbackLocation || "Istanbul",
+          platform: "Direct Executive Outreach",
+          appliedAt: new Date().toISOString().slice(0, 10),
+          status: "Applied",
+          cvUsed: "EN",
+          salaryQuote: "190.000 - 240.000 TL Net",
+          url: "#"
+        };
+        STATE.applied.unshift(existing);
+      }
       existing.contactPhone = phone.replace(/[^\d+]/g, "");
       existing.contactPhoneDisplay = phone.trim();
       existing.contactEmail = email.trim();
@@ -1010,6 +1339,7 @@
         await ghSaveDb();
       }
       renderOutreach();
+      renderCrm();
       showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
@@ -1072,7 +1402,7 @@
     }, 90000);
 
     function updateHeaderCounts() {
-      const target = new Date("2026-12-14T00:00:00");
+      const target = new Date("2026-12-31T23:59:59");
       const now = new Date();
       const diffDays = Math.max(0, Math.ceil((target - now) / (1000 * 60 * 60 * 24)));
       document.getElementById("daysLeft").textContent = `${diffDays}d left`;
@@ -1094,7 +1424,10 @@
       document.getElementById("scanControls").classList.toggle("hidden", tab !== "radar");
     }
 
+    let isScanRunning = false;
     async function runScan() {
+      if (isScanRunning) return;
+      isScanRunning = true;
       const tpr = document.getElementById("tprSelect").value;
       const btn = document.getElementById("scanBtn");
       btn.disabled = true;
@@ -1116,6 +1449,7 @@
         } catch (e) {
           document.getElementById("scanStatusText").textContent = "Error scanning: " + e.message;
         } finally {
+          isScanRunning = false;
           btn.disabled = false;
           btn.innerHTML = "🔍 Scan Fresh Jobs Now";
         }
@@ -1138,6 +1472,7 @@
             document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries} searches live via your local PC (0 GitHub Action mins used).`;
             document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
             renderRadarList();
+            isScanRunning = false;
             btn.disabled = false;
             btn.innerHTML = "🔍 Scan Fresh Jobs Now";
             return;
@@ -1157,14 +1492,29 @@
             },
             body: JSON.stringify({ ref: "main", inputs: { tpr } })
           });
-          document.getElementById("scanStatusText").textContent = "☁️ Cloud scanner started on GitHub Actions! Refreshing feed in ~18 seconds...";
+          let countdown = 32;
+          document.getElementById("scanStatusText").textContent = `☁️ Cloud scanner running on GitHub Actions (${countdown}s)...`;
+          const cdInterval = setInterval(() => {
+            countdown--;
+            if (countdown > 0) {
+              document.getElementById("scanStatusText").textContent = `☁️ Cloud scanner running on GitHub Actions (${countdown}s)...`;
+            } else {
+              clearInterval(cdInterval);
+            }
+          }, 1000);
+
           setTimeout(async () => {
+            clearInterval(cdInterval);
             await loadCloudFeed();
+            isScanRunning = false;
             btn.disabled = false;
             btn.innerHTML = "🔍 Scan Fresh Jobs Now";
-          }, 18000);
+            // Second safety poll 10s later to catch trailing commit
+            setTimeout(loadCloudFeed, 10000);
+          }, 32000);
         } catch (e) {
           await loadCloudFeed();
+          isScanRunning = false;
           btn.disabled = false;
           btn.innerHTML = "🔍 Scan Fresh Jobs Now";
         }
@@ -1240,6 +1590,12 @@
         redFlags: []
       };
 
+      const pitch = a.aiPitch || d.aiPitch || (
+        d.title
+          ? `Merhaba, ${d.company} bünyesindeki ${d.title} pozisyonunuzu ilgiyle inceledim. Pilz Türkiye bünyesinde kurumsal dijital dönüşüme liderlik ederek .NET Core, C#, React ve SAP entegrasyonlu yüksek performanslı sistemler geliştirdim. Deneyimimin ekibinize hızla değer katacağına inanıyorum.`
+          : ""
+      );
+
       panel.innerHTML = `
         <div class="space-y-4">
           <div class="flex items-center justify-between">
@@ -1274,6 +1630,26 @@
               </div>
             </div>
           ` : ""}
+          <div class="p-3.5 rounded-lg bg-gradient-to-r from-blue-950/60 to-indigo-950/60 border border-blue-500/40 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
+                🤖 AI Recruiter Pitch (Tailored to this Job)
+              </span>
+              <button onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(pitch)}')); showToast('📋 Pitch copied to clipboard!', true);" class="px-2.5 py-1 rounded text-[11px] font-bold bg-blue-600 hover:bg-blue-500 text-white transition">
+                📋 Copy Pitch
+              </button>
+            </div>
+            <p class="text-xs text-slate-200 leading-relaxed italic bg-black/40 p-2.5 rounded border border-blue-500/20">"${pitch}"</p>
+            <div class="flex gap-2 pt-1 text-[11px]">
+              <button onclick="generateCustomAiEmail('${id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition">
+                ✉️ Full Cover Email
+              </button>
+              <button onclick="generateAiInterviewQA('${id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition">
+                🎯 Interview Questions
+              </button>
+            </div>
+            <div id="aiExtraOutput-${id}" class="hidden mt-2 p-2.5 rounded bg-slate-950/95 border border-slate-700 text-xs text-slate-200 whitespace-pre-wrap leading-relaxed"></div>
+          </div>
           <div class="flex gap-2 pt-1">
             <a href="https://www.linkedin.com/jobs/view/${id}/" target="_blank" class="flex-1 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white text-center">
               ↗ Apply on LinkedIn
@@ -1292,6 +1668,57 @@
         </div>
       `;
       panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function generateCustomAiEmail(id) {
+      const d = LAST_SCAN_JOBS.find(j => String(j.id) === String(id)) || {};
+      const out = document.getElementById(`aiExtraOutput-${id}`);
+      if (!out) return;
+      const full = `${d.title || ""} ${d.company || ""} ${d.description || ""}`;
+      const isEn = (d.analysis?.recommendedCv || "").includes("EN");
+      const skills = (d.analysis?.matchedSkills || d.tags || [".NET Core", "C#", "React", "SQL Server"]).join(", ");
+
+      const hasAi = /\b(llm|openai|claude|rag\b|ai\b|yapay zeka|agent)\b/i.test(full);
+      const hasSap = /\b(sap\b|erp\b|e-fatura|e-invoice|rpa\b)\b/i.test(full);
+
+      const trProjectParagraph = hasAi
+        ? `Pilz Türkiye bünyesinde geliştirdiğim InsightfulAI (OpenAI GPT + Anthropic Claude tabanlı RAG, Vector Store ve otonom AI ajan platformu) ve n8n NL-to-SQL veritabanı ajanları ile yanıt sürelerini %75+ kısalttım.`
+        : hasSap
+        ? `Pilz Türkiye bünyesinde geliştirdiğim PilzPortal (804 REST API endpoint, 120 tablo) ve WebRunner (SAP GUI VA01/VF01/XD01 + Playwright RPA + Sovos/ISIS GİB e-Fatura otomasyon motoru) ile manuel veri girişini ortadan kaldırıp süreçleri %80 hızlandırdım.`
+        : `Pilz Türkiye bünyesinde 1.190+ REST API endpoint ve 215+ veritabanı tablosundan oluşan 5 kurumsal platformu (PilzPortal CRM/ERP, EvenTracer Next.js 16 & .NET 10 CQRS/Redis BI SaaS, WebRunner SAP RPA ve InsightfulAI) baş mimar olarak uçtan uca geliştirdim.`;
+
+      const enProjectParagraph = hasAi
+        ? `At Pilz Türkiye, I architected InsightfulAI (multi-provider OpenAI GPT + Anthropic Claude RAG, vector search, and autonomous tool-calling agents) and n8n NL-to-SQL database agents, cutting inquiry turnaround by 75%+.`
+        : hasSap
+        ? `At Pilz Türkiye, I engineered PilzPortal (804 REST endpoints, 120 tables) and WebRunner (SAP GUI COM Interop + Playwright RPA + GİB e-Invoice automation), reducing order-to-invoice processing time by 80%.`
+        : `At Pilz Türkiye, I served as lead architect and principal developer for 5 production platforms totaling 1,190+ REST API endpoints and 215+ DB tables (PilzPortal CRM/ERP, EvenTracer Next.js 16 & .NET 10 CQRS/Redis SaaS, WebRunner SAP RPA, and InsightfulAI).`;
+
+      const email = isEn
+        ? `Subject: Application: ${d.title} – Hessam Barasm Mamagani (Senior Full-Stack & AI Architect)\n\nDear ${d.company} Hiring Team,\n\nI am writing to apply for the ${d.title} position at ${d.company}. Your requirements around ${skills} align directly with the production systems I have architected and delivered.\n\n${enProjectParagraph}\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I would welcome the opportunity to demonstrate my live platforms (pilztr.online/portal, eventracer.com/en) in a brief interview.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`
+        : `Konu: İş Başvurusu: ${d.title} – Hessam Barasm Mamagani\n\nSayın ${d.company} İK ve Teknoloji Ekibi,\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu iletmekten memnuniyet duyarım. İlanınızda vurgulanan (${skills}) yetkinlikleri, aktif olarak canlıda çalışan kurumsal projelerimle birebir örtüşmektedir.\n\n${trProjectParagraph}\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Geliştirdiğim canlı sistemleri (pilztr.online/portal, eventracer.com/en) kısa bir teknik görüşmede paylaşmak isterim.\n\nSaygılarımla,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`;
+
+      out.textContent = email;
+      out.classList.remove("hidden");
+      navigator.clipboard.writeText(email);
+      showToast("✉️ Tailored email generated & copied to clipboard!", true);
+    }
+
+    function generateAiInterviewQA(id) {
+      const d = LAST_SCAN_JOBS.find(j => String(j.id) === String(id)) || {};
+      const out = document.getElementById(`aiExtraOutput-${id}`);
+      if (!out) return;
+      const skills = (d.analysis?.matchedSkills || d.tags || [".NET Core", "React"]).join(", ");
+      out.textContent = `🎯 Tailored Interview Strategy for ${d.title} at ${d.company}\n` +
+        `Matched Stack in JD: ${skills}\n\n` +
+        `1. Architecture & Scale Question:\n` +
+        `   "How did you structure 1,190+ endpoints and 215+ tables at Pilz without coupling?"\n` +
+        `   💡 Answer: Explain your Clean Architecture + CQRS (MediatR) separation in EvenTracer & PilzPortal, Redis caching, and 5-tier RBAC.\n\n` +
+        `2. Enterprise Integration & Reliability Question:\n` +
+        `   "How do you handle failures in external ERP / SAP / e-Invoice integrations?"\n` +
+        `   💡 Answer: Showcase WebRunner's async worker queue, SAP COM bridge, and AI-driven failure diagnostics that cut manual processing by 80%.\n\n` +
+        `3. Live Demo Hook (Your Biggest Advantage):\n` +
+        `   💡 In the first 5 minutes of the call, ask to share your screen for 2 minutes to show eventracer.com/en and pilztr.online/portal.`;
+      out.classList.remove("hidden");
     }
 
     async function quickMarkApplied(id) {
