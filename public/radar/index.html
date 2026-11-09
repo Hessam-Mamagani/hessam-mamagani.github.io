@@ -2168,6 +2168,11 @@
       } else {
         if (!STATE.applied.some(a => String(a.id) === String(id))) {
           STATE.applied.unshift(newEntry);
+          fetch("http://localhost:4545/api/apply", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newEntry)
+          }).catch(() => {});
           await ghSaveDb();
           // Also auto-enrich phone/email/HR via local PC server if running
           fetch("http://localhost:4545/api/find-contact", {
