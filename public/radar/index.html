@@ -1879,6 +1879,7 @@
       } else {
         // 1. Try local PC server first, then 2. 24/7 Cloudflare Worker (3-4s instant scan), then 3. GitHub Actions fallback!
         btn.innerHTML = "⏳ Scanning via Cloudflare 24/7...";
+        let alreadyDispatchedByWorker = false;
         for (const scanUrl of ["http://localhost:4545/api/scan", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/scan"]) {
           try {
             const res = await fetch(scanUrl, {
@@ -1901,24 +1902,29 @@
                 btn.disabled = false;
                 btn.innerHTML = "🔍 Scan Fresh Jobs Now";
                 return;
+              } else {
+                alreadyDispatchedByWorker = true;
+                break;
               }
             }
           } catch {}
         }
 
-        // Fallback: trigger GitHub Action workflow_dispatch
+        // Fallback: trigger GitHub Action workflow_dispatch ONLY if Cloudflare Worker didn't already dispatch it!
         btn.innerHTML = "☁️ Triggering Cloud Scan...";
         const token = getGhToken();
         try {
-          await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/job-radar-scan.yml/dispatches`, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/vnd.github+json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ ref: "main", inputs: { tpr } })
-          });
+          if (!alreadyDispatchedByWorker) {
+            await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/job-radar-scan.yml/dispatches`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/vnd.github+json",
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ ref: "main", inputs: { tpr } })
+            });
+          }
           let countdown = 32;
           document.getElementById("scanStatusText").textContent = `☁️ Cloud scanner running on GitHub Actions (${countdown}s)...`;
           const cdInterval = setInterval(() => {
