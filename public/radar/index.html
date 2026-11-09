@@ -1499,7 +1499,7 @@
       btn.innerHTML = "⏳ Gemini AI Researching...";
       if (panel) {
         panel.classList.remove("hidden");
-        panel.innerHTML = `<div class="py-4 text-center text-indigo-300 font-semibold animate-pulse">🤖 Gemini AI Agent is researching ${item.company}'s CTO, Engineering Leaders, Tech Recruiters, and HR Emails...</div>`;
+        panel.innerHTML = `<div class="py-4 text-center text-indigo-300 font-semibold animate-pulse">🤖 Multi-Model AI Agent (OpenAI + Claude 5.5 + Gemini + LinkedIn) is researching ${item.company}'s CTO, Engineering Leaders, Tech Recruiters, and HR Emails...</div>`;
       }
 
       let aiIntel = null;
@@ -1507,25 +1507,28 @@
       let foundPhoneDisplay = item.phoneDisplay;
       let foundEmail = item.email;
 
-      // 1. Try Local PC Server (which runs live multi-query LinkedIn/Web scraper + Gemini AI Grounding)
-      try {
-        const res = await fetch("http://localhost:4545/api/find-contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: item.id, company: item.company, role: item.role })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.applied) STATE.applied = data.applied;
-          const f = data.info || {};
-          if (f.contactPhone) {
-            foundPhone = f.contactPhone;
-            foundPhoneDisplay = f.contactPhoneDisplay;
+      // 1. Try Local PC Server first, then fallback to 24/7 Cloudflare Worker (works even when laptop is OFF!)
+      for (const apiBase of ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]) {
+        try {
+          const res = await fetch(`${apiBase}/api/find-contact`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: item.id, company: item.company, role: item.role })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.applied) STATE.applied = data.applied;
+            const f = data.info || {};
+            if (f.contactPhone) {
+              foundPhone = f.contactPhone;
+              foundPhoneDisplay = f.contactPhoneDisplay;
+            }
+            if (f.contactEmail) foundEmail = f.contactEmail;
+            if (f.aiIntel) aiIntel = f.aiIntel;
+            if (aiIntel) break;
           }
-          if (f.contactEmail) foundEmail = f.contactEmail;
-          if (f.aiIntel) aiIntel = f.aiIntel;
-        }
-      } catch {}
+        } catch {}
+      }
 
       // 2. Fallback / Enrich with Client-Side Executive Knowledge Base + Live Clearbit Domain Resolver
       const cleanComp = item.company.split("(")[0].trim();
@@ -2174,29 +2177,38 @@
             body: JSON.stringify(newEntry)
           }).catch(() => {});
           await ghSaveDb();
-          // Also auto-enrich phone/email/HR via local PC server if running
-          fetch("http://localhost:4545/api/find-contact", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: newEntry.id, company: newEntry.company })
-          }).then(r => r.ok ? r.json() : null).then(async data => {
-            if (data && data.info && (data.info.contactPhone || data.info.contactEmail || data.info.contactPerson)) {
-              const target = STATE.applied.find(a => String(a.id) === String(newEntry.id));
-              if (target) {
-                if (data.info.contactPhone) {
-                  target.contactPhone = data.info.contactPhone;
-                  target.contactPhoneDisplay = data.info.contactPhoneDisplay;
+          // Also auto-enrich phone/email/HR via local PC server or 24/7 Cloudflare Worker
+          (async () => {
+            for (const apiBase of ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]) {
+              try {
+                const r = await fetch(`${apiBase}/api/find-contact`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: newEntry.id, company: newEntry.company })
+                });
+                if (!r.ok) continue;
+                const data = await r.json();
+                if (data && data.info && (data.info.contactPhone || data.info.contactEmail || data.info.contactPerson || data.info.aiIntel)) {
+                  const target = STATE.applied.find(a => String(a.id) === String(newEntry.id));
+                  if (target) {
+                    if (data.info.contactPhone) {
+                      target.contactPhone = data.info.contactPhone;
+                      target.contactPhoneDisplay = data.info.contactPhoneDisplay;
+                    }
+                    if (data.info.contactEmail) target.contactEmail = data.info.contactEmail;
+                    if (data.info.aiIntel) target.aiIntel = data.info.aiIntel;
+                    if (data.info.contactPerson && !target.notes.includes(data.info.contactPerson)) {
+                      target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
+                    }
+                    await ghSaveDb();
+                    renderOutreach();
+                    renderCrm();
+                  }
+                  break;
                 }
-                if (data.info.contactEmail) target.contactEmail = data.info.contactEmail;
-                if (data.info.contactPerson && !target.notes.includes(data.info.contactPerson)) {
-                  target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
-                }
-                await ghSaveDb();
-                renderOutreach();
-                renderCrm();
-              }
+              } catch {}
             }
-          }).catch(() => {});
+          })();
         }
       }
       LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
