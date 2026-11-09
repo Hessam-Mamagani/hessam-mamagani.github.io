@@ -1156,14 +1156,18 @@
             </div>
             <div class="pt-2.5 border-t border-slate-800/80 space-y-2">
               <div class="flex flex-wrap items-center justify-between text-xs gap-2">
-                ${item.phone
-                  ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`
-                  : `<span class="text-slate-400 text-[11px]">📞 Click AI Research below to find phone</span>`
-                }
-                ${item.email
-                  ? `<span class="text-emerald-300 font-mono font-semibold">📧 ${item.email}</span>`
-                  : `<span class="text-slate-400 text-[11px]">📧 Click AI Research below to find email</span>`
-                }
+                <span id="phoneSlot-${idx}">
+                  ${item.phone
+                    ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`
+                    : `<span class="text-slate-400 text-[11px]">📞 Click AI Research below to find phone</span>`
+                  }
+                </span>
+                <span id="emailSlot-${idx}">
+                  ${item.email
+                    ? `<span class="text-emerald-300 font-mono font-semibold">📧 ${item.email}</span>`
+                    : `<span class="text-slate-400 text-[11px]">📧 Click AI Research below to find email</span>`
+                  }
+                </span>
               </div>
               <div class="flex flex-wrap gap-1.5 pt-0.5">
                 <button onclick="runAiCompanyResearch(${idx}, 'cto', this)" class="py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow">
@@ -1208,14 +1212,14 @@
         emails: ["talent@useinsider.com", "people@useinsider.com", "info@useinsider.com"],
         phone: "+90 (212) 988 10 16",
         ctoAndEngLeads: [
-          { name: "Mehmet Sinan Toktay", title: "Co-Founder & CTO at Insider", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Mehmet%20Sinan%20Toktay%20Insider" },
+          { name: "Mehmet Sinan Toktay", title: "Co-Founder & CTO at Insider", linkedinUrl: "https://tr.linkedin.com/in/mstoktay" },
           { name: "Insider VP of Engineering", title: "VP of Engineering / Director of Software Engineering", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Insider%20VP%20Engineering%20Istanbul" }
         ],
         hrAndRecruiters: [
-          { name: "Insider Global Talent Acquisition", title: "Senior Technical Recruiter / People & Culture (Istanbul)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Insider%20Technical%20Recruiter%20Istanbul" }
+          { name: "Belis Dokumacı", title: "Talent Acquisition Lead at Insider", linkedinUrl: "https://tr.linkedin.com/in/belis-dokumaci-9127a9216" }
         ],
         officeAndMetro: "🚇 Kağıthane / Ayazağa (M7 Kağıthane & M2 Sanayi/Levent Metro — Libadiye/Cendere Valley)",
-        walkInVerdict: "Do NOT walk in cold (plaza turnstile requires QR visitor invite). Email talent@useinsider.com + send LinkedIn DM to CTO/VP Engineering with your live EventRacer & InsightfulAI links first."
+        walkInVerdict: "Do NOT walk in cold (plaza turnstile requires QR visitor invite). Email talent@useinsider.com + send LinkedIn DM to CTO Mehmet Sinan Toktay & Talent Lead Belis Dokumacı with your live EventRacer & InsightfulAI links first."
       },
       microsoft: {
         domain: "microsoft.com",
@@ -1308,7 +1312,7 @@
           { name: "Hitachi Energy Türkiye Country Managing Director & Hub Manager", title: "Transformers Hub & Digital Transformation Leadership (Kartal)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Hitachi%20Energy%20Turkey%20Kartal%20Manager" }
         ],
         hrAndRecruiters: [
-          { name: "Hitachi Energy Türkiye Talent Acquisition", title: "HR Business Partner & Talent Acquisition (Kartal Factory/Hub)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Hitachi%20Energy%20Turkey%20Talent%20Acquisition" }
+          { name: "Aylin Kızılay", title: "Human Resources / Talent Acquisition at Hitachi Energy Türkiye", linkedinUrl: "https://tr.linkedin.com/in/aylin-k%C4%B1z%C4%B1lay-4b113863" }
         ],
         officeAndMetro: "🚇 Kartal M4 Metro / Yakacık-Adnan Kahveci (Esentepe Mah. Milangaz Cad. No:58, Kartal!)",
         walkInVerdict: "✅ HIGH-VALUE WALK-IN TARGET: Right in Kartal (Milangaz Cad. No:58). Call 0850 528 10 02 in the morning, mention your Pilz GmbH GM Reference Letter for 'Hub Digital Transformation Lead', and offer to drop off your printed dossier in person!"
@@ -1398,13 +1402,15 @@
         emails: ["ik@golfdondurma.com.tr", "info@golfdondurma.com.tr"],
         phone: "+90 (212) 629 60 60",
         ctoAndEngLeads: [
-          { name: "Golf Dondurma (Natura Gıda) BT Direktörü / Genel Müdür", title: "Executive Leadership hiring İş Uygulamaları Müdürü", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Golf%20Dondurma%20Bilgi%20Teknolojileri" }
+          { name: "Sercan Sever", title: "Yönetim & Satın Alma Lideri — Golf Dondurma (Natura Gıda)", linkedinUrl: "https://tr.linkedin.com/in/sercan-sever-526305107" },
+          { name: "Ceren Ökten", title: "Kurumsal İletişim & Yönetim — Golf Dondurma", linkedinUrl: "https://tr.linkedin.com/in/ceren-%C3%B6kten-28a10260" }
         ],
         hrAndRecruiters: [
-          { name: "Golf Dondurma İnsan Kaynakları Müdürü", title: "HR Manager (Downloaded Your CV on Kariyer.net! ⭐)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Golf%20Dondurma%20Insan%20Kaynaklari" }
+          { name: "Sema Tongur", title: "İnsan Kaynakları Profesyoneli — Golf Dondurma (Downloaded Your CV! ⭐)", linkedinUrl: "https://tr.linkedin.com/in/sema-tongur-64702819b" },
+          { name: "Aydanur Karamık", title: "İnsan Kaynakları & İdari İşler — Golf Dondurma", linkedinUrl: "https://tr.linkedin.com/in/aydanur-karam%C4%B1k-659aa7177" }
         ],
         officeAndMetro: "📍 İstanbul Merkez Ofis (+90 212 629 60 60)",
-        walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları, and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
+        walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları (Sema Tongur / İK Ekibi), and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
       }
     };
 
@@ -1611,6 +1617,16 @@
         panel.innerHTML = renderAiIntelHtml(aiIntel, item, idx);
       }
 
+      // Update top card Phone & Email labels in-place immediately
+      const emailSlot = document.getElementById(`emailSlot-${idx}`);
+      if (emailSlot && item.email) {
+        emailSlot.innerHTML = `<span class="text-emerald-300 font-mono font-semibold">📧 ${item.email}</span>`;
+      }
+      const phoneSlot = document.getElementById(`phoneSlot-${idx}`);
+      if (phoneSlot && item.phoneDisplay) {
+        phoneSlot.innerHTML = `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`;
+      }
+
       // Update Gmail & Mailto links with newly discovered email
       if (item.email) {
         const mail = buildOutreachEmail(item);
@@ -1763,13 +1779,33 @@
     async function loadCloudFeed(isAutoPoll = false) {
       try {
         const prevCount = LAST_SCAN_JOBS.length;
-        const feedFile = await ghFetchFile(GH_FEED_PATH);
+        let localFeed = null;
+        try {
+          const lr = await fetch("http://localhost:4545/api/feed", { signal: AbortSignal.timeout(2500) });
+          if (lr.ok) localFeed = await lr.json();
+        } catch {}
+
+        let ghFeed = null;
+        try {
+          const feedFile = await ghFetchFile(GH_FEED_PATH);
+          ghFeed = feedFile.data;
+        } catch {}
+
+        const combinedMap = new Map();
+        for (const j of [...(localFeed?.jobs || []), ...(ghFeed?.jobs || [])]) {
+          if (j && j.id && !combinedMap.has(String(j.id))) {
+            combinedMap.set(String(j.id), j);
+          }
+        }
+
         const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
         const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
-        LAST_SCAN_JOBS = (feedFile.data.jobs || []).filter(
-          j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j)
-        );
-        const scannedTime = feedFile.data.scannedAt ? new Date(feedFile.data.scannedAt).toLocaleString() : "Recent";
+        LAST_SCAN_JOBS = Array.from(combinedMap.values())
+          .filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j))
+          .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+        const latestTimeStr = localFeed?.scannedAt || ghFeed?.scannedAt;
+        const scannedTime = latestTimeStr ? new Date(latestTimeStr).toLocaleString() : "Recent";
         document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes automatically every 90s).`;
         document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
         renderRadarList();
