@@ -255,6 +255,20 @@
     const GH_REPO = "Hessam-Mamagani/antigravity-chats";
     const GH_DB_PATH = "2026-11-03_cv-portfolio-job-applications/job-radar/data/jobs-db.json";
     const GH_FEED_PATH = "2026-11-03_cv-portfolio-job-applications/job-radar/data/cloud-feed.json";
+    const CF_WORKER_URL = "https://hessam-job-radar-ai.hessam-mamagani.workers.dev";
+
+    async function d1Post(endpoint, body) {
+      try {
+        const res = await fetch(`${CF_WORKER_URL}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
 
     let STATE = { applied: [], skipped: [] };
     let DB_SHA = null;
@@ -469,9 +483,30 @@
         renderVault();
         runScan();
       } else {
-        const dbFile = await ghFetchFile(GH_DB_PATH);
-        DB_SHA = dbFile.sha;
-        STATE = dbFile.data;
+        let loadedFromD1 = false;
+        try {
+          const res = await fetch(`${CF_WORKER_URL}/api/state`, { cache: "no-store" });
+          if (res.ok) {
+            const d1Data = await res.json();
+            if (d1Data && Array.isArray(d1Data.applied)) {
+              STATE = d1Data;
+              loadedFromD1 = true;
+            }
+          }
+        } catch (e) {
+          console.warn("Cloudflare D1 fetch failed, trying GitHub fallback:", e);
+        }
+
+        if (!loadedFromD1) {
+          try {
+            const dbFile = await ghFetchFile(GH_DB_PATH);
+            DB_SHA = dbFile.sha;
+            STATE = dbFile.data;
+          } catch (e) {
+            console.error("GitHub fetch fallback also failed:", e);
+          }
+        }
+
         const mergedSkipped = new Set([
           ...(STATE.skipped || []).map(String),
           ...getLocalSkippedCache().map(String)
@@ -1813,7 +1848,10 @@
           crmItem.contactPhoneDisplay = item.phoneDisplay;
           crmItem.contactPhone = item.phone;
         }
-        if (!IS_LOCAL) ghSaveDb();
+        if (!IS_LOCAL) {
+          d1Post("/api/apply", crmItem);
+          ghSaveDb();
+        }
       }
 
       if (panel) {
@@ -1892,6 +1930,7 @@
           STATE.applied = data.applied;
         } else {
           STATE.applied.unshift(newEntry);
+          d1Post("/api/apply", newEntry);
           await ghSaveDb();
         }
         updateHeaderCounts();
@@ -1935,6 +1974,7 @@
         const data = await res.json();
         STATE.applied = data.applied;
       } else {
+        d1Post("/api/apply", existing);
         await ghSaveDb();
       }
       renderOutreach();
@@ -2432,6 +2472,7 @@
       } else {
         if (!STATE.applied.some(a => String(a.id) === String(id))) {
           STATE.applied.unshift(newEntry);
+          d1Post("/api/apply", newEntry);
           fetch("http://localhost:4545/api/apply", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -2461,6 +2502,7 @@
                     if (data.info.contactPerson && !target.notes.includes(data.info.contactPerson)) {
                       target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
                     }
+                    d1Post("/api/apply", target);
                     await ghSaveDb();
                     renderUnifiedPipeline();
                     renderCrm();
@@ -2495,6 +2537,7 @@
           body: JSON.stringify({ id })
         });
       } else {
+        d1Post("/api/skip", { id });
         fetch("http://localhost:4545/api/skip", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -2517,6 +2560,7 @@
         const data = await res.json();
         STATE.applied = data.applied;
       } else {
+        d1Post("/api/status", { id, status: newStatus });
         await ghSaveDb();
       }
       updateHeaderCounts();
@@ -3281,9 +3325,38 @@
       const crmItem = STATE.applied.find(a => String(a.id) === strId);
       if (crmItem && (field === "emailed" || field === "called") && value && crmItem.status === "Applied") {
         crmItem.status = "HR Messaged 💬";
+        d1Post("/api/status", { id: strId, status: "HR Messaged 💬" });
         if (!IS_LOCAL) ghSaveDb();
         updateHeaderCounts();
         renderCrm();
+      }
+
+      // Auto-add Proactive Giant to CRM & D1 if user checked "Apply"
+      if (field === "applied" && value && !STATE.applied.some(a => String(a.id) === strId)) {
+        const vip = VIP_CHECKLIST_ALL.find(v => v.id === strId);
+        if (vip) {
+          const newEntry = {
+            id: vip.id,
+            company: vip.company,
+            title: vip.role,
+            location: vip.address || "Istanbul",
+            platform: "Direct Executive / Proactive",
+            appliedAt: new Date().toISOString().slice(0, 10),
+            status: "Applied",
+            cvUsed: "EN",
+            salaryQuote: "180.000 - 220.000 TL Net",
+            url: vip.jobUrl || "#",
+            notes: vip.summary || "",
+            contactEmail: vip.email || "",
+            contactPhone: vip.phone || "",
+            contactPhoneDisplay: vip.phoneDisplay || ""
+          };
+          STATE.applied.unshift(newEntry);
+          d1Post("/api/apply", newEntry);
+          if (!IS_LOCAL) ghSaveDb();
+          updateHeaderCounts();
+          renderCrm();
+        }
       }
 
       renderUnifiedPipeline();
@@ -3884,6 +3957,7 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
         STATE.applied = data.applied;
       } else {
         STATE.applied.unshift(entry);
+        d1Post("/api/apply", entry);
         await ghSaveDb();
       }
       closeAddModal();
