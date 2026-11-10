@@ -335,6 +335,11 @@
       localStorage.setItem("jr_skipped_cache", JSON.stringify([...list]));
     }
 
+    function removeLocalSkippedCache(id) {
+      const list = getLocalSkippedCache().filter(x => String(x) !== String(id));
+      localStorage.setItem("jr_skipped_cache", JSON.stringify(list));
+    }
+
     let IS_SAVING_GH = false;
     let SAVE_QUEUED_GH = false;
 
@@ -2535,7 +2540,7 @@
       LAST_SCAN_JOBS = LAST_SCAN_JOBS.filter(j => String(j.id) !== String(id));
       document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
       renderRadarList();
-      showToast(`✕ Hidden job #${id} permanently across all your devices.`, false);
+      showToast(`✕ Hidden job #${id}. <button onclick="undoSkip('${id}')" class="ml-2 px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold hover:bg-yellow-300 transition shadow">↩️ Undo</button>`, false);
 
       if (IS_LOCAL) {
         await fetch("/api/skip", {
@@ -2552,6 +2557,28 @@
         }).catch(() => {});
         await ghSaveDb();
       }
+    }
+
+    async function undoSkip(id) {
+      removeLocalSkippedCache(id);
+      STATE.skipped = (STATE.skipped || []).filter(s => String(s) !== String(id));
+      if (IS_LOCAL) {
+        await fetch("/api/unskip", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        });
+      } else {
+        d1Post("/api/unskip", { id });
+        fetch("http://localhost:4545/api/unskip", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        }).catch(() => {});
+        await ghSaveDb();
+      }
+      await loadCloudFeed();
+      showToast(`↩️ Restored job #${id} to Live Scanner!`, true);
     }
 
     async function updateAppStatus(id, newStatus) {
