@@ -1472,10 +1472,34 @@
     function copyAiDm(idx, target, btn) {
       const item = CURRENT_OUTREACH_ITEMS[idx];
       if (!item || !item.aiIntel) return;
+      if (target === "email") {
+        const mail = buildOutreachEmail(item);
+        copyTextSafe(`Subject: ${mail.subject}\n\n${mail.body}`, btn, "📧 Copied AI Executive Email to clipboard!");
+        return;
+      }
       const text = target === "hr"
         ? (item.aiIntel.customHrDm || item.aiIntel.customExecutiveDm || "")
         : (item.aiIntel.customExecutiveDm || "");
       copyTextSafe(text, btn, target === "hr" ? "📋 Copied LinkedIn HR DM to clipboard!" : "📋 Copied LinkedIn Manager/CTO DM to clipboard!");
+    }
+
+    function copyPersonDm(idx, group, personIdx, btn) {
+      const item = CURRENT_OUTREACH_ITEMS[idx];
+      if (!item || !item.aiIntel) return;
+      const list = group === "hr" ? (item.aiIntel.hrAndRecruiters || []) : (item.aiIntel.ctoAndEngLeads || []);
+      const person = list[personIdx];
+      let baseText = group === "hr"
+        ? (item.aiIntel.customHrDm || item.aiIntel.customExecutiveDm || "")
+        : (item.aiIntel.customExecutiveDm || "");
+      if (person && person.name && baseText) {
+        const firstName = person.name.split(/\s+/)[0].replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ]/g, "");
+        if (firstName && firstName.length >= 2) {
+          baseText = baseText
+            .replace(/^Merhaba\s+[^,]+,/i, `Merhaba ${firstName},`)
+            .replace(/^Hi\s+[^,]+,/i, `Hi ${firstName},`);
+        }
+      }
+      copyTextSafe(baseText, btn, `📋 Copied personalized LinkedIn DM for ${person?.name || "contact"}!`);
     }
 
     function renderAiIntelHtml(intel, item, idx) {
@@ -1484,6 +1508,7 @@
       const hrList = intel.hrAndRecruiters || [];
       const dmText = intel.customExecutiveDm || "";
       const hrDmText = intel.customHrDm || "";
+      const mailObj = buildOutreachEmail({ ...item, aiIntel: intel });
       const emailToUse = intel.bestEmail || item.email || "";
       const renderProfileLink = (url) => {
         if (!url) return "";
@@ -1504,13 +1529,16 @@
           <div>
             <p class="text-[11px] font-bold text-emerald-300 mb-1">👨‍💻 CTO / VP Engineering / Tech Leaders:</p>
             <div class="space-y-1">
-              ${ctoList.map(p => `
+              ${ctoList.map((p, pIdx) => `
                 <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
                   <div>
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
-                  ${renderProfileLink(p.linkedinUrl)}
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="copyPersonDm(${idx}, 'cto', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-indigo-600/40 hover:bg-indigo-600/70 text-indigo-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
+                    ${renderProfileLink(p.linkedinUrl)}
+                  </div>
                 </div>
               `).join("")}
             </div>
@@ -1521,13 +1549,16 @@
           <div>
             <p class="text-[11px] font-bold text-blue-300 mb-1">👩‍💼 HR / Technical Recruiters:</p>
             <div class="space-y-1">
-              ${hrList.map(p => `
+              ${hrList.map((p, pIdx) => `
                 <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
                   <div>
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
-                  ${renderProfileLink(p.linkedinUrl)}
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="copyPersonDm(${idx}, 'hr', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-blue-600/40 hover:bg-blue-600/70 text-blue-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
+                    ${renderProfileLink(p.linkedinUrl)}
+                  </div>
                 </div>
               `).join("")}
             </div>
@@ -1568,6 +1599,19 @@
               </button>
             </div>
             <p class="text-slate-200 italic leading-relaxed whitespace-pre-line">"${hrDmText}"</p>
+          </div>
+        ` : ""}
+
+        ${mailObj?.body ? `
+          <div class="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-emerald-200 text-[11px]">📧 AI Tailored Direct Email (Used by Open Gmail / Mail App / Copy Email):</span>
+              <button type="button" onclick="copyAiDm(${idx}, 'email', this)" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+                📋 Copy Full Email
+              </button>
+            </div>
+            <p class="text-[11px] font-semibold text-emerald-300">Subject: ${mailObj.subject}</p>
+            <p class="text-slate-200 text-[11px] leading-relaxed whitespace-pre-line">${mailObj.body}</p>
           </div>
         ` : ""}
       `;
