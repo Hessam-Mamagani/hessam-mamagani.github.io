@@ -76,17 +76,14 @@
         <button onclick="switchTab('radar')" id="tabBtn-radar" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white transition">
           📡 1. Live Scanner
         </button>
+        <button onclick="switchTab('pipeline')" id="tabBtn-pipeline" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition">
+          🎯 2. Master Outreach & Pipeline
+        </button>
         <button onclick="switchTab('crm')" id="tabBtn-crm" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          🗂️ 2. My Applications CRM
-        </button>
-        <button onclick="switchTab('outreach')" id="tabBtn-outreach" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-amber-600/20 border border-amber-500/40 text-amber-300 hover:bg-amber-600/30 transition">
-          📞 3. VIP Call & Email List
-        </button>
-        <button onclick="switchTab('checklist')" id="tabBtn-checklist" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition">
-          ✅ 4. Master VIP Checklist (41)
+          🗂️ 3. Applications CRM
         </button>
         <button onclick="switchTab('vault')" id="tabBtn-vault" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          ⚡ 5. Copy Vault & Kariyer.net
+          ⚡ 4. Copy Vault & Kariyer.net
         </button>
       </div>
 
@@ -162,75 +159,50 @@
       </div>
     </section>
 
-    <!-- TAB 3: VIP CALL & EMAIL OUTREACH LIST -->
-    <section id="tab-outreach" class="mt-5 hidden space-y-4">
-      <div class="glass rounded-xl p-5 border border-amber-500/30">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div>
-            <h2 class="text-base font-bold text-white mb-1">🌍 Global Tech Unicorns & VIP Outreach Command Center (Metro + Remote + Applied CRM)</h2>
-            <p class="text-xs text-slate-300 leading-relaxed" id="outreachSummaryText">
-              Combines your <strong>Applied CRM</strong> with <strong>Proactive Global Software Giants & Unicorns in Istanbul (Metro-Accessible) & Remote EMEA</strong>. Includes 1-Click Gmail Launcher, CTO/Engineering Director LinkedIn Finder, Live Website Contact Scraper, and Office/Call Strategy.
-            </p>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <input id="outreachSearch" oninput="renderOutreach()" placeholder="Filter company, metro, stack..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200" />
-            <select id="outreachFilter" onchange="renderOutreach()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200">
-              <option value="ALL">All (Applied + Global Tech Radar)</option>
-              <option value="GLOBAL_RADAR">🚀 Proactive Global Tech & Unicorns (Unapplied)</option>
-              <option value="SIGNALS">⭐ Top Signals & Dream Applied Roles</option>
-              <option value="DIRECT">📞 Has Verified Phone / Email</option>
-              <option value="PENDING">⏳ Not Contacted Yet</option>
-              <option value="CONTACTED">💬 Already Contacted</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div id="outreachGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-    </section>
-
-    <!-- TAB 4: MASTER VIP CHECKLIST (ALL 41 TARGETS) -->
-    <section id="tab-checklist" class="mt-5 hidden space-y-4">
+    <!-- TAB 2: MASTER OUTREACH & PIPELINE -->
+    <section id="tab-pipeline" class="mt-5 hidden space-y-4">
       <div class="glass rounded-xl p-5 border border-emerald-500/40">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base font-bold text-white">✅ Master VIP Checklist (41 Companies)</h2>
-              <span id="checklistProgressBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">0/41 Tracked</span>
+              <h2 class="text-base font-bold text-white">🎯 Master Outreach & Follow-Up Pipeline</h2>
+              <span id="pipelineProgressBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Loading Pipeline...</span>
             </div>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              Unified directory of all 41 companies from your research chats. Email them, call switchboard/HR, or walk directly into their plaza with your printed CV & Pilz GM Reference Letter. Check off each step to track your pipeline in real time.
+              Unified command center for your <strong>Freshly Applied Roles</strong> (Ant International, Sezzle...) and <strong>Proactive Tech Giants</strong> (Microsoft #1, AWS #2...). Email decision-makers, send tailored LinkedIn DMs, check off progress, or run AI contact research.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
-              <button onclick="setVipViewMode('compact')" id="vipViewBtn-compact" class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition">
+              <button onclick="setPipelineViewMode('compact')" id="pipelineViewBtn-compact" class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition">
                 📋 Compact List
               </button>
-              <button onclick="setVipViewMode('cards')" id="vipViewBtn-cards" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition">
+              <button onclick="setPipelineViewMode('cards')" id="pipelineViewBtn-cards" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition">
                 🗂️ Cards
               </button>
             </div>
-            <input id="checklistSearch" oninput="renderVipChecklist()" placeholder="Search company, district, phone..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
-            <select id="checklistFilter" onchange="renderVipChecklist()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-              <option value="ALL">All (41 Companies)</option>
+            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, recruiter, phone..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-56 focus:outline-none focus:border-emerald-500" />
+            <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+              <option value="ALL">All (Applied Pipeline + Tech Giants)</option>
+              <option value="FRESH_APPLIED">⚡ Freshly Applied (Needs Follow-Up)</option>
+              <option value="PROACTIVE_GIANTS">🏢 Proactive Tech Giants (Microsoft, AWS...)</option>
               <option value="PENDING">⏳ Not Emailed Yet</option>
               <option value="EMAILED">📧 Emailed</option>
-              <option value="CALLED">📞 Phone Called</option>
-              <option value="WALKED">🚶 Walk-In Done</option>
-              <option value="APPLIED">🌐 Applied on Portal/LinkedIn</option>
-              <option value="CONNECTIONS">⭐ Has 1st-Deg / Direct Leads</option>
+              <option value="CALLED">📞 Phone Called / DM Sent</option>
+              <option value="AI_INTEL">🤖 Has AI Decision-Makers</option>
+              <option value="CONNECTIONS">⭐ Has Direct / 1st-Deg Leads</option>
               <option value="CLUSTER_MASLAK">📍 Maslak & İTÜ Teknokent</option>
-              <option value="CLUSTER_LEVENT">📍 Levent & Şişli / Mecidiyeköy</option>
-              <option value="CLUSTER_ASIAN">📍 Asian Side (Üsküdar / Ataşehir / Pendik)</option>
+              <option value="CLUSTER_LEVENT">📍 Levent & Şişli</option>
+              <option value="CLUSTER_ASIAN">📍 Asian Side</option>
             </select>
           </div>
         </div>
       </div>
 
-      <div id="checklistContainer" class="space-y-2"></div>
+      <div id="pipelineContainer" class="space-y-2"></div>
     </section>
 
-    <!-- TAB 5: QUICK COPY VAULT & KARIYER.NET -->
+    <!-- TAB 4: QUICK COPY VAULT & KARIYER.NET -->
     <section id="tab-vault" class="mt-5 hidden space-y-6">
       <div class="glass rounded-xl p-5">
         <h2 class="text-base font-bold text-white mb-1">🚀 Kariyer.net — 1-Click "Last 24 Hours" Searches</h2>
@@ -489,7 +461,7 @@
         STATE = await res.json();
         updateHeaderCounts();
         renderCrm();
-        renderOutreach();
+        renderUnifiedPipeline();
         renderVault();
         runScan();
       } else {
@@ -508,7 +480,7 @@
         }
         updateHeaderCounts();
         renderCrm();
-        renderOutreach();
+        renderUnifiedPipeline();
         renderVault();
         await loadCloudFeed();
       }
@@ -1282,17 +1254,57 @@
       },
       microsoft: {
         domain: "microsoft.com",
-        emails: ["trinfo@microsoft.com"],
+        emails: [],
         phone: "+90 (212) 370 55 55",
         ctoAndEngLeads: [
-          { name: "Levent Özbilgin", title: "General Manager at Microsoft Türkiye", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Levent%20Ozbilgin%20Microsoft" },
-          { name: "Microsoft Türkiye CTO / CSU Lead", title: "Customer Success Unit (CSU) & Cloud/AI Solutions Lead", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Microsoft%20Turkiye%20Cloud%20AI%20Lead" }
+          { name: "Cüneyt Batmaz", title: "Commercial Solutions Sales Leader, Deputy GM at Microsoft Türkiye (1st-Degree Connection ⭐)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Cuneyt%20Batmaz%20Microsoft" },
+          { name: "Mesut Aladağ", title: "Cloud & AI Technical Lead, Azure Master Architect at Microsoft", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Mesut%20Aladag%20Microsoft" },
+          { name: "Levent Özbilgin", title: "General Manager at Microsoft Türkiye", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Levent%20Ozbilgin%20Microsoft" }
         ],
         hrAndRecruiters: [
           { name: "Microsoft EMEA Talent Acquisition", title: "Senior Technical Recruiter — Türkiye & MEA", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Microsoft%20Talent%20Acquisition%20Turkey" }
         ],
         officeAndMetro: "🚇 Levent M2 Metro (Bellevue Residence, Nispetiye Mah.)",
-        walkInVerdict: "Strict enterprise security at Bellevue Residence. Reach out via LinkedIn DM to Microsoft Türkiye CSU / Solutions Architecture Directors highlighting your .NET 10 + Azure + VS Marketplace AI extension."
+        walkInVerdict: "Direct LinkedIn outreach: send tailored DM to 1st-degree connection Cüneyt Batmaz & connection note to Mesut Aladağ. Note that trinfo@microsoft.com blocks external email."
+      },
+      "ant international": {
+        domain: "ant-intl.com",
+        emails: ["talent@ant-intl.com", "careers@ant-intl.com"],
+        phone: "Global / Istanbul Tech Hub",
+        ctoAndEngLeads: [
+          { name: "Ant International Solutions Architecture & Tech Leadership", title: "Head of Solutions Architecture & Enterprise Tech", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Ant%20International%20Solutions%20Architecture" }
+        ],
+        hrAndRecruiters: [
+          { name: "Ant International Talent Acquisition", title: "Technical Recruiter — EMEA & Türkiye", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Ant%20International%20Talent%20Acquisition" }
+        ],
+        officeAndMetro: "📍 Istanbul (Hybrid / Global Hub)",
+        walkInVerdict: "Applied for Solutions Architect! Send direct LinkedIn DM to Solutions Architecture Leads & Technical Recruiters highlighting your high-scale .NET 10 & 80% automated SAP workflows."
+      },
+      sompo: {
+        domain: "somposigorta.com.tr",
+        emails: ["ik@somposigorta.com.tr"],
+        phone: "+90 (216) 600 55 00",
+        ctoAndEngLeads: [
+          { name: "Sompo Teknoloji Yazılım Direktörü", title: "Yazılım Geliştirme Direktörü / BT Lideri", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Sompo%20Teknoloji%20Yazilim%20Direktoru" }
+        ],
+        hrAndRecruiters: [
+          { name: "Sompo İnsan Kaynakları & İşe Alım", title: "Teknik İşe Alım Uzmanı — Sompo Teknoloji", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Sompo%20Sigorta%20Insan%20Kaynaklari" }
+        ],
+        officeAndMetro: "📍 Ataşehir / Kozyatağı (M4 Metro)",
+        walkInVerdict: "Applied for Yazılım Geliştirme Takım Lideri! Reach out to Sompo Teknoloji software directors."
+      },
+      getir: {
+        domain: "getir.com",
+        emails: ["talent@getir.com"],
+        phone: "0850 532 50 50",
+        ctoAndEngLeads: [
+          { name: "Getir Tech Leadership", title: "VP of Engineering / AI Tech Lead", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Getir%20VP%20Engineering%20AI" }
+        ],
+        hrAndRecruiters: [
+          { name: "Getir Tech Talent Acquisition", title: "Technical Recruiter at Getir", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Getir%20Tech%20Recruiter" }
+        ],
+        officeAndMetro: "🚇 Levent M2 Metro",
+        walkInVerdict: "Applied for Senior AI Engineer! DM Getir AI and Tech Talent Leads on LinkedIn."
       },
       papara: {
         domain: "papara.com",
@@ -1514,11 +1526,20 @@
       if (toastMsg) showToast(toastMsg, true);
     }
 
-    function copyAiDm(idx, target, btn) {
-      const item = CURRENT_OUTREACH_ITEMS[idx];
+    function findPipelineItem(idOrIdx) {
+      if (typeof idOrIdx === "number" && CURRENT_OUTREACH_ITEMS[idOrIdx]) {
+        return CURRENT_OUTREACH_ITEMS[idOrIdx];
+      }
+      return (typeof UNIFIED_PIPELINE_ITEMS !== "undefined" ? UNIFIED_PIPELINE_ITEMS.find(x => String(x.id) === String(idOrIdx)) : null) ||
+             (typeof CURRENT_OUTREACH_ITEMS !== "undefined" ? CURRENT_OUTREACH_ITEMS.find(x => String(x.id) === String(idOrIdx)) : null) ||
+             (typeof getUnifiedPipelineList === "function" ? getUnifiedPipelineList().find(x => String(x.id) === String(idOrIdx)) : null);
+    }
+
+    function copyAiDm(idOrIdx, target, btn) {
+      const item = findPipelineItem(idOrIdx);
       if (!item || !item.aiIntel) return;
       if (target === "email") {
-        const mail = buildOutreachEmail(item);
+        const mail = (typeof buildUnifiedEmail === "function") ? buildUnifiedEmail(item) : buildOutreachEmail(item);
         copyTextSafe(`Subject: ${mail.subject}\n\n${mail.body}`, btn, "📧 Copied AI Executive Email to clipboard!");
         return;
       }
@@ -1528,8 +1549,8 @@
       copyTextSafe(text, btn, target === "hr" ? "📋 Copied LinkedIn HR DM to clipboard!" : "📋 Copied LinkedIn Manager/CTO DM to clipboard!");
     }
 
-    function copyPersonDm(idx, group, personIdx, btn) {
-      const item = CURRENT_OUTREACH_ITEMS[idx];
+    function copyPersonDm(idOrIdx, group, personIdx, btn) {
+      const item = findPipelineItem(idOrIdx);
       if (!item || !item.aiIntel) return;
       const list = group === "hr" ? (item.aiIntel.hrAndRecruiters || []) : (item.aiIntel.ctoAndEngLeads || []);
       const person = list[personIdx];
@@ -1547,13 +1568,14 @@
       copyTextSafe(baseText, btn, `📋 Copied personalized LinkedIn DM for ${person?.name || "contact"}!`);
     }
 
-    function renderAiIntelHtml(intel, item, idx) {
+    function renderAiIntelHtml(intel, item, idOrIdx) {
       if (!intel) return "";
+      const itemId = item?.id || idOrIdx;
       const ctoList = intel.ctoAndEngLeads || [];
       const hrList = intel.hrAndRecruiters || [];
       const dmText = intel.customExecutiveDm || "";
       const hrDmText = intel.customHrDm || "";
-      const mailObj = buildOutreachEmail({ ...item, aiIntel: intel });
+      const mailObj = (typeof buildUnifiedEmail === "function") ? buildUnifiedEmail({ ...item, aiIntel: intel }) : buildOutreachEmail({ ...item, aiIntel: intel });
       const emailToUse = intel.bestEmail || item.email || "";
       const renderProfileLink = (url) => {
         if (!url) return "";
@@ -1581,7 +1603,7 @@
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="copyPersonDm(${idx}, 'cto', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-indigo-600/40 hover:bg-indigo-600/70 text-indigo-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
+                    <button type="button" onclick="copyPersonDm('${itemId}', 'cto', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-indigo-600/40 hover:bg-indigo-600/70 text-indigo-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
                     ${renderProfileLink(p.linkedinUrl)}
                   </div>
                 </div>
@@ -1601,7 +1623,7 @@
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="copyPersonDm(${idx}, 'hr', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-blue-600/40 hover:bg-blue-600/70 text-blue-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
+                    <button type="button" onclick="copyPersonDm('${itemId}', 'hr', ${pIdx}, this)" class="px-2 py-0.5 rounded bg-blue-600/40 hover:bg-blue-600/70 text-blue-100 text-[10px] font-semibold cursor-pointer">📋 Copy DM</button>
                     ${renderProfileLink(p.linkedinUrl)}
                   </div>
                 </div>
@@ -1627,7 +1649,7 @@
           <div class="p-2.5 rounded-lg bg-indigo-950/50 border border-indigo-500/30 space-y-1.5">
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-indigo-200 text-[11px]">💬 LinkedIn Direct Message — For CTO / Hiring Manager (Send on LinkedIn):</span>
-              <button type="button" onclick="copyAiDm(${idx}, 'cto', this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+              <button type="button" onclick="copyAiDm('${itemId}', 'cto', this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
                 📋 Copy Manager DM
               </button>
             </div>
@@ -1639,7 +1661,7 @@
           <div class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-500/30 space-y-1.5">
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-blue-200 text-[11px]">👩‍💼 LinkedIn Direct Message — For HR / Talent Acquisition (Send on LinkedIn):</span>
-              <button type="button" onclick="copyAiDm(${idx}, 'hr', this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+              <button type="button" onclick="copyAiDm('${itemId}', 'hr', this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
                 📋 Copy HR DM
               </button>
             </div>
@@ -1651,7 +1673,7 @@
           <div class="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-500/30 space-y-1.5">
             <div class="flex items-center justify-between gap-2">
               <span class="font-bold text-emerald-200 text-[11px]">📧 AI Tailored Direct Email (Used by Open Gmail / Mail App / Copy Email):</span>
-              <button type="button" onclick="copyAiDm(${idx}, 'email', this)" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+              <button type="button" onclick="copyAiDm('${itemId}', 'email', this)" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
                 📋 Copy Full Email
               </button>
             </div>
@@ -1662,10 +1684,11 @@
       `;
     }
 
-    async function runAiCompanyResearch(idx, mode, btn) {
-      const item = CURRENT_OUTREACH_ITEMS[idx];
+    async function runAiCompanyResearch(idOrIdx, mode, btn) {
+      const item = findPipelineItem(idOrIdx);
       if (!item) return;
-      const panel = document.getElementById(`aiIntelPanel-${idx}`);
+      const itemId = item.id || idOrIdx;
+      const panel = document.getElementById(`aiIntelPanel-${itemId}`) || document.getElementById(`aiIntelPanel-${idOrIdx}`);
       btn.disabled = true;
       btn.innerHTML = mode === "email" ? "⏳ AI Writing Pitch..." : "⏳ AI Researching...";
       if (panel) {
@@ -1706,7 +1729,7 @@
 
       // 2. Fallback / Enrich with Client-Side Executive Knowledge Base + Live Clearbit Domain Resolver
       const cleanComp = item.company.split("(")[0].trim();
-      const kbKey = Object.keys(EXECUTIVE_INTEL_KB).find(k => item.company.toLowerCase().includes(k));
+      const kbKey = Object.keys(EXECUTIVE_INTEL_KB).find(k => item.company.toLowerCase().includes(k) || k.includes(item.company.toLowerCase().split("(")[0].trim()));
       const kb = kbKey ? EXECUTIVE_INTEL_KB[kbKey] : null;
 
       if (!aiIntel) {
@@ -1727,13 +1750,13 @@
 
         const leadPerson = kb?.ctoAndEngLeads?.[0]?.name || `${cleanComp} Yönetimi`;
         const hrPerson = kb?.hrAndRecruiters?.[0]?.name || `${cleanComp} İnsan Kaynakları Ekibi`;
-        const isEn = item.lang === "EN";
+        const isEn = item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sompo|getir|onftech)\b/i.test(item.company);
         const customDm = isEn
-          ? `Hi ${leadPerson.split("/")[0].trim()}, I recently applied for the ${item.role} role at ${cleanComp} and wanted to connect directly. At Pilz Türkiye (German multinational Pilz GmbH), I architected 5 production enterprise platforms end-to-end—spanning CRM/ERP, SAP & e-Invoice automation, AI workflows, and a B2B SaaS platform serving 9,000+ companies—cutting operational turnaround by 80%, after previously training 150+ software engineers. As I evaluate my next high-impact role, I would love to share a 10-minute live walkthrough of these running systems this week. Feel free to reach me here or directly at +90 539 229 4251. Best regards, Hessam Barasm Mamagani`
-          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu ilettim ve doğrudan da tanışmak istedim. Alman Pilz GmbH Türkiye'de kurumsal CRM/ERP, SAP ve e-Fatura otomasyonu ile 9.000+ firmaya hizmet veren B2B SaaS sistemleri dahil 5 canlı kurumsal platformu sıfırdan mimarlayıp hayata geçirerek operasyonel süreçleri %80 hızlandırdım; öncesinde de 640+ saat canlı eğitimle 150'den fazla yazılımcı yetiştirdim. Kariyerimin bir sonraki adımını değerlendirdiğim bu dönemde, canlıda çalışan bu sistemleri ve ${cleanComp} ekibine katabileceğim değeri bu hafta 10 dakikalık kısa bir görüşmede paylaşmayı çok isterim. Bana buradan veya +90 539 229 4251 numaramdan doğrudan ulaşabilirsiniz. Selamlar, Hessam Barasm Mamagani`;
+          ? `Hi ${leadPerson.split("/")[0].trim()}, I recently applied for ${item.role} at ${cleanComp} and wanted to connect directly. At Pilz Türkiye (German multinational Pilz GmbH), I architected 5 production enterprise platforms end-to-end—cutting operational turnaround by 80% and deploying multi-model Agentic AI/RAG systems. I hold an active work permit in Istanbul and a signed recommendation letter from our General Manager Yavuz Çopur. Would love to share a brief 10-minute walkthrough this week! (+90 539 229 4251 | https://hessam-mamagani.github.io/)`
+          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu ilettim ve doğrudan da tanışmak istedim. Alman Pilz GmbH Türkiye'de kurumsal CRM/ERP, SAP ve e-Fatura süreçlerini %80 hızlandıran 5 kurumsal platformun mimarisini yönettim; öncesinde 150+ yazılımcı yetiştirdim. Canlı sistemlerimi ve ekibinize katabileceğim değeri 10 dakikalık kısa bir görüşmede paylaşmak isterim. (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
         const customHrDm = isEn
-          ? `Hi ${hrPerson.split("/")[0].trim()}, I recently submitted my application for the ${item.role} position at ${cleanComp}. At Pilz Türkiye (Pilz GmbH), I led the end-to-end delivery of 5 enterprise digital transformation and automation platforms that reduced operational turnaround by 80%, backed by a personal recommendation from our General Manager Yavuz Çopur. I am currently in active discussions for my next chapter in Istanbul and would love to prioritize ${cleanComp}—happy to jump on a brief 10-minute introductory call this week. You can reach me anytime here or at +90 539 229 4251. Best regards, Hessam Barasm Mamagani`
-          : `Merhaba ${hrPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim. Alman Pilz GmbH Türkiye'de satıştan SAP/ERP ve e-Fatura otomasyonuna kadar tüm süreçleri uçtan uca dijitalleştiren 5 canlı kurumsal platformun liderliğini üstlenerek operasyonel süreleri %80 kısalttım. Genel Müdürümüz Yavuz Çopur'un referansıyla, yeni dönem kariyer adımlarımı değerlendirdiğim bu süreçte ${cleanComp} ile bu hafta 10-15 dakikalık bir tanışma görüşmesi yapmaktan büyük memnuniyet duyarım. Bana buradan veya +90 539 229 4251 numaramdan her zaman ulaşabilirsiniz. İyi çalışmalar dilerim, Hessam Barasm Mamagani`;
+          ? `Hi ${hrPerson.split("/")[0].trim()}, I recently submitted my application for the ${item.role} position at ${cleanComp}. At Pilz Türkiye (Pilz GmbH), I led delivery of 5 enterprise automation platforms reducing turnaround by 80%, backed by a recommendation from our General Manager Yavuz Çopur. Active work permit in Istanbul through 31.12.2026. Would love to jump on a brief 10-minute introductory call this week! (+90 539 229 4251)`
+          : `Merhaba ${hrPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim. Alman Pilz GmbH Türkiye'de SAP ve e-Fatura süreçlerini %80 hızlandıran kurumsal platformlara liderlik ettim. Genel Müdürümüz Yavuz Çopur'un referansıyla bu hafta 10-15 dakikalık bir tanışma görüşmesi yapmaktan memnuniyet duyarım. (+90 539 229 4251)`;
 
         aiIntel = {
           poweredBy: "Gemini AI & Executive Intelligence Graph",
@@ -1761,25 +1784,9 @@
       } else if (kb) {
         if (!aiIntel.ctoAndEngLeads?.length) {
           aiIntel.ctoAndEngLeads = kb.ctoAndEngLeads;
-        } else if (kb.ctoAndEngLeads?.length) {
-          for (const kp of kb.ctoAndEngLeads) {
-            const existing = aiIntel.ctoAndEngLeads.find(p => p.name.toLowerCase() === kp.name.toLowerCase());
-            if (existing) existing.linkedinUrl = kp.linkedinUrl;
-            else if (aiIntel.ctoAndEngLeads.length < 3) aiIntel.ctoAndEngLeads.push(kp);
-          }
         }
         if (!aiIntel.hrAndRecruiters?.length) {
           aiIntel.hrAndRecruiters = kb.hrAndRecruiters;
-        } else if (kb.hrAndRecruiters?.length) {
-          for (const kp of kb.hrAndRecruiters) {
-            const existing = aiIntel.hrAndRecruiters.find(p => p.name.toLowerCase() === kp.name.toLowerCase());
-            if (existing) {
-              existing.linkedinUrl = kp.linkedinUrl;
-              existing.title = kp.title;
-            } else {
-              aiIntel.hrAndRecruiters.unshift(kp);
-            }
-          }
         }
         if (!aiIntel.bestEmail && kb.emails?.[0]) aiIntel.bestEmail = kb.emails[0];
         if (!aiIntel.phoneDisplay && kb.phone) aiIntel.phoneDisplay = kb.phone;
@@ -1794,15 +1801,9 @@
         item.phone = foundPhone || foundPhoneDisplay.replace(/[^\d+]/g, "");
       }
 
-      const pItem = PROACTIVE_GLOBAL_TARGETS.find(t => String(t.id) === String(item.id));
-      if (pItem) {
-        pItem.aiIntel = aiIntel;
-        if (item.email) pItem.email = item.email;
-        if (item.phoneDisplay) {
-          pItem.phoneDisplay = item.phoneDisplay;
-          pItem.phone = item.phone;
-        }
-      }
+      try {
+        localStorage.setItem(`jr_intel_${itemId}`, JSON.stringify(aiIntel));
+      } catch {}
 
       const crmItem = STATE.applied.find(a => String(a.id) === String(item.id));
       if (crmItem) {
@@ -1816,23 +1817,22 @@
       }
 
       if (panel) {
-        panel.innerHTML = renderAiIntelHtml(aiIntel, item, idx);
+        panel.innerHTML = renderAiIntelHtml(aiIntel, item, itemId);
       }
 
-      // Update top card Phone & Email labels in-place immediately
-      const emailSlot = document.getElementById(`emailSlot-${idx}`);
+      // Update card slots immediately
+      const emailSlot = document.getElementById(`emailSlot-${itemId}`) || document.getElementById(`emailSlot-${idOrIdx}`);
       if (emailSlot && item.email) {
         emailSlot.innerHTML = `<span class="text-emerald-300 font-mono font-semibold">📧 ${item.email}</span>`;
       }
-      const phoneSlot = document.getElementById(`phoneSlot-${idx}`);
+      const phoneSlot = document.getElementById(`phoneSlot-${itemId}`) || document.getElementById(`phoneSlot-${idOrIdx}`);
       if (phoneSlot && item.phoneDisplay) {
         phoneSlot.innerHTML = `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`;
       }
 
-      // Always refresh Gmail & Mailto links with the newly generated AI subject & body
-      const mail = buildOutreachEmail(item);
-      const gBtn = document.getElementById(`gmailBtn-${idx}`);
-      const mBtn = document.getElementById(`mailtoBtn-${idx}`);
+      const mail = (typeof buildUnifiedEmail === "function") ? buildUnifiedEmail(item) : buildOutreachEmail(item);
+      const gBtn = document.getElementById(`gmailBtn-${itemId}`) || document.getElementById(`gmailBtn-${idOrIdx}`);
+      const mBtn = document.getElementById(`mailtoBtn-${itemId}`) || document.getElementById(`mailtoBtn-${idOrIdx}`);
       const targetEmail = item.email || aiIntel?.bestEmail?.split("/")[0]?.trim() || "";
       if (gBtn) gBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
       if (mBtn) mBtn.href = `mailto:${targetEmail}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
@@ -2031,22 +2031,24 @@
     }
 
     function switchTab(tab) {
-      ["radar", "crm", "outreach", "checklist", "vault"].forEach(t => {
+      ["radar", "pipeline", "crm", "vault"].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.classList.toggle("hidden", t !== tab);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (btn) {
           btn.className = t === tab
-            ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white transition"
-            : t === "outreach"
-            ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-amber-600/20 border border-amber-500/40 text-amber-300 hover:bg-amber-600/30 transition"
-            : t === "checklist"
-            ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition"
-            : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
+            ? (t === "pipeline"
+                ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600 text-white shadow-lg transition"
+                : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white shadow-lg transition")
+            : (t === "pipeline"
+                ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition"
+                : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition");
         }
       });
       document.getElementById("scanControls").classList.toggle("hidden", tab !== "radar");
-      if (tab === "checklist") renderVipChecklist();
+      if (tab === "pipeline") renderUnifiedPipeline();
+      if (tab === "crm") renderCrm();
+      if (tab === "vault") renderVault();
     }
 
     let isScanRunning = false;
@@ -2460,7 +2462,7 @@
                       target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
                     }
                     await ghSaveDb();
-                    renderOutreach();
+                    renderUnifiedPipeline();
                     renderCrm();
                   }
                   break;
@@ -2474,8 +2476,8 @@
       updateHeaderCounts();
       renderRadarList();
       renderCrm();
-      renderOutreach();
-      showToast(`✅ Added "${newEntry.company}" to CRM & Dynamic Call/Email List!`, true);
+      renderUnifiedPipeline();
+      showToast(`✅ Added "${newEntry.company}" to Master Pipeline! <button onclick="switchTab('pipeline'); togglePipelineExpand('${newEntry.id}')" class="ml-2 px-2 py-0.5 rounded bg-white text-emerald-900 font-bold hover:bg-yellow-300 transition shadow">🚀 Open in Master Pipeline →</button>`, true);
     }
 
     async function quickSkip(id) {
@@ -2519,7 +2521,7 @@
       }
       updateHeaderCounts();
       renderCrm();
-      renderOutreach();
+      renderUnifiedPipeline();
     }
 
     function renderCrm() {
@@ -2587,31 +2589,38 @@
     }
 
     // ==========================================
-    // TAB 4: MASTER VIP CHECKLIST (ALL 41 TARGETS)
+    // TAB 2: MASTER OUTREACH & PIPELINE SYSTEM
     // ==========================================
-    let VIP_VIEW_MODE = localStorage.getItem("jr_vip_view_mode") || "compact";
-    let VIP_EXPANDED_IDS = new Set();
+    let PIPELINE_VIEW_MODE = localStorage.getItem("jr_pipeline_view_mode") || localStorage.getItem("jr_vip_view_mode") || "compact";
+    let PIPELINE_EXPANDED_IDS = new Set();
+    let VIP_VIEW_MODE = PIPELINE_VIEW_MODE;
+    let VIP_EXPANDED_IDS = PIPELINE_EXPANDED_IDS;
 
-    function setVipViewMode(m) {
+    function setPipelineViewMode(m) {
+      PIPELINE_VIEW_MODE = m;
       VIP_VIEW_MODE = m;
+      localStorage.setItem("jr_pipeline_view_mode", m);
       localStorage.setItem("jr_vip_view_mode", m);
-      const bCompact = document.getElementById("vipViewBtn-compact");
-      const bCards = document.getElementById("vipViewBtn-cards");
+      const bCompact = document.getElementById("pipelineViewBtn-compact") || document.getElementById("vipViewBtn-compact");
+      const bCards = document.getElementById("pipelineViewBtn-cards") || document.getElementById("vipViewBtn-cards");
       if (bCompact && bCards) {
         bCompact.className = m === "compact" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
         bCards.className = m === "cards" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
       }
-      renderVipChecklist();
+      renderUnifiedPipeline();
     }
+    function setVipViewMode(m) { setPipelineViewMode(m); }
 
-    function toggleVipExpand(id) {
-      if (VIP_EXPANDED_IDS.has(id)) {
-        VIP_EXPANDED_IDS.delete(id);
+    function togglePipelineExpand(id) {
+      const strId = String(id);
+      if (PIPELINE_EXPANDED_IDS.has(strId)) {
+        PIPELINE_EXPANDED_IDS.delete(strId);
       } else {
-        VIP_EXPANDED_IDS.add(id);
+        PIPELINE_EXPANDED_IDS.add(strId);
       }
-      renderVipChecklist();
+      renderUnifiedPipeline();
     }
+    function toggleVipExpand(id) { togglePipelineExpand(id); }
 
     const VIP_CHECKLIST_ALL = [
       {
@@ -2628,7 +2637,7 @@
         mapQuery: "Bellevue Residence Levent Beşiktaş İstanbul",
         jobUrl: "https://careers.microsoft.com/v2/global/en/locations/istanbul.html",
         vipBadge: "⭐ 1st-Deg: Cüneyt Batmaz (Deputy GM) & Levent Özbilgin (GM)",
-        summary: "Top #1 Global Partner for .NET 10 + Azure. You have 1st-degree connection Cüneyt Batmaz (Commercial Solutions Leader, Deputy GM) & GM Levent Özbilgin."
+        summary: "Top #1 Global Partner for .NET 10 + Azure. ⚠️ Note: trinfo@microsoft.com blocks external emails. Message 1st-degree connection Cüneyt Batmaz (Deputy GM) & Mesut Aladağ (Cloud & AI Tech Lead) directly on LinkedIn!"
       },
       {
         rank: 2,
@@ -3247,309 +3256,558 @@
       }
     ];
 
-    function getVipChecklistState() {
+    function getPipelineCheckState() {
       try {
+        const v2 = JSON.parse(localStorage.getItem("jr_pipeline_checks_v2") || "null");
+        if (v2) return v2;
         return JSON.parse(localStorage.getItem("jr_vip_checklist_v1") || "{}");
       } catch {
         return {};
       }
     }
 
-    function saveVipChecklistState(st) {
-      localStorage.setItem("jr_vip_checklist_v1", JSON.stringify(st));
+    function savePipelineCheckState(st) {
+      localStorage.setItem("jr_pipeline_checks_v2", JSON.stringify(st));
     }
 
-    function toggleVipCheck(id, field, value) {
-      const st = getVipChecklistState();
-      if (!st[id]) st[id] = { emailed: false, called: false, walked: false, applied: false };
-      st[id][field] = !!value;
-      saveVipChecklistState(st);
-      renderVipChecklist();
+    function togglePipelineCheck(id, field, value) {
+      const st = getPipelineCheckState();
+      const strId = String(id);
+      if (!st[strId]) st[strId] = { emailed: false, called: false, walked: false, applied: false };
+      st[strId][field] = !!value;
+      savePipelineCheckState(st);
+
+      // Auto-advance CRM status if user checked email/call for an applied job
+      const crmItem = STATE.applied.find(a => String(a.id) === strId);
+      if (crmItem && (field === "emailed" || field === "called") && value && crmItem.status === "Applied") {
+        crmItem.status = "HR Messaged 💬";
+        if (!IS_LOCAL) ghSaveDb();
+        updateHeaderCounts();
+        renderCrm();
+      }
+
+      renderUnifiedPipeline();
       showToast(`Saved check for ${id}!`, true);
     }
+    function getVipChecklistState() { return getPipelineCheckState(); }
+    function saveVipChecklistState(st) { savePipelineCheckState(st); }
+    function toggleVipCheck(id, field, value) { togglePipelineCheck(id, field, value); }
 
-    function buildVipEmail(item) {
-      const isEnglish = /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard)\b/i.test(item.company);
+    function buildUnifiedEmail(item) {
+      if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody) {
+        return {
+          subject: item.aiIntel.customEmailSubject,
+          body: item.aiIntel.customEmailBody
+        };
+      }
+      const isEnglish = item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sompo|getir|onftech)\b/i.test(item.company);
       if (isEnglish) {
         return {
           subject: `Senior Software & AI Architect — ${item.company} — Hessam Barasm Mamagani`,
-          body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company}'s engineering culture and high-scale technical challenges strongly align with the enterprise architectures I lead.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led the end-to-end architecture and delivery of 5 production platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting operational turnaround time by 80%), and multi-model Agentic AI/RAG automation. Additionally, I have mentored 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 10–15 minute call to discuss how I can contribute.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out regarding ${item.role} at ${item.company}.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led the end-to-end architecture and delivery of 5 production enterprise platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting operational turnaround time by 80%), and multi-model Agentic AI/RAG automation. Additionally, I have mentored 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 10–15 minute call to discuss how I can contribute.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
       return {
         subject: `Tanışma & Başvuru: ${item.role} — Hessam Barasm Mamagani`,
-        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki ${item.role} pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 zaman tasarrufu), çok kiracılı SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca mimari liderlikle hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz bu hafta 10-15 dakikalık bir görüşmede ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki ${item.role} pozisyonu için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 zaman tasarrufu), çok kiracılı SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca mimari liderlikle hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz bu hafta 10-15 dakikalık bir görüşmede ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
+    function buildVipEmail(item) { return buildUnifiedEmail(item); }
 
-    function buildVipDm(item) {
-      const isEnglish = /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard)\b/i.test(item.company);
-      if (isEnglish) {
-        return `Hello, I recently shared my CV with ${item.company}'s talent team for ${item.role}. At German multinational Pilz GmbH & Co. KG, I lead architecture across 5 enterprise platforms—automating SAP & e-Invoice workflows by 80% and deploying multi-model Agentic AI/RAG systems. I hold an active work permit in Istanbul and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. Would you be open to a brief 10-minute intro call this week? (Phone: +90 539 229 4251 | Portfolio: https://hessam-mamagani.github.io/)`;
+    function buildUnifiedDm(item, target = "cto") {
+      if (item.aiIntel) {
+        if (target === "hr" && item.aiIntel.customHrDm) return item.aiIntel.customHrDm;
+        if (item.aiIntel.customExecutiveDm) return item.aiIntel.customExecutiveDm;
       }
-      return `Merhaba, ${item.company} bünyesindeki ${item.role} vizyonunuz için özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı tavsiye mektubunu ilettim. Pilz GmbH bünyesinde 5 kurumsal platformun mimarisini uçtan uca yönettim; SAP ve e-Fatura süreçlerini %80 hızlandırıp kurumsal AI sistemlerini canlıya aldım. İstanbul'da aktif çalışma iznim mevcuttur. Bu hafta 10 dakikalık kısa bir tanışma görüşmesi gerçekleştirebilir miyiz? (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      const isEnglish = item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sompo|getir|onftech)\b/i.test(item.company);
+      if (isEnglish) {
+        if (target === "hr") {
+          return `Hi, I recently submitted my application for the ${item.role} position at ${item.company}. At Pilz Türkiye (German Pilz GmbH), I led delivery of 5 enterprise automation platforms reducing operational turnaround by 80%, backed by a signed recommendation letter from our General Manager Yavuz Çopur. Active work permit in Istanbul through 31.12.2026. Would love to jump on a brief 10-minute introductory call this week! (+90 539 229 4251)`;
+        }
+        return `Hello, I recently applied for ${item.role} at ${item.company} and wanted to connect directly. At Pilz Türkiye (German multinational Pilz GmbH), I architected 5 production platforms—cutting SAP & e-Invoice turnaround by 80% and deploying multi-model Agentic AI/RAG systems. I hold an active work permit in Istanbul and a signed recommendation letter from our General Manager Yavuz Çopur. Would you be open to a brief 10-minute intro call this week? (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      }
+      if (target === "hr") {
+        return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim. Alman Pilz GmbH Türkiye'de SAP ve e-Fatura süreçlerini %80 hızlandıran kurumsal platformlara liderlik ettim. Genel Müdürümüz Yavuz Çopur'un referansı ve aktif çalışma iznimle bu hafta 10-15 dakikalık bir tanışma görüşmesi yapmaktan memnuniyet duyarım. (+90 539 229 4251)`;
+      }
+      return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu ilettim ve doğrudan da tanışmak istedim. Alman Pilz GmbH Türkiye'de kurumsal CRM/ERP, SAP ve e-Fatura süreçlerini %80 hızlandıran 5 kurumsal platformun mimarisini yönettim; öncesinde 150+ yazılımcı yetiştirdim. Canlı sistemlerimi ve ekibinize katabileceğim değeri 10 dakikalık kısa bir görüşmede paylaşmak isterim. (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+    }
+    function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
+
+    let UNIFIED_PIPELINE_ITEMS = [];
+
+    function getUnifiedPipelineList() {
+      const checks = getPipelineCheckState();
+      const list = [];
+      const appliedMap = new Map();
+
+      // 1. Process all applied jobs from STATE.applied (excluding Rejected)
+      STATE.applied.forEach(app => {
+        if (app.status === "Rejected") return;
+        const comp = (app.company || "").trim();
+        if (!comp || /^gizli/i.test(comp) || /^yazılım şirketi$/i.test(comp)) return;
+
+        const cleanKey = comp.toLowerCase().split("(")[0].trim();
+        appliedMap.set(cleanKey, app);
+
+        // Find match in EXECUTIVE_INTEL_KB or COMPANY_CONTACT_DB or VIP_CHECKLIST_ALL
+        const kbKey = Object.keys(EXECUTIVE_INTEL_KB).find(k => cleanKey.includes(k) || k.includes(cleanKey));
+        const kb = kbKey ? EXECUTIVE_INTEL_KB[kbKey] : null;
+        const known = COMPANY_CONTACT_DB.find(c => c.match.test(comp)) || {};
+        const vipMatch = VIP_CHECKLIST_ALL.find(v => v.company.toLowerCase().includes(cleanKey) || cleanKey.includes(v.company.toLowerCase().split("(")[0].trim()));
+
+        const isEnglish = (app.cvUsed === "EN") || (known.lang === "EN") || /\b(remote|global|emea|aws|amazon|deel|ant|sezzle|google|microsoft|ibm|oracle|sompo|getir|onftech)\b/i.test(comp);
+
+        let priority = 80;
+        const todayStr = new Date().toISOString().slice(0, 10);
+        if (app.appliedAt === todayStr) priority = 120; // Applied today!
+        if (app.status === "CV Downloaded ⭐") priority = 115;
+        if (app.status === "Viewed 👀") priority = 110;
+        if (app.status === "Interview 🎯") priority = 130;
+
+        // Restore cached AI intel if present
+        let savedIntel = app.aiIntel;
+        if (!savedIntel) {
+          try {
+            savedIntel = JSON.parse(localStorage.getItem(`jr_intel_${app.id}`) || "null");
+          } catch {}
+        }
+
+        const email = app.contactEmail || (savedIntel && savedIntel.bestEmail) || (kb?.emails && kb.emails[0]) || known.email || vipMatch?.email || "";
+        const phone = app.contactPhone || kb?.phone || known.phone || vipMatch?.phone || "";
+        const phoneDisplay = app.contactPhoneDisplay || (savedIntel && savedIntel.phoneDisplay) || kb?.phone || known.phoneDisplay || vipMatch?.phoneDisplay || phone || "";
+        const address = kb?.officeAndMetro || vipMatch?.address || app.location || "Istanbul";
+        const mapQuery = vipMatch?.mapQuery || `${comp} ${address} Istanbul`;
+
+        list.push({
+          id: String(app.id),
+          category: "APPLIED",
+          rank: null,
+          badge: app.status === "Applied" ? "⚡ Just Applied" : `⭐ ${app.status}`,
+          company: comp,
+          role: app.title || "Software Solutions Architect",
+          location: app.location || "Istanbul",
+          cluster: vipMatch?.cluster || "CLUSTER_LEVENT",
+          clusterLabel: vipMatch?.clusterLabel || `📍 ${app.location || "Istanbul (Hybrid/Remote)"}`,
+          appliedAt: app.appliedAt || "",
+          status: app.status || "Applied",
+          email,
+          phone,
+          phoneDisplay,
+          address,
+          mapQuery,
+          jobUrl: app.url && app.url !== "#" ? app.url : `https://www.linkedin.com/jobs/view/${app.id}/`,
+          summary: app.notes || vipMatch?.summary || kb?.walkInVerdict || "Recent job application logged in your system. Send tailored follow-up DMs to decision-makers!",
+          lang: isEnglish ? "EN" : "TR",
+          vipBadge: vipMatch?.vipBadge || null,
+          aiIntel: savedIntel || (kb ? {
+            poweredBy: "Executive Intelligence Graph",
+            ctoAndEngLeads: kb.ctoAndEngLeads || [],
+            hrAndRecruiters: kb.hrAndRecruiters || [],
+            bestEmail: email,
+            phoneDisplay,
+            officeAndMetro: kb.officeAndMetro || address,
+            walkInVerdict: kb.walkInVerdict || ""
+          } : null),
+          priority
+        });
+      });
+
+      // Sort applied list by priority descending
+      list.sort((a, b) => b.priority - a.priority);
+
+      // 2. Append Proactive VIP Tech Giants (Microsoft #1, AWS #2, etc.)
+      VIP_CHECKLIST_ALL.forEach(vip => {
+        const cleanKey = vip.company.toLowerCase().split("(")[0].trim();
+        const appliedApp = appliedMap.get(cleanKey) || [...appliedMap.entries()].find(([k]) => cleanKey.includes(k) || k.includes(cleanKey))?.[1];
+
+        const kbKey = Object.keys(EXECUTIVE_INTEL_KB).find(k => cleanKey.includes(k) || k.includes(cleanKey));
+        const kb = kbKey ? EXECUTIVE_INTEL_KB[kbKey] : null;
+
+        const isEnglish = /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft)\b/i.test(vip.company);
+
+        // Restore cached AI intel if present
+        let savedIntel = null;
+        try {
+          savedIntel = JSON.parse(localStorage.getItem(`jr_intel_${vip.id}`) || "null");
+        } catch {}
+
+        list.push({
+          id: vip.id,
+          category: "PROACTIVE_GIANT",
+          rank: vip.rank,
+          badge: `#${vip.rank} Tech Giant`,
+          company: vip.company,
+          role: vip.role,
+          location: vip.address,
+          cluster: vip.cluster,
+          clusterLabel: vip.clusterLabel,
+          appliedAt: appliedApp?.appliedAt || "",
+          status: appliedApp ? appliedApp.status : "Proactive Target 🎯",
+          hasAppliedInCrm: !!appliedApp,
+          email: vip.email,
+          phone: vip.phone,
+          phoneDisplay: vip.phoneDisplay,
+          address: vip.address,
+          mapQuery: vip.mapQuery,
+          jobUrl: vip.jobUrl,
+          summary: vip.summary,
+          lang: isEnglish ? "EN" : "TR",
+          vipBadge: vip.vipBadge,
+          aiIntel: savedIntel || (kb ? {
+            poweredBy: "Executive Intelligence Graph",
+            ctoAndEngLeads: kb.ctoAndEngLeads || [],
+            hrAndRecruiters: kb.hrAndRecruiters || [],
+            bestEmail: vip.email,
+            phoneDisplay: vip.phoneDisplay,
+            officeAndMetro: kb.officeAndMetro || vip.clusterLabel,
+            walkInVerdict: kb.walkInVerdict || vip.summary
+          } : null),
+          priority: 50 - (vip.rank || 50)
+        });
+      });
+
+      return list;
     }
 
-    function renderVipChecklist() {
-      const container = document.getElementById("checklistContainer");
-      if (!container) return;
-      const q = (document.getElementById("checklistSearch")?.value || "").toLowerCase().trim();
-      const filter = document.getElementById("checklistFilter")?.value || "ALL";
-      const checks = getVipChecklistState();
+    function renderPipelineDrawerHtml(item, checks, mail, dmText, gmailHref, mapsHref, myConnectionsHref) {
+      const hrDmText = buildUnifiedDm(item, "hr");
+      const isMicrosoft = item.id === "VIP-MICROSOFT" || item.company.toLowerCase().includes("microsoft");
+      const emailDisplay = isMicrosoft
+        ? `<span class="text-amber-300 font-semibold" title="Generic email blocked by Microsoft Exchange">Direct LinkedIn ( trinfo@ blocked ⚠️ )</span>`
+        : item.email
+        ? `<a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline text-xs">${item.email}</a>`
+        : `<span class="text-slate-400 text-xs">Run AI Research below</span>`;
 
-      const appliedNames = new Set(STATE.applied.map(a => (a.company || "").toLowerCase()));
+      return `
+        <div class="p-4 bg-slate-950/80 border-t border-slate-800/80 space-y-3.5 text-xs">
+          <!-- Top Contact Strip -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Email</span>
+              <div id="emailSlot-${item.id}" class="truncate font-mono">${emailDisplay}</div>
+            </div>
+            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+              <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Phone / Switchboard</span>
+              <div id="phoneSlot-${item.id}">
+                ${item.phone && item.phone !== "Global Remote"
+                  ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline text-xs">📞 ${item.phoneDisplay}</a>`
+                  : `<span class="text-slate-400 text-xs">${item.phoneDisplay || "Switchboard via HQ"}</span>`
+                }
+              </div>
+            </div>
+            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+              <div>
+                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Career Post</span>
+                <a href="${item.jobUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold text-xs">↗ Open Active Job Post</a>
+              </div>
+              <a href="${mapsHref}" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600/30 transition">
+                🗺️ Maps
+              </a>
+            </div>
+          </div>
+
+          <!-- Location & Summary -->
+          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
+            <strong class="text-slate-400">📍 Address & Metro:</strong> ${item.address} &middot; <span class="text-amber-200/90">${item.summary}</span>
+          </div>
+
+          <!-- AI Actions Bar -->
+          <div class="bg-indigo-950/40 p-3 rounded-xl border border-indigo-500/30 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                🤖 Multi-Model AI Decision-Maker & Outreach Intelligence
+              </span>
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="runAiCompanyResearch('${item.id}', 'cto', this)" class="py-1 px-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow transition cursor-pointer">
+                  🤖 AI Research Contacts (CTO & HR)
+                </button>
+                <button type="button" onclick="runAiCompanyResearch('${item.id}', 'email', this)" class="py-1 px-2.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-xs font-semibold transition cursor-pointer">
+                  ✨ AI Generate Custom Executive Pitch
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic AI Intel Output Container -->
+            <div id="aiIntelPanel-${item.id}" class="${item.aiIntel ? '' : 'hidden'} mt-2 p-3 rounded-xl bg-slate-950/95 border border-indigo-500/40 space-y-2.5 text-xs">
+              ${item.aiIntel ? renderAiIntelHtml(item.aiIntel, item, item.id) : ''}
+            </div>
+          </div>
+
+          <!-- 1-Click Fast Actions Strip -->
+          <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-800/80">
+            <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-1">
+              ✉️ Open Gmail
+            </a>
+            <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Full email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
+              📋 Copy Pre-Filled Email
+            </button>
+            <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 Manager DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+              💬 Copy Manager DM
+            </button>
+            <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(hrDmText)}'), this, '👩‍💼 HR DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 font-medium text-xs transition">
+              👩‍💼 Copy HR DM
+            </button>
+            <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold transition">
+              👥 My 1st-Deg Connections
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPipelineRow(item, checks) {
+      const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
+      const isApplied = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
+      const isExpanded = PIPELINE_EXPANDED_IDS.has(String(item.id));
+      const mail = buildUnifiedEmail(item);
+      const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+      const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
+      const dmText = buildUnifiedDm(item, "cto");
+      const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
+
+      return `
+        <div class="glass rounded-xl border ${c.emailed ? 'border-emerald-500/50 bg-emerald-950/15' : item.category === 'APPLIED' ? 'border-blue-500/40 hover:border-emerald-500/40' : 'border-slate-800 hover:border-slate-700'} transition overflow-hidden">
+          <!-- Compact Single-Row Bar -->
+          <div class="p-3 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
+            <div class="flex items-center gap-2.5 flex-1 min-w-[280px]">
+              <span class="px-2 py-0.5 rounded text-xs font-bold ${item.category === 'APPLIED' ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'bg-slate-800 text-slate-300 border border-slate-700'}">
+                ${item.category === 'APPLIED' ? item.badge : '#' + item.rank}
+              </span>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-bold text-white hover:text-blue-300 transition">${item.company}</span>
+                  <span class="text-[11px] px-2 py-0.2 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel.split("(")[0].trim()}</span>
+                  ${item.vipBadge ? `<span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ""}
+                  ${isApplied && item.category !== 'APPLIED' ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Applied</span>` : ""}
+                </div>
+                <p class="text-xs text-slate-400 font-medium truncate max-w-md">${item.role}</p>
+              </div>
+            </div>
+
+            <!-- Inline Checkboxes -->
+            <div class="flex items-center gap-3 shrink-0 text-xs bg-black/40 px-3 py-1.5 rounded-lg border border-slate-800" onclick="event.stopPropagation()">
+              <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
+                <span class="${c.emailed ? 'font-bold text-emerald-300' : 'text-slate-400'}">📧 Email</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                <input type="checkbox" ${c.called ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
+                <span class="${c.called ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call/DM</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                <input type="checkbox" ${c.walked ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
+                <span class="${c.walked ? 'font-bold text-emerald-300' : 'text-slate-400'}">🚶 Walk</span>
+              </label>
+              <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                <input type="checkbox" ${isApplied ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
+                <span class="${isApplied ? 'font-bold text-emerald-300' : 'text-slate-400'}">🌐 Apply</span>
+              </label>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+              <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition">
+                ✉️ Gmail
+              </a>
+              <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 DM copied!')" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+                💬 DM
+              </button>
+              <a href="${myConnectionsHref}" target="_blank" class="px-2 py-1 rounded bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search your 1st-degree connections at ${item.company}">
+                👥 Connections
+              </a>
+              <button onclick="togglePipelineExpand('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                ${isExpanded ? '▲ Hide' : '▼ Details'}
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Drawer -->
+          ${isExpanded ? renderPipelineDrawerHtml(item, checks, mail, dmText, gmailHref, mapsHref, myConnectionsHref) : ""}
+        </div>
+      `;
+    }
+
+    function renderPipelineCard(item, checks) {
+      const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
+      const isApplied = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
+      const mail = buildUnifiedEmail(item);
+      const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+      const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
+      const dmText = buildUnifiedDm(item, "cto");
+      const hrDmText = buildUnifiedDm(item, "hr");
+      const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
+
+      return `
+        <div class="glass rounded-xl p-4 border ${c.emailed ? 'border-emerald-500/50 bg-emerald-950/15' : item.category === 'APPLIED' ? 'border-blue-500/40 hover:border-emerald-500/40' : 'border-slate-800 hover:border-emerald-500/30'} transition flex flex-col justify-between space-y-3">
+          <div>
+            <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-xs font-bold ${item.category === 'APPLIED' ? 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/40' : 'bg-slate-800 text-slate-200 border border-slate-700'}">
+                  ${item.category === 'APPLIED' ? item.badge : '#' + item.rank}
+                </span>
+                <span class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel}</span>
+              </div>
+              ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : isApplied && item.category !== 'APPLIED' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ In CRM</span>` : ""}
+            </div>
+            <h3 class="text-base font-bold text-white">${item.company}</h3>
+            <p class="text-xs text-blue-300 font-medium mt-0.5">${item.role}</p>
+            <p class="text-xs text-slate-300/90 mt-1.5 leading-relaxed">${item.summary}</p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-800/80 space-y-2 text-xs">
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+              <div id="emailSlot-${item.id}">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Email</span>
+                ${item.email ? `<a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline">${item.email}</a>` : `<span class="text-slate-400">Run AI Research</span>`}
+              </div>
+              <div id="phoneSlot-${item.id}">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Phone</span>
+                ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>` : `<span class="text-slate-400">${item.phoneDisplay || "Switchboard"}</span>`}
+              </div>
+            </div>
+
+            <div class="flex items-start justify-between gap-2 bg-slate-900/40 p-2 rounded border border-slate-800/60">
+              <div class="text-[11px] text-slate-300 flex-1">
+                <span class="text-slate-400 font-semibold">📍 Address:</span> ${item.address}
+              </div>
+              <a href="${mapsHref}" target="_blank" class="shrink-0 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                🗺️ Maps
+              </a>
+            </div>
+
+            <!-- AI Action Buttons in Card -->
+            <div class="flex flex-wrap gap-1.5 pt-0.5">
+              <button type="button" onclick="runAiCompanyResearch('${item.id}', 'cto', this)" class="py-1 px-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition">
+                🤖 AI Research Contacts
+              </button>
+              <button type="button" onclick="runAiCompanyResearch('${item.id}', 'email', this)" class="py-1 px-2.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 border border-purple-500/40 text-xs font-semibold transition">
+                ✨ AI Custom Pitch
+              </button>
+            </div>
+
+            <!-- Dynamic AI Intel Output -->
+            <div id="aiIntelPanel-${item.id}" class="${item.aiIntel ? '' : 'hidden'} mt-1 p-2.5 rounded-xl bg-slate-950/95 border border-indigo-500/40 space-y-2 text-xs">
+              ${item.aiIntel ? renderAiIntelHtml(item.aiIntel, item, item.id) : ''}
+            </div>
+
+            <!-- Action Checklist -->
+            <div class="bg-black/40 p-2.5 rounded-lg border border-emerald-500/20">
+              <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block mb-1.5">Action Checklist:</span>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                  <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.emailed ? 'font-bold text-emerald-300' : ''}">📧 Email</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                  <input type="checkbox" ${c.called ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.called ? 'font-bold text-emerald-300' : ''}">📞 Call/DM</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                  <input type="checkbox" ${c.walked ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.walked ? 'font-bold text-emerald-300' : ''}">🚶 Walk</span>
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                  <input type="checkbox" ${isApplied ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${isApplied ? 'font-bold text-emerald-300' : ''}">🌐 Apply</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Quick Action Buttons -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-1">
+              <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-1">
+                ✉️ Gmail
+              </a>
+              <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
+                📋 Email
+              </button>
+              <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+                💬 DM
+              </button>
+              <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search connections">
+                👥 Connections
+              </a>
+              <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition ml-auto">
+                ↗ Job
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderUnifiedPipeline() {
+      const container = document.getElementById("pipelineContainer");
+      if (!container) return;
+      const q = (document.getElementById("pipelineSearch")?.value || "").toLowerCase().trim();
+      const filter = document.getElementById("pipelineFilter")?.value || "ALL";
+      const checks = getPipelineCheckState();
+
+      UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList();
 
       let totalEmailed = 0;
       let totalCalled = 0;
       let totalWalked = 0;
       let totalApplied = 0;
+      let appliedCount = 0;
 
-      VIP_CHECKLIST_ALL.forEach(item => {
+      UNIFIED_PIPELINE_ITEMS.forEach(item => {
         const c = checks[item.id] || {};
-        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
+        const isApp = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
+        if (item.category === "APPLIED") appliedCount++;
         if (c.emailed) totalEmailed++;
         if (c.called) totalCalled++;
         if (c.walked) totalWalked++;
-        if (c.applied || isCrmApplied) totalApplied++;
+        if (isApp) totalApplied++;
       });
 
-      const badge = document.getElementById("checklistProgressBadge");
+      const badge = document.getElementById("pipelineProgressBadge");
       if (badge) {
-        badge.textContent = `📧 ${totalEmailed}/41 Emailed · 📞 ${totalCalled}/41 Called · 🚶 ${totalWalked}/41 Walked · 🌐 ${totalApplied}/41 Applied`;
+        badge.textContent = `⚡ ${appliedCount} Applied Pipeline · 🏢 ${VIP_CHECKLIST_ALL.length} Tech Giants · 📧 ${totalEmailed} Emailed · 📞 ${totalCalled} Called/DMed`;
       }
 
-      const filtered = VIP_CHECKLIST_ALL.filter(item => {
+      const filtered = UNIFIED_PIPELINE_ITEMS.filter(item => {
         const c = checks[item.id] || {};
-        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
-        const hasApplied = c.applied || isCrmApplied;
+        const isApp = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
 
+        if (filter === "FRESH_APPLIED" && item.category !== "APPLIED") return false;
+        if (filter === "PROACTIVE_GIANTS" && item.category !== "PROACTIVE_GIANT") return false;
         if (filter === "PENDING" && c.emailed) return false;
         if (filter === "EMAILED" && !c.emailed) return false;
         if (filter === "CALLED" && !c.called) return false;
         if (filter === "WALKED" && !c.walked) return false;
-        if (filter === "APPLIED" && !hasApplied) return false;
-        if (filter === "CONNECTIONS" && !item.vipBadge) return false;
+        if (filter === "AI_INTEL" && (!item.aiIntel || (!item.aiIntel.ctoAndEngLeads?.length && !item.aiIntel.hrAndRecruiters?.length))) return false;
+        if (filter === "CONNECTIONS" && !item.vipBadge && !item.notes?.includes("Connection")) return false;
         if (filter === "CLUSTER_MASLAK" && item.cluster !== "CLUSTER_MASLAK") return false;
         if (filter === "CLUSTER_LEVENT" && item.cluster !== "CLUSTER_LEVENT") return false;
         if (filter === "CLUSTER_ASIAN" && item.cluster !== "CLUSTER_ASIAN") return false;
 
         if (q) {
-          const haystack = `${item.company} ${item.role} ${item.email} ${item.phoneDisplay} ${item.address} ${item.clusterLabel} ${item.summary} ${item.vipBadge || ""}`.toLowerCase();
+          const leadNames = [
+            ...(item.aiIntel?.ctoAndEngLeads || []).map(p => `${p.name} ${p.title}`),
+            ...(item.aiIntel?.hrAndRecruiters || []).map(p => `${p.name} ${p.title}`)
+          ].join(" ");
+          const haystack = `${item.company} ${item.role} ${item.email} ${item.phoneDisplay} ${item.address} ${item.clusterLabel} ${item.summary} ${item.vipBadge || ""} ${leadNames}`.toLowerCase();
           if (!haystack.includes(q)) return false;
         }
         return true;
       });
 
       if (!filtered.length) {
-        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No companies match this search or filter. Try switching filter to "All (41 Companies)".</div>`;
+        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No applications or tech giants match this search or filter. Try switching filter to "All (Applied Pipeline + Tech Giants)".</div>`;
         return;
       }
 
-      if (VIP_VIEW_MODE === "cards") {
+      if (PIPELINE_VIEW_MODE === "cards") {
         container.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
-        container.innerHTML = filtered.map(item => {
-          const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
-          const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
-          const isApplied = c.applied || isCrmApplied;
-          const mail = buildVipEmail(item);
-          const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
-          const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
-          const dmText = buildVipDm(item);
-          const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
-
-          return `
-            <div class="glass rounded-xl p-4 border ${c.emailed && isApplied ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800 hover:border-emerald-500/30'} transition flex flex-col justify-between space-y-3">
-              <div>
-                <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700">#${item.rank}</span>
-                    <span class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel}</span>
-                  </div>
-                  ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : isApplied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ In CRM</span>` : ""}
-                </div>
-                <h3 class="text-base font-bold text-white">${item.company}</h3>
-                <p class="text-xs text-blue-300 font-medium mt-0.5">${item.role}</p>
-                <p class="text-xs text-slate-300/90 mt-1.5 leading-relaxed">${item.summary}</p>
-              </div>
-
-              <div class="pt-2 border-t border-slate-800/80 space-y-2 text-xs">
-                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
-                  <div>
-                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Email</span>
-                    <a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline">${item.email}</a>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Phone</span>
-                    ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>` : `<span class="text-slate-400">${item.phoneDisplay}</span>`}
-                  </div>
-                </div>
-
-                <div class="flex items-start justify-between gap-2 bg-slate-900/40 p-2 rounded border border-slate-800/60">
-                  <div class="text-[11px] text-slate-300 flex-1">
-                    <span class="text-slate-400 font-semibold">📍 Address:</span> ${item.address}
-                  </div>
-                  <a href="${mapsHref}" target="_blank" class="shrink-0 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] font-semibold flex items-center gap-1 transition">
-                    🗺️ Maps
-                  </a>
-                </div>
-
-                <div class="bg-black/40 p-2.5 rounded-lg border border-emerald-500/20">
-                  <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block mb-1.5">Action Checklist (Click to Tick):</span>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
-                      <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
-                      <span class="${c.emailed ? 'font-bold text-emerald-300' : ''}">📧 Emailed</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
-                      <input type="checkbox" ${c.called ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
-                      <span class="${c.called ? 'font-bold text-emerald-300' : ''}">📞 Called</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
-                      <input type="checkbox" ${c.walked ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
-                      <span class="${c.walked ? 'font-bold text-emerald-300' : ''}">🚶 Walked In</span>
-                    </label>
-                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
-                      <input type="checkbox" ${isApplied ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
-                      <span class="${isApplied ? 'font-bold text-emerald-300' : ''}">🌐 Applied</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-1.5 pt-1">
-                  <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-1">
-                    ✉️ Open Gmail
-                  </a>
-                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
-                    📋 Copy Email
-                  </button>
-                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
-                    💬 Copy DM
-                  </button>
-                  <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search for your 1st-degree connections at ${item.company}">
-                    👥 My 1st-Deg Connections
-                  </a>
-                  <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition ml-auto">
-                    ↗ Job Link
-                  </a>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join("");
-        return;
+        container.innerHTML = filtered.map(item => renderPipelineCard(item, checks)).join("");
+      } else {
+        container.className = "space-y-2";
+        container.innerHTML = filtered.map(item => renderPipelineRow(item, checks)).join("");
       }
-
-      // DEFAULT: COMPACT ACCORDION LIST VIEW (SCROLL-FREE SCANNING)
-      container.className = "space-y-2";
-      container.innerHTML = filtered.map(item => {
-        const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
-        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
-        const isApplied = c.applied || isCrmApplied;
-        const isExpanded = VIP_EXPANDED_IDS.has(item.id);
-        const mail = buildVipEmail(item);
-        const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
-        const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
-        const dmText = buildVipDm(item);
-        const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
-
-        return `
-          <div class="glass rounded-xl border ${c.emailed && isApplied ? 'border-emerald-500/50 bg-emerald-950/15' : 'border-slate-800 hover:border-slate-700'} transition overflow-hidden">
-            <!-- Compact Single-Row Bar -->
-            <div class="p-3 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) toggleVipExpand('${item.id}')">
-              <div class="flex items-center gap-2.5 flex-1 min-w-[280px]">
-                <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">#${item.rank}</span>
-                <div>
-                  <div class="flex items-center gap-2 flex-wrap">
-                    <span class="text-sm font-bold text-white hover:text-blue-300 transition">${item.company}</span>
-                    <span class="text-[11px] px-2 py-0.2 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel.split("(")[0].trim()}</span>
-                    ${item.vipBadge ? `<span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ""}
-                    ${isApplied ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Applied</span>` : ""}
-                  </div>
-                  <p class="text-xs text-slate-400 font-medium truncate max-w-md">${item.role}</p>
-                </div>
-              </div>
-
-              <!-- Inline Action Checkboxes -->
-              <div class="flex items-center gap-3 shrink-0 text-xs bg-black/40 px-3 py-1.5 rounded-lg border border-slate-800" onclick="event.stopPropagation()">
-                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
-                  <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
-                  <span class="${c.emailed ? 'font-bold text-emerald-300' : 'text-slate-400'}">📧 Email</span>
-                </label>
-                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
-                  <input type="checkbox" ${c.called ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
-                  <span class="${c.called ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call</span>
-                </label>
-                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
-                  <input type="checkbox" ${c.walked ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
-                  <span class="${c.walked ? 'font-bold text-emerald-300' : 'text-slate-400'}">🚶 Walk</span>
-                </label>
-                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
-                  <input type="checkbox" ${isApplied ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
-                  <span class="${isApplied ? 'font-bold text-emerald-300' : 'text-slate-400'}">🌐 Apply</span>
-                </label>
-              </div>
-
-              <!-- Quick Buttons -->
-              <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
-                <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition">
-                  ✉️ Gmail
-                </a>
-                <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 DM copied!')" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
-                  💬 DM
-                </button>
-                <a href="${myConnectionsHref}" target="_blank" class="px-2 py-1 rounded bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search your 1st-degree connections at ${item.company}">
-                  👥 My Connections
-                </a>
-                <button onclick="toggleVipExpand('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
-                  ${isExpanded ? '▲ Hide' : '▼ Details'}
-                </button>
-              </div>
-            </div>
-
-            <!-- Expanded Drawer Details -->
-            ${isExpanded ? `
-              <div class="p-4 bg-slate-950/70 border-t border-slate-800/80 space-y-3 text-xs">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
-                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Email</span>
-                    <a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline text-xs">${item.email}</a>
-                  </div>
-                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
-                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Phone</span>
-                    ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline text-xs">📞 ${item.phoneDisplay}</a>` : `<span class="text-slate-400 text-xs">${item.phoneDisplay}</span>`}
-                  </div>
-                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
-                    <div>
-                      <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Career Portal</span>
-                      <a href="${item.jobUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold text-xs">↗ Open Active Job Post</a>
-                    </div>
-                    <a href="${mapsHref}" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600/30 transition">
-                      🗺️ Maps
-                    </a>
-                  </div>
-                </div>
-
-                <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300">
-                  <span class="text-slate-400 font-semibold">📍 Full Building Address:</span> ${item.address} &middot; <span class="italic text-slate-400">${item.summary}</span>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2 pt-1">
-                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Email copied!')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
-                    📋 Copy Full Pre-Filled Email
-                  </button>
-                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 LinkedIn DM copied!')" class="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
-                    💬 Copy Short LinkedIn DM
-                  </button>
-                  <a href="${myConnectionsHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold transition">
-                    👥 Open LinkedIn & Filter My 1st-Deg Connections
-                  </a>
-                </div>
-              </div>
-            ` : ""}
-          </div>
-        `;
-      }).join("");
     }
+    function renderVipChecklist() { renderUnifiedPipeline(); }
+    function renderOutreach() { renderUnifiedPipeline(); }
 
         function openAddModal() {
       document.getElementById("addModal").classList.remove("hidden");
@@ -3591,7 +3849,7 @@
       closeAddModal();
       updateHeaderCounts();
       renderCrm();
-      renderOutreach();
+      renderUnifiedPipeline();
     }
 
     initApp();
