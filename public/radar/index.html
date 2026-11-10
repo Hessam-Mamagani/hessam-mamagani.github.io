@@ -2018,6 +2018,13 @@
     async function loadCloudFeed(isAutoPoll = false) {
       try {
         const prevCount = LAST_SCAN_JOBS.length;
+
+        let cfFeed = null;
+        try {
+          const cfr = await fetch(`${CF_WORKER_URL}/api/feed`, { cache: "no-store", signal: AbortSignal.timeout(3000) });
+          if (cfr.ok) cfFeed = await cfr.json();
+        } catch {}
+
         let localFeed = null;
         try {
           const lr = await fetch("http://localhost:4545/api/feed", { signal: AbortSignal.timeout(2500) });
@@ -2031,7 +2038,7 @@
         } catch {}
 
         const combinedMap = new Map();
-        for (const j of [...(localFeed?.jobs || []), ...(ghFeed?.jobs || [])]) {
+        for (const j of [...(cfFeed?.jobs || []), ...(localFeed?.jobs || []), ...(ghFeed?.jobs || [])]) {
           if (j && j.id && !combinedMap.has(String(j.id))) {
             combinedMap.set(String(j.id), j);
           }
