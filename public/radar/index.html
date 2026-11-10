@@ -1075,33 +1075,47 @@
     }
 
     function buildOutreachEmail(item) {
+      if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody) {
+        return {
+          subject: item.aiIntel.customEmailSubject,
+          body: item.aiIntel.customEmailBody
+        };
+      }
+
+      const isMgmtOrErp = /\b(müdür|director|manager|head of|dijital dönüşüm|digital transformation|iş uygulamaları|sap|erp)\b/i.test(item.role || "");
+
       if (item.isProactive) {
         if (item.lang === "EN") {
           return {
-            subject: `Senior Full-Stack & AI Solutions Architect (.NET 10 / React 19 / Agentic AI) — Hessam Mamagani`,
-            body: `Dear ${item.company} Engineering Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company} is at the top of my list of global technology companies in Istanbul where I want to contribute at scale.\n\nCurrently, as Senior Full-Stack & AI Solutions Architect (Project Development Engineer) at Pilz Türkiye (Pilz GmbH & Co. KG), I architected and built 5 production enterprise platforms end-to-end across 1,190+ REST API endpoints and 215+ database tables:\n• Modern Full-Stack & Cloud SaaS: .NET 10 (Clean Architecture, CQRS/MediatR), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SignalR, and Microsoft Azure.\n• Production Agentic AI & RAG: Multi-provider OpenAI GPT & Anthropic Claude orchestration, autonomous tool-calling, vector search, and NL-to-SQL agents (InsightfulAI.online), plus a published open-source AI extension on the VS Code Marketplace.\n• Engineering Leadership & Mentorship: Previously trained 150+ software engineers across 640+ hours of live full-stack coding cohorts from zero to production.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I hold an active work permit in Istanbul (Pilz Türkiye, valid through 31.12.2026) and can easily commute anywhere via Metro or join a quick 15-minute online call to demo my live platforms (eventracer.com/en, pilztr.online/portal).\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+            subject: `Executive Introduction — ${item.role} — Hessam Barasm Mamagani`,
+            body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company}'s engineering culture and product vision strongly align with the enterprise systems I lead and architect.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led end-to-end digital transformation and architected 5 production platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting manual processing time by 80%), multi-tenant B2B SaaS, and enterprise AI/RAG automation. Previously, I also mentored and trained 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I hold an active work permit in Istanbul (through 31.12.2026) and would welcome a brief 15-minute call or in-person coffee to share my live systems (eventracer.com/en, pilztr.online/portal).\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
           };
         }
         return {
-          subject: `Kıdemli Full-Stack & AI Çözüm Mimarı (.NET 10 / React 19 / Agentic AI) — Hessam Mamagani`,
-          body: `Sayın ${item.company} Teknoloji Yönetimi (CTO / Mühendislik Liderliği) ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu ve mühendislik kültürünü yakından takip ediyor; ekibinizdeki mevcut veya açılacak Kıdemli Yazılım Mimarı / Full-Stack & AI Mühendisi pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Pilz Türkiye (Pilz GmbH) bünyesinde Kıdemli Full-Stack & AI Çözüm Mimarı olarak; .NET 10 (Clean Architecture, CQRS), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA ve OpenAI/Claude tabanlı Agentic AI/RAG mimarisiyle 1.190+ REST API endpoint ve 215+ tabloya sahip 5 kurumsal platformu uçtan uca tasarlayıp canlıya aldım. Ayrıca daha önce 640+ saat canlı yazılım eğitimiyle 150'den fazla mühendisi sıfırdan ileri seviye Full-Stack geliştirici olarak yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz canlı sistemlerimi (eventracer.com/en, pilztr.online/portal) göstermek üzere 15 dakikalık bir online görüşme veya ofisinizde yüz yüze tanışma talep ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Tanışma & Başvuru: ${item.role} — Hessam Barasm Mamagani`,
+          body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki mevcut veya açılacak ${item.role} pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 hızlanma), çok kiracılı B2B SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca liderlik ederek hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz canlı sistemlerimi paylaşmak üzere 15 dakikalık bir online görüşme veya ofisinizde yüz yüze tanışma talep ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
       if (item.lang === "EN") {
         return {
-          subject: `Application Follow-Up & Live Architecture Demo: ${item.role} — Hessam Mamagani`,
-          body: `Dear ${item.company} Engineering Leadership & Talent Acquisition Team,\n\nI recently applied for the "${item.role}" position and wanted to follow up directly with my CV and the signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nAs Senior Full-Stack & AI Solutions Architect at Pilz Türkiye (Pilz GmbH & Co. KG), I have architected and delivered 5 production platforms end-to-end—spanning .NET 10 (CQRS/Clean Architecture), C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA, and multi-LLM Agentic AI/RAG workflows across 1,190+ API endpoints and 215+ DB tables, in addition to mentoring 150+ engineers across 640+ hours of live coding instruction.\n\nI am based in Istanbul with an active work permit (valid through 31.12.2026) and can easily reach your office by Metro for a 15-minute introduction or demo my live systems (eventracer.com/en, pilztr.online/portal) on a brief call this week.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Application Follow-Up: ${item.role} — Hessam Barasm Mamagani`,
+          body: `Dear ${item.company} Hiring & Talent Acquisition Team,\n\nI recently applied for the "${item.role}" position at ${item.company} and wanted to follow up directly with my CV and the signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nAt Pilz Türkiye (Pilz GmbH & Co. KG), I have led end-to-end architecture and delivery of 5 enterprise production platforms—streamlining CRM/ERP operations, automating SAP & e-Invoice workflows by 80%, and deploying production AI/RAG systems, in addition to mentoring 150+ engineers across 640+ hours of live instruction.\n\nI am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 15-minute conversation this week to discuss how I can contribute to ${item.company}.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
+
+      const trImpactParagraph = isMgmtOrErp
+        ? `Halihazırda Pilz Türkiye (Pilz GmbH) bünyesinde kurumsal dijital dönüşüm, SAP/ERP ve e-Fatura iş süreçleri otomasyonu (manuel operasyonlarda %80 zaman tasarrufu), kurumsal CRM/iş uygulamaları ve yapay zeka destekli yönetim platformlarını uçtan uca liderlik ederek hayata geçirdim. Ayrıca 15+ yıllık mühendislik ve proje yönetimi tecrübemle ekipleri koordine ederek yüksek ölçekli kurumsal projeleri canlıya aldım.`
+        : `Halihazırda Pilz Türkiye (Pilz GmbH) bünyesinde kurumsal CRM/ERP platformları, SAP/iş süreçleri otomasyonu, B2B SaaS sistemleri ve kurumsal yapay zeka çözümlerini uçtan uca mimar olarak tasarlayıp canlıya aldım. Bunun öncesinde 640+ saat canlı yazılım eğitimiyle 150'den fazla yazılım mühendisi yetiştirdim.`;
+
       return {
-        subject: `Başvuru Takibi & Referans Mektubu: ${item.role} — Hessam Mamagani`,
-        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu, özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu (ekte) doğrudan dikkatinize sunmak istedim.\n\nHalihazırda Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı olarak; .NET 10, C#, React 19, Next.js 16, TypeScript, SQL Server, PostgreSQL, Redis, SAP RPA ve Kurumsal Agentic AI/RAG mimarisiyle 1.190+ API uç noktası ve 215+ tabloya sahip 5 kurumsal platformu sıfırdan tasarlayıp canlıya aldım. Bunun öncesinde 640+ saat canlı eğitimle 150+ yazılım mühendisi yetiştirdim.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim (31.12.2026'ya kadar geçerli) bulunmaktadır. Uygun görürseniz bu hafta 15 dakikalık bir online görüşmede canlı sistemlerimi (eventracer.com/en, pilztr.online/portal) paylaşmak veya Metro ile ofisinize uğrayarak yüz yüze tanışmak isterim.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nGitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Başvuru Takibi & Referans Mektubu: ${item.role} — Hessam Barasm Mamagani`,
+        body: `Sayın ${item.company} İnsan Kaynakları ve Teknoloji Yönetimi Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu, özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu (ekte) doğrudan dikkatinize sunmak istedim.\n\n${trImpactParagraph}\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim (31.12.2026'ya kadar geçerli) bulunmaktadır. Uygun görürseniz bu hafta 15 dakikalık kısa bir görüşmede canlı projelerimi ve ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
 
     function buildCallScript(item) {
-      return `📞 20-Second Call & Work-Permit Qualification Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. Yazılım / Teknoloji İK (Talent Acquisition) ekibinden yetkili kişiyle görüşebilir miyim? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. ${item.role} pozisyonu için CV'mi ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubunu ilettim. Pilz Türkiye'de .NET 10, React 19 ve AI mimarisiyle 1.190+ API'lik 5 kurumsal sistemi uçtan uca geliştirdim. Şu an 31 Aralık'a kadar aktif çalışma iznim mevcut — İK süreciniz yabancı uzman çalışma izni transferini destekliyor mu ve bu hafta 15 dakikalık bir tanışma görüşmesi planlayabilir miyiz?"`;
+      return `📞 20-Second Executive Call Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. İnsan Kaynakları (İşe Alım) ekibinden yetkili kişiyle görüşebilir miyim? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. ${item.role} pozisyonunuz için başvurumu ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubunu ilettim. Pilz Türkiye'de kurumsal dijital dönüşüm, SAP/ERP iş süreçleri otomasyonu ve yazılım projelerine liderlik ediyorum. Şu an 31 Aralık'a kadar aktif çalışma iznim mevcut — uygun görürseniz bu hafta 15 dakikalık kısa bir tanışma görüşmesi planlayabilir miyiz?"`;
     }
 
     let CURRENT_OUTREACH_ITEMS = [];
@@ -1402,15 +1416,15 @@
         emails: ["ik@golfdondurma.com.tr", "info@golfdondurma.com.tr"],
         phone: "+90 (212) 629 60 60",
         ctoAndEngLeads: [
-          { name: "Sercan Sever", title: "Yönetim & Satın Alma Lideri — Golf Dondurma (Natura Gıda)", linkedinUrl: "https://tr.linkedin.com/in/sercan-sever-526305107" },
-          { name: "Ceren Ökten", title: "Kurumsal İletişim & Yönetim — Golf Dondurma", linkedinUrl: "https://tr.linkedin.com/in/ceren-%C3%B6kten-28a10260" }
+          { name: "Akif Yumuk", title: "Bilgi Teknolojileri Direktörü — Golf Dondurma", linkedinUrl: "https://www.linkedin.com/in/akif-yumuk-b715961a/" },
+          { name: "Rıza Can Başargan", title: "Yazılım Müdürü — Golf Dondurma", linkedinUrl: "https://www.linkedin.com/in/r%C4%B1za-can-ba%C5%9Fargan-8923363a/" }
         ],
         hrAndRecruiters: [
-          { name: "Sema Tongur", title: "İnsan Kaynakları Profesyoneli — Golf Dondurma (Downloaded Your CV! ⭐)", linkedinUrl: "https://tr.linkedin.com/in/sema-tongur-64702819b" },
-          { name: "Aydanur Karamık", title: "İnsan Kaynakları & İdari İşler — Golf Dondurma", linkedinUrl: "https://tr.linkedin.com/in/aydanur-karam%C4%B1k-659aa7177" }
+          { name: "Sema Tongur", title: "İnsan Kaynakları — Golf Dondurma (Downloaded Your CV! ⭐)", linkedinUrl: "https://www.linkedin.com/in/sema-tongur-85603090/" },
+          { name: "Ezgi Eröz", title: "İnsan Kaynakları Müdürü — Golf Dondurma", linkedinUrl: "https://www.linkedin.com/in/ezgieroz/" }
         ],
         officeAndMetro: "📍 İstanbul Merkez Ofis (+90 212 629 60 60)",
-        walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları (Sema Tongur / İK Ekibi), and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
+        walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları (Sema Tongur / Ezgi Eröz), and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
       }
     };
 
@@ -1420,6 +1434,12 @@
       const hrList = intel.hrAndRecruiters || [];
       const dmText = intel.customExecutiveDm || "";
       const emailToUse = intel.bestEmail || item.email || "";
+      const renderProfileLink = (url) => {
+        if (!url) return "";
+        const isDirect = url.includes("/in/");
+        const label = isDirect ? "↗ Open Profile" : "🔎 Find on LinkedIn";
+        return `<a href="${url}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[10px] font-semibold shrink-0">${label}</a>`;
+      };
 
       return `
         <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
@@ -1439,7 +1459,7 @@
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
-                  ${p.linkedinUrl ? `<a href="${p.linkedinUrl}" target="_blank" class="px-2 py-0.5 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[10px] font-semibold shrink-0">↗ Open Profile</a>` : ""}
+                  ${renderProfileLink(p.linkedinUrl)}
                 </div>
               `).join("")}
             </div>
@@ -1456,7 +1476,7 @@
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
-                  ${p.linkedinUrl ? `<a href="${p.linkedinUrl}" target="_blank" class="px-2 py-0.5 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 text-[10px] font-semibold shrink-0">↗ Open Profile</a>` : ""}
+                  ${renderProfileLink(p.linkedinUrl)}
                 </div>
               `).join("")}
             </div>
@@ -1494,12 +1514,11 @@
       const item = CURRENT_OUTREACH_ITEMS[idx];
       if (!item) return;
       const panel = document.getElementById(`aiIntelPanel-${idx}`);
-      const oldText = btn.innerHTML;
       btn.disabled = true;
-      btn.innerHTML = "⏳ Gemini AI Researching...";
+      btn.innerHTML = mode === "email" ? "⏳ AI Writing Pitch..." : "⏳ AI Researching...";
       if (panel) {
         panel.classList.remove("hidden");
-        panel.innerHTML = `<div class="py-4 text-center text-indigo-300 font-semibold animate-pulse">🤖 Multi-Model AI Agent (OpenAI + Claude 5.5 + Gemini + LinkedIn) is researching ${item.company}'s CTO, Engineering Leaders, Tech Recruiters, and HR Emails...</div>`;
+        panel.innerHTML = `<div class="py-4 text-center text-indigo-300 font-semibold animate-pulse">🤖 Multi-Model AI Agent is researching ${item.company}'s verified LinkedIn contacts & writing a tailored, natural executive message...</div>`;
       }
 
       let aiIntel = null;
@@ -1507,8 +1526,11 @@
       let foundPhoneDisplay = item.phoneDisplay;
       let foundEmail = item.email;
 
-      // 1. Try Local PC Server first, then fallback to 24/7 Cloudflare Worker (works even when laptop is OFF!)
-      for (const apiBase of ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]) {
+      const apiBases = IS_LOCAL
+        ? ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]
+        : ["https://hessam-job-radar-ai.hessam-mamagani.workers.dev"];
+
+      for (const apiBase of apiBases) {
         try {
           const res = await fetch(`${apiBase}/api/find-contact`, {
             method: "POST",
@@ -1551,37 +1573,57 @@
         if (!foundEmail && inferredEmail && !inferredEmail.includes("/")) foundEmail = inferredEmail;
         if (!foundPhoneDisplay && inferredPhone) foundPhoneDisplay = inferredPhone;
 
-        const leadPerson = kb?.ctoAndEngLeads?.[0]?.name || `${cleanComp} CTO / Engineering Director`;
+        const leadPerson = kb?.ctoAndEngLeads?.[0]?.name || `${cleanComp} Yönetimi`;
         const isEn = item.lang === "EN";
         const customDm = isEn
-          ? `Hi ${leadPerson.split("/")[0].trim()}, I’m reaching out directly regarding ${item.role} at ${cleanComp}. As Senior Full-Stack & AI Solutions Architect at Pilz Türkiye (Pilz GmbH), I architected 5 production enterprise platforms end-to-end (.NET 10, React 19, Next.js 16, Agentic AI/RAG across 1,190+ APIs) and previously trained 150+ engineers across 640+ hours of live coding cohorts. I hold an active work permit in Istanbul (through 31.12.2026) and a signed recommendation letter from our General Manager—would love to share a 5-minute live demo of my platforms this week.`
-          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} vizyonunuz için doğrudan iletişime geçmek istedim. Pilz Türkiye'de Kıdemli Full-Stack & AI Çözüm Mimarı olarak .NET 10, React 19, Next.js 16 ve Agentic AI/RAG mimarisiyle 1.190+ API'lik 5 kurumsal platformu uçtan uca geliştirdim ve 640+ saat canlı eğitimle 150+ yazılımcı yetiştirdim. Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubu ve aktif çalışma iznimle (31.12.2026) bu hafta 15 dakikalık bir tanışma görüşmesi yapmayı çok isterim.`;
+          ? `Hi ${leadPerson.split("/")[0].trim()}, I’m reaching out directly regarding the ${item.role} position at ${cleanComp}. At Pilz Türkiye (subsidiary of Pilz GmbH), I lead our enterprise software and digital transformation initiatives end-to-end—covering CRM/ERP workflows, SAP & e-Invoice automation, and AI-driven internal tools. With an active work permit in Istanbul (through Dec 2026) and a signed recommendation from our General Manager, I would welcome a brief 15-minute introductory conversation this week.`
+          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için doğrudan iletişime geçmek istedim. Pilz Türkiye'de kurumsal iş uygulamaları, SAP/ERP entegrasyonu ve dijital dönüşüm projelerine liderlik ediyorum; satıştan faturalamaya tüm operasyonel süreçleri uçtan uca dijitalleştiren 5 kurumsal platformu hayata geçirdim. Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubu ve aktif çalışma iznimle bu hafta 15 dakikalık kısa bir tanışma görüşmesi yapmayı çok isterim.`;
 
         aiIntel = {
           poweredBy: "Gemini AI & Executive Intelligence Graph",
           ctoAndEngLeads: kb?.ctoAndEngLeads || [
             {
-              name: `${cleanComp} — CTO / VP of Engineering / Yazılım Müdürü`,
-              title: `Engineering Leadership (${cleanComp})`,
+              name: `${cleanComp} — CTO / VP of Engineering / BT Lideri`,
+              title: `Technology Leadership (${cleanComp})`,
               linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " CTO OR VP Engineering OR Yazılım Müdürü")}`
             }
           ],
           hrAndRecruiters: kb?.hrAndRecruiters || [
             {
-              name: `${cleanComp} — Technical Recruiter / Talent Acquisition`,
-              title: `HR & Tech Recruitment (${cleanComp})`,
+              name: `${cleanComp} — İnsan Kaynakları / Talent Acquisition`,
+              title: `HR & Recruitment (${cleanComp})`,
               linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " Talent Acquisition OR Technical Recruiter OR İnsan Kaynakları")}`
             }
           ],
           bestEmail: inferredEmail,
           phoneDisplay: inferredPhone,
           officeAndMetro: kb?.officeAndMetro || `${item.location} (Accessible via Istanbul Metro)`,
-          walkInVerdict: kb?.walkInVerdict || "Send the tailored AI Executive Message above to the CTO/Engineering Lead on LinkedIn AND email HR with your signed Pilz GM Reference Letter attached.",
+          walkInVerdict: kb?.walkInVerdict || "Send the tailored AI Executive Message above on LinkedIn AND email HR with your signed Pilz GM Reference Letter attached.",
           customExecutiveDm: customDm
         };
       } else if (kb) {
-        if (!aiIntel.ctoAndEngLeads?.length) aiIntel.ctoAndEngLeads = kb.ctoAndEngLeads;
-        if (!aiIntel.hrAndRecruiters?.length) aiIntel.hrAndRecruiters = kb.hrAndRecruiters;
+        if (!aiIntel.ctoAndEngLeads?.length) {
+          aiIntel.ctoAndEngLeads = kb.ctoAndEngLeads;
+        } else if (kb.ctoAndEngLeads?.length) {
+          for (const kp of kb.ctoAndEngLeads) {
+            const existing = aiIntel.ctoAndEngLeads.find(p => p.name.toLowerCase() === kp.name.toLowerCase());
+            if (existing) existing.linkedinUrl = kp.linkedinUrl;
+            else if (aiIntel.ctoAndEngLeads.length < 3) aiIntel.ctoAndEngLeads.push(kp);
+          }
+        }
+        if (!aiIntel.hrAndRecruiters?.length) {
+          aiIntel.hrAndRecruiters = kb.hrAndRecruiters;
+        } else if (kb.hrAndRecruiters?.length) {
+          for (const kp of kb.hrAndRecruiters) {
+            const existing = aiIntel.hrAndRecruiters.find(p => p.name.toLowerCase() === kp.name.toLowerCase());
+            if (existing) {
+              existing.linkedinUrl = kp.linkedinUrl;
+              existing.title = kp.title;
+            } else {
+              aiIntel.hrAndRecruiters.unshift(kp);
+            }
+          }
+        }
         if (!aiIntel.bestEmail && kb.emails?.[0]) aiIntel.bestEmail = kb.emails[0];
         if (!aiIntel.phoneDisplay && kb.phone) aiIntel.phoneDisplay = kb.phone;
         if (kb.officeAndMetro) aiIntel.officeAndMetro = kb.officeAndMetro;
@@ -1630,18 +1672,21 @@
         phoneSlot.innerHTML = `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>`;
       }
 
-      // Update Gmail & Mailto links with newly discovered email
-      if (item.email) {
-        const mail = buildOutreachEmail(item);
-        const gBtn = document.getElementById(`gmailBtn-${idx}`);
-        const mBtn = document.getElementById(`mailtoBtn-${idx}`);
-        if (gBtn) gBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
-        if (mBtn) mBtn.href = `mailto:${item.email}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+      // Always refresh Gmail & Mailto links with the newly generated AI subject & body
+      const mail = buildOutreachEmail(item);
+      const gBtn = document.getElementById(`gmailBtn-${idx}`);
+      const mBtn = document.getElementById(`mailtoBtn-${idx}`);
+      const targetEmail = item.email || aiIntel?.bestEmail?.split("/")[0]?.trim() || "";
+      if (gBtn) gBtn.href = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+      if (mBtn) mBtn.href = `mailto:${targetEmail}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+
+      if (mode === "email" && aiIntel?.customExecutiveDm) {
+        navigator.clipboard.writeText(aiIntel.customExecutiveDm);
       }
 
       btn.disabled = false;
-      btn.innerHTML = "✅ AI Intel Ready";
-      showToast(`🤖 AI Executive & Contact Intel loaded for ${item.company}!`, true);
+      btn.innerHTML = mode === "email" ? "✅ Custom Pitch Ready" : "✅ AI Intel Ready";
+      showToast(mode === "email" ? `✨ Tailored AI pitch & email ready for ${item.company}!` : `🤖 Verified contacts & AI pitch loaded for ${item.company}!`, true);
     }
 
     function copyOutreachEmail(idx, btn) {
@@ -2103,55 +2148,102 @@
       panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
-    function generateCustomAiEmail(id) {
+    async function generateCustomAiEmail(id) {
       const d = LAST_SCAN_JOBS.find(j => String(j.id) === String(id)) || {};
       const out = document.getElementById(`aiExtraOutput-${id}`);
       if (!out) return;
-      const full = `${d.title || ""} ${d.company || ""} ${d.description || ""}`;
-      const isEn = (d.analysis?.recommendedCv || "").includes("EN");
-      const skills = (d.analysis?.matchedSkills || d.tags || [".NET Core", "C#", "React", "SQL Server"]).join(", ");
+      out.classList.remove("hidden");
+      out.textContent = "⏳ AI is writing a personalized, role-specific cover email for " + (d.company || "this role") + "...";
 
+      const isEn = (d.analysis?.recommendedCv || "").includes("EN");
+      try {
+        const res = await fetch("https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/generate-outreach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "email",
+            company: d.company,
+            title: d.title,
+            description: d.description || "",
+            lang: isEn ? "EN" : "TR"
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.body) {
+            const fullEmail = data.subject ? `Subject: ${data.subject}\n\n${data.body}` : data.body;
+            out.textContent = fullEmail;
+            navigator.clipboard.writeText(fullEmail);
+            showToast(`✉️ AI email generated (${data.poweredBy || "Cloud AI"}) & copied!`, true);
+            return;
+          }
+        }
+      } catch {}
+
+      const full = `${d.title || ""} ${d.company || ""} ${d.description || ""}`;
       const hasAi = /\b(llm|openai|claude|rag\b|ai\b|yapay zeka|agent)\b/i.test(full);
       const hasSap = /\b(sap\b|erp\b|e-fatura|e-invoice|rpa\b)\b/i.test(full);
 
       const trProjectParagraph = hasAi
-        ? `Pilz Türkiye bünyesinde geliştirdiğim InsightfulAI (OpenAI GPT + Anthropic Claude tabanlı RAG, Vector Store ve otonom AI ajan platformu) ve n8n NL-to-SQL veritabanı ajanları ile yanıt sürelerini %75+ kısalttım.`
+        ? `Pilz Türkiye bünyesinde geliştirdiğim kurumsal yapay zeka ve bilgi asistanı platformları ile iç süreçlerdeki yanıt sürelerini %75'in üzerinde kısalttım.`
         : hasSap
-        ? `Pilz Türkiye bünyesinde geliştirdiğim PilzPortal (804 REST API endpoint, 120 tablo) ve WebRunner (SAP GUI VA01/VF01/XD01 + Playwright RPA + Sovos/ISIS GİB e-Fatura otomasyon motoru) ile manuel veri girişini ortadan kaldırıp süreçleri %80 hızlandırdım.`
-        : `Pilz Türkiye bünyesinde 1.190+ REST API endpoint ve 215+ veritabanı tablosundan oluşan 5 kurumsal platformu (PilzPortal CRM/ERP, EvenTracer Next.js 16 & .NET 10 CQRS/Redis BI SaaS, WebRunner SAP RPA ve InsightfulAI) baş mimar olarak uçtan uca geliştirdim.`;
+        ? `Pilz Türkiye bünyesinde geliştirdiğim kurumsal CRM/ERP portalı ve SAP / e-Fatura otomasyon sistemleri ile manuel veri girişini ortadan kaldırıp operasyonel süreçleri %80 hızlandırdım.`
+        : `Pilz Türkiye bünyesinde satıştan faturalamaya, saha operasyonlarından iş zekası raporlamasına kadar tüm süreçleri dijitalleştiren 5 kurumsal yazılım platformunu uçtan uca mimarlayıp hayata geçirdim.`;
 
       const enProjectParagraph = hasAi
-        ? `At Pilz Türkiye, I architected InsightfulAI (multi-provider OpenAI GPT + Anthropic Claude RAG, vector search, and autonomous tool-calling agents) and n8n NL-to-SQL database agents, cutting inquiry turnaround by 75%+.`
+        ? `At Pilz Türkiye, I architected enterprise AI knowledge and workflow automation systems that reduced internal inquiry turnaround by over 75%.`
         : hasSap
-        ? `At Pilz Türkiye, I engineered PilzPortal (804 REST endpoints, 120 tables) and WebRunner (SAP GUI COM Interop + Playwright RPA + GİB e-Invoice automation), reducing order-to-invoice processing time by 80%.`
-        : `At Pilz Türkiye, I served as lead architect and principal developer for 5 production platforms totaling 1,190+ REST API endpoints and 215+ DB tables (PilzPortal CRM/ERP, EvenTracer Next.js 16 & .NET 10 CQRS/Redis SaaS, WebRunner SAP RPA, and InsightfulAI).`;
+        ? `At Pilz Türkiye, I engineered our enterprise CRM/ERP portal and automated SAP & e-Invoice workflows, reducing order-to-invoice processing time by 80%.`
+        : `At Pilz Türkiye, I led the end-to-end architecture and delivery of 5 production enterprise platforms spanning CRM/ERP operations, business intelligence, and workflow automation.`;
 
       const email = isEn
-        ? `Subject: Application: ${d.title} – Hessam Barasm Mamagani (Senior Full-Stack & AI Architect)\n\nDear ${d.company} Hiring Team,\n\nI am writing to apply for the ${d.title} position at ${d.company}. Your requirements around ${skills} align directly with the production systems I have architected and delivered.\n\n${enProjectParagraph}\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I would welcome the opportunity to demonstrate my live platforms (pilztr.online/portal, eventracer.com/en) in a brief interview.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`
-        : `Konu: İş Başvurusu: ${d.title} – Hessam Barasm Mamagani\n\nSayın ${d.company} İK ve Teknoloji Ekibi,\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu iletmekten memnuniyet duyarım. İlanınızda vurgulanan (${skills}) yetkinlikleri, aktif olarak canlıda çalışan kurumsal projelerimle birebir örtüşmektedir.\n\n${trProjectParagraph}\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Geliştirdiğim canlı sistemleri (pilztr.online/portal, eventracer.com/en) kısa bir teknik görüşmede paylaşmak isterim.\n\nSaygılarımla,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`;
+        ? `Subject: Application: ${d.title} – Hessam Barasm Mamagani\n\nDear ${d.company} Hiring Team,\n\nI am writing to apply for the ${d.title} position at ${d.company}.\n\n${enProjectParagraph}\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I would welcome the opportunity to share a brief walkthrough of these live systems in an introductory conversation.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`
+        : `Konu: ${d.title} Başvurusu – Hessam Barasm Mamagani\n\nSayın ${d.company} İK ve İşe Alım Ekibi,\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu iletmekten memnuniyet duyarım.\n\n${trProjectParagraph}\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Uygun görmeniz halinde kısa bir tanışma görüşmesinde projelerimi paylaşmak isterim.\n\nSaygılarımla,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`;
 
       out.textContent = email;
-      out.classList.remove("hidden");
       navigator.clipboard.writeText(email);
       showToast("✉️ Tailored email generated & copied to clipboard!", true);
     }
 
-    function generateAiInterviewQA(id) {
+    async function generateAiInterviewQA(id) {
       const d = LAST_SCAN_JOBS.find(j => String(j.id) === String(id)) || {};
       const out = document.getElementById(`aiExtraOutput-${id}`);
       if (!out) return;
-      const skills = (d.analysis?.matchedSkills || d.tags || [".NET Core", "React"]).join(", ");
-      out.textContent = `🎯 Tailored Interview Strategy for ${d.title} at ${d.company}\n` +
-        `Matched Stack in JD: ${skills}\n\n` +
-        `1. Architecture & Scale Question:\n` +
-        `   "How did you structure 1,190+ endpoints and 215+ tables at Pilz without coupling?"\n` +
-        `   💡 Answer: Explain your Clean Architecture + CQRS (MediatR) separation in EvenTracer & PilzPortal, Redis caching, and 5-tier RBAC.\n\n` +
-        `2. Enterprise Integration & Reliability Question:\n` +
-        `   "How do you handle failures in external ERP / SAP / e-Invoice integrations?"\n` +
-        `   💡 Answer: Showcase WebRunner's async worker queue, SAP COM bridge, and AI-driven failure diagnostics that cut manual processing by 80%.\n\n` +
-        `3. Live Demo Hook (Your Biggest Advantage):\n` +
-        `   💡 In the first 5 minutes of the call, ask to share your screen for 2 minutes to show eventracer.com/en and pilztr.online/portal.`;
       out.classList.remove("hidden");
+      out.textContent = "⏳ AI is preparing custom interview questions & strategy for " + (d.title || "this role") + "...";
+
+      try {
+        const res = await fetch("https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/generate-outreach", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "interview",
+            company: d.company,
+            title: d.title,
+            description: d.description || ""
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.text) {
+            out.textContent = data.text;
+            showToast(`🎯 AI interview prep generated (${data.poweredBy || "Cloud AI"})!`, true);
+            return;
+          }
+        }
+      } catch {}
+
+      const skills = (d.analysis?.matchedSkills || d.tags || ["Enterprise Architecture", "Full-Stack"]).join(", ");
+      out.textContent = `🎯 Tailored Interview Strategy for ${d.title} at ${d.company}\n` +
+        `Key Focus Areas: ${skills}\n\n` +
+        `1. Business Impact & Ownership Question:\n` +
+        `   "How have you translated complex operational bottlenecks into reliable software systems?"\n` +
+        `   💡 Answer: Share how you took ownership of 5 enterprise platforms at Pilz Türkiye from requirements to daily production use.\n\n` +
+        `2. Enterprise Integration & Reliability Question:\n` +
+        `   "How do you handle cross-system ERP / SAP / e-Invoice integrations and data consistency?"\n` +
+        `   💡 Answer: Showcase how your SAP & e-Invoice automation reduced manual processing time by 80% with automated diagnostics.\n\n` +
+        `3. Live Demo Hook (Your Biggest Advantage):\n` +
+        `   💡 Early in the conversation, offer a 2-minute live walkthrough of eventracer.com/en and pilztr.online/portal.`;
     }
 
     async function quickMarkApplied(id) {
