@@ -202,7 +202,15 @@
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <input id="checklistSearch" oninput="renderVipChecklist()" placeholder="Search company, district, phone..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-56 focus:outline-none focus:border-emerald-500" />
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
+              <button onclick="setVipViewMode('compact')" id="vipViewBtn-compact" class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition">
+                📋 Compact List
+              </button>
+              <button onclick="setVipViewMode('cards')" id="vipViewBtn-cards" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition">
+                🗂️ Cards
+              </button>
+            </div>
+            <input id="checklistSearch" oninput="renderVipChecklist()" placeholder="Search company, district, phone..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
             <select id="checklistFilter" onchange="renderVipChecklist()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
               <option value="ALL">All (41 Companies)</option>
               <option value="PENDING">⏳ Not Emailed Yet</option>
@@ -210,6 +218,7 @@
               <option value="CALLED">📞 Phone Called</option>
               <option value="WALKED">🚶 Walk-In Done</option>
               <option value="APPLIED">🌐 Applied on Portal/LinkedIn</option>
+              <option value="CONNECTIONS">⭐ Has 1st-Deg / Direct Leads</option>
               <option value="CLUSTER_MASLAK">📍 Maslak & İTÜ Teknokent</option>
               <option value="CLUSTER_LEVENT">📍 Levent & Şişli / Mecidiyeköy</option>
               <option value="CLUSTER_ASIAN">📍 Asian Side (Üsküdar / Ataşehir / Pendik)</option>
@@ -218,7 +227,7 @@
         </div>
       </div>
 
-      <div id="checklistGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      <div id="checklistContainer" class="space-y-2"></div>
     </section>
 
     <!-- TAB 5: QUICK COPY VAULT & KARIYER.NET -->
@@ -2580,7 +2589,969 @@
     // ==========================================
     // TAB 4: MASTER VIP CHECKLIST (ALL 41 TARGETS)
     // ==========================================
+    let VIP_VIEW_MODE = localStorage.getItem("jr_vip_view_mode") || "compact";
+    let VIP_EXPANDED_IDS = new Set();
+
+    function setVipViewMode(m) {
+      VIP_VIEW_MODE = m;
+      localStorage.setItem("jr_vip_view_mode", m);
+      const bCompact = document.getElementById("vipViewBtn-compact");
+      const bCards = document.getElementById("vipViewBtn-cards");
+      if (bCompact && bCards) {
+        bCompact.className = m === "compact" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
+        bCards.className = m === "cards" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
+      }
+      renderVipChecklist();
+    }
+
+    function toggleVipExpand(id) {
+      if (VIP_EXPANDED_IDS.has(id)) {
+        VIP_EXPANDED_IDS.delete(id);
+      } else {
+        VIP_EXPANDED_IDS.add(id);
+      }
+      renderVipChecklist();
+    }
+
     const VIP_CHECKLIST_ALL = [
+      {
+        rank: 1,
+        id: "VIP-MICROSOFT",
+        company: "Microsoft Turkey",
+        role: "Solutions Architect / Customer Success Engineer (CSE) / Cloud AI",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Bellevue Residence · M2 Metro)",
+        email: "trinfo@microsoft.com",
+        phone: "+902123051000",
+        phoneDisplay: "+90 (212) 305 10 00 / 0212 370 55 55",
+        address: "Bellevue Residence, Nispetiye Mah. Aydın Sok. No:7, Levent / Beşiktaş, İstanbul",
+        mapQuery: "Bellevue Residence Levent Beşiktaş İstanbul",
+        jobUrl: "https://careers.microsoft.com/v2/global/en/locations/istanbul.html",
+        vipBadge: "⭐ 1st-Deg: Cüneyt Batmaz (Deputy GM) & Levent Özbilgin (GM)",
+        summary: "Top #1 Global Partner for .NET 10 + Azure. You have 1st-degree connection Cüneyt Batmaz (Commercial Solutions Leader, Deputy GM) & GM Levent Özbilgin."
+      },
+      {
+        rank: 2,
+        id: "VIP-AWS",
+        company: "Amazon Web Services (AWS Turkey)",
+        role: "Senior Solutions Architect / Technical Account Manager",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Ferko Signature · M2 Metro)",
+        email: "aws-turkey@amazon.com",
+        phone: "+902123739000",
+        phoneDisplay: "+90 (212) 373 90 00",
+        address: "Ferko Signature, Esentepe Mah. Büyükdere Cad. No:175, Levent / Şişli, İstanbul",
+        mapQuery: "Ferko Signature Levent Şişli İstanbul",
+        jobUrl: "https://www.amazon.jobs/en/locations/istanbul-turkey",
+        vipBadge: "💬 Messaged Recruiter: Sueda Erkan · Applied 2 SA Roles",
+        summary: "Already applied to 2 Senior SA / TAM roles and messaged Technical Recruiter Sueda Erkan. High compensation & cloud prestige."
+      },
+      {
+        rank: 3,
+        id: "VIP-GOOGLE",
+        company: "Google Turkey",
+        role: "Cloud Solutions Engineer / Customer Engineer",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Kanyon Ofis Kat:6 · M2 Metro)",
+        email: "google-turkey@google.com",
+        phone: "+902123769600",
+        phoneDisplay: "+90 (212) 376 96 00",
+        address: "Kanyon Ofis Binası Kat:6-7, Büyükdere Cad. No:185, Levent / Beşiktaş, İstanbul",
+        mapQuery: "Kanyon Ofis Binası Levent İstanbul",
+        jobUrl: "https://careers.google.com/locations/istanbul/",
+        vipBadge: "📍 Levent Kanyon HQ",
+        summary: "Google Cloud Regional Hub in Kanyon. Enterprise customer engineering and cloud architecture."
+      },
+      {
+        rank: 4,
+        id: "VIP-SAP",
+        company: "SAP Türkiye",
+        role: "Senior Solutions Architect / Cloud & BTP Integration Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Üsküdar (Emaar Square Ofis Kulesi)",
+        email: "info.turkey@sap.com",
+        phone: "+902165797000",
+        phoneDisplay: "+90 (216) 579 70 00",
+        address: "Emaar Square Ofis Kulesi Kat:17-18, Ünalan Mah. Libadiye Cad. No:82, Üsküdar, İstanbul",
+        mapQuery: "Emaar Square Ofis Kulesi Üsküdar İstanbul",
+        jobUrl: "https://jobs.sap.com",
+        vipBadge: "🇩🇪 100% German Enterprise + SAP / e-Invoice Fit",
+        summary: "Direct match for your Pilz GmbH background where you automated SAP & e-Invoice pipelines by 80%."
+      },
+      {
+        rank: 5,
+        id: "VIP-TRENDYOL",
+        company: "Trendyol Tech (Trendyol Group)",
+        role: "Software Engineer (Fintech / Platform / AI)",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak (Spine Tower · M2 Metro)",
+        email: "tech.talent@trendyol.com",
+        phone: "+902123310200",
+        phoneDisplay: "+90 (212) 331 02 00",
+        address: "Spine Tower, Büyükdere Cad. No:243, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Spine Tower Maslak Sarıyer İstanbul",
+        jobUrl: "https://trendyol.com/kariyer",
+        vipBadge: "🦄 $16B+ Decacorn · Applied Fintech Services",
+        summary: "Turkey's largest tech decacorn ($16B+). Already applied to Fintech Services; follow up via direct email & walk-in."
+      },
+      {
+        rank: 6,
+        id: "VIP-INSIDER",
+        company: "Insider One (Insider)",
+        role: "Senior Software Engineer / AI & Platform Architect",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Kağıthane / Maslak (Libelle Plaza)",
+        email: "talent@useinsider.com",
+        phone: "+902129500020",
+        phoneDisplay: "+90 (212) 950 00 20",
+        address: "Libelle Tech Plaza, Merkez Mah. Ayazma Cad. No:37, Kağıthane, İstanbul",
+        mapQuery: "Libelle Tech Plaza Kağıthane İstanbul",
+        jobUrl: "https://jobs.lever.co/insiderone?team=Software+Development",
+        vipBadge: "🦄 Global AI Unicorn · Active Lever Board",
+        summary: "Global AI marketing platform unicorn. English-speaking engineering culture, high-scale event streaming & AI."
+      },
+      {
+        rank: 7,
+        id: "VIP-AMADEUS",
+        company: "Amadeus Istanbul",
+        role: "Senior Software Engineer / Staff Full-Stack & AI Architect",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Şişli / Mecidiyeköy (Torun Center · M2 Metro)",
+        email: "istanbul-careers@amadeus.com",
+        phone: "+902123100700",
+        phoneDisplay: "+90 (212) 310 07 00",
+        address: "Torun Center, Fulya Mah. Büyükdere Cad. No:74/D, Şişli / Mecidiyeköy, İstanbul",
+        mapQuery: "Torun Center Mecidiyeköy Şişli İstanbul",
+        jobUrl: "https://dev.amadeus.com/en/careers/locations/istanbul",
+        vipBadge: "✈️ 450+ Engineers · #1 Work Permit Sponsor",
+        summary: "450+ engineers in Torun Center. Global aviation tech giant; regularly sponsors foreign senior architect work permits."
+      },
+      {
+        rank: 8,
+        id: "VIP-HEPSIBURADA",
+        company: "Hepsiburada Technology (NASDAQ: HEPS)",
+        role: "Senior .NET Core & React Software Architect",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Mecidiyeköy (Trump Towers Kule 2 · M2 Metro)",
+        email: "ik@hepsiburada.com",
+        phone: "+902123815200",
+        phoneDisplay: "+90 (212) 381 52 00",
+        address: "Trump Towers Kule 2 Kat:2-3, Kuştepe Mah. Mecidiyeköy Yolu Cad. No:12, Şişli, İstanbul",
+        mapQuery: "Trump Towers Mecidiyeköy Şişli İstanbul",
+        jobUrl: "https://kariyer.hepsiburada.com",
+        vipBadge: "📈 NASDAQ Tech Giant · .NET Core + React + AI",
+        summary: "NASDAQ-listed tech giant with large-scale .NET Core, React, and AI search teams. Direct M2 underground exit."
+      },
+      {
+        rank: 9,
+        id: "VIP-OBSS",
+        company: "OBSS Teknoloji A.Ş.",
+        role: "Senior .NET Developer & .NET Full Stack Developer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
+        email: "ik@obss.com.tr",
+        phone: "+902122862400",
+        phoneDisplay: "+90 (212) 286 24 00",
+        address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent No:4/601, Maslak / Sarıyer, İstanbul",
+        mapQuery: "İTÜ ARI 3 Teknokent Maslak Sarıyer İstanbul",
+        jobUrl: "https://tr.linkedin.com/jobs/view/net-full-stack-developer-at-obss-4431928975",
+        vipBadge: "💬 Messaged Nilay Turgut · Active .NET Full Stack Ad",
+        summary: "Certified Teknokent R&D center (quota-exempt work permit!). Active .NET Full Stack & Senior roles."
+      },
+      {
+        rank: 10,
+        id: "VIP-ADESSO",
+        company: "adesso Turkey",
+        role: "Software Developer (.NET) & Senior AI/ML Engineer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak (Olive Plaza Kat:7 · M2 Metro)",
+        email: "recruiting@adesso-group.com",
+        phone: "+902123462002",
+        phoneDisplay: "+90 (212) 346 20 02",
+        address: "Olive Plaza, Maslak Mah. Ahi Evran Cad. No:11 Kat:7, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Olive Plaza Maslak Sarıyer İstanbul",
+        jobUrl: "https://tr.linkedin.com/jobs/view/software-developer-net-at-adesso-turkey-4421678336",
+        vipBadge: "🇩🇪 German Tech Giant · Active .NET Ad",
+        summary: "German enterprise software powerhouse. Direct corporate synergy with Pilz GmbH; active .NET and AI roles."
+      },
+      {
+        rank: 11,
+        id: "VIP-TURKCELL",
+        company: "Turkcell (+ Turkcell Teknoloji)",
+        role: "Lead Software Developer (.NET) & Senior AI Lead",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Maltepe (Küçükyalı Plaza · M4 Metro)",
+        email: "ik@turkcell.com.tr",
+        phone: "05325320000",
+        phoneDisplay: "0532 532 00 00 / 0212 313 10 00",
+        address: "Turkcell Küçükyalı Plaza, Aydınevler Mah. İnönü Cad. No:20, Maltepe, İstanbul",
+        mapQuery: "Turkcell Küçükyalı Plaza Maltepe İstanbul",
+        jobUrl: "https://kariyer.turkcell.com.tr",
+        vipBadge: "💬 Emailed Nursal Burcu Şengönül · 6 Roles Applied",
+        summary: "Applied to 6 roles (Lead .NET, AI Solutions, Backend, Manager). Massive campus right at Küçükyalı M4 Metro."
+      },
+      {
+        rank: 12,
+        id: "VIP-INTERTECH",
+        company: "Intertech (DenizBank Tech Subsidiary)",
+        role: "Kıdemli Yazılım Mühendisi (.NET / Banking / Core)",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Pendik (Teknopark İstanbul)",
+        email: "ik@intertech.com.tr",
+        phone: "+902169995000",
+        phoneDisplay: "+90 (216) 999 50 00",
+        address: "Teknopark İstanbul, Sanayi Mah. Teknopark Bulvarı No:1/1C, Pendik, İstanbul",
+        mapQuery: "Intertech Teknopark İstanbul Pendik",
+        jobUrl: "https://www.intertech.com.tr/tr-TR/Kariyer",
+        vipBadge: "🏦 3 Roles Applied · Teknopark İstanbul",
+        summary: "Already applied to 3 roles (Kıdemli .NET, Swift, Treasury). Huge Teknopark R&D campus right in Pendik."
+      },
+      {
+        rank: 13,
+        id: "VIP-ETIYA",
+        company: "Etiya Information Technology",
+        role: "Senior Specialist, Generative AI & LLM",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (ARI 8 Binası · Maslak)",
+        email: "hr@etiya.com",
+        phone: "+902124837101",
+        phoneDisplay: "+90 (212) 483 71 01",
+        address: "İTÜ Ayazağa Kampüsü, ARI 8 Teknokent Binası, Maslak / Sarıyer, İstanbul",
+        mapQuery: "İTÜ ARI 8 Teknokent Maslak Sarıyer İstanbul",
+        jobUrl: "https://www.etiya.com/en/our-company/career",
+        vipBadge: "🤖 Active Senior GenAI/LLM Open through 31.12",
+        summary: "Active Senior GenAI & LLM role open through Dec 31, 2026! 100% match for your InsightfulAI Multi-Model RAG platform."
+      },
+      {
+        rank: 14,
+        id: "VIP-COMMENCIS",
+        company: "Commencis",
+        role: "Senior Software Architect / Principal Full-Stack Engineer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
+        email: "careers@commencis.com",
+        phone: "+902122864400",
+        phoneDisplay: "+90 (212) 286 44 00",
+        address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent Binası, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Commencis İTÜ ARI 3 Maslak Sarıyer İstanbul",
+        jobUrl: "https://www.commencis.com/careers/",
+        summary: "Elite cloud and digital transformation engineering firm building banking, aviation, and high-scale consumer apps."
+      },
+      {
+        rank: 15,
+        id: "VIP-BGTS",
+        company: "BGTS (BilgeAdam Technologies)",
+        role: "Full Stack Engineer (.NET Core + SQL + React)",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
+        email: "ik@bilgeadam.com",
+        phone: "4443326",
+        phoneDisplay: "444 33 26 / 0212 285 99 77",
+        address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent, Maslak / Sarıyer, İstanbul",
+        mapQuery: "BilgeAdam Teknoloji İTÜ Maslak Sarıyer İstanbul",
+        jobUrl: "https://tr.linkedin.com/jobs/view/full-stack-engineer-at-bilgeadam-teknoloji-4249930403",
+        vipBadge: "⚡ Active Full Stack .NET Ad #4249930403",
+        summary: "Active ad for Full Stack Engineer (.NET Core + React). Massive enterprise software delivery center."
+      },
+      {
+        rank: 16,
+        id: "VIP-ORION",
+        company: "Orion Innovation Turkey",
+        role: "Senior .NET / Full-Stack & Solutions Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Pendik / Kurtköy (Nidakule / Teknopark)",
+        email: "turkey.careers@orioninc.com",
+        phone: "+902165718000",
+        phoneDisplay: "+90 (216) 571 80 00",
+        address: "Nidakule Kurtköy / Teknopark Bölgesi, Pendik / Kurtköy, İstanbul",
+        mapQuery: "Orion Innovation Pendik Kurtköy İstanbul",
+        jobUrl: "https://www.orioninc.com/careers/",
+        summary: "Global software and telecom engineering R&D center in Kurtköy. Fast-track Teknopark work permit benefits."
+      },
+      {
+        rank: 17,
+        id: "VIP-DOGUS",
+        company: "Doğuş Teknoloji",
+        role: "Senior .NET Core / React / Enterprise AI Engineer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak (Doğuş Center Maslak)",
+        email: "ik@d-teknoloji.com.tr",
+        phone: "+902123354800",
+        phoneDisplay: "+90 (212) 335 48 00",
+        address: "Doğuş Center Maslak, Maslak Mah. Ahi Evran Cad. No:4, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Doğuş Center Maslak Sarıyer İstanbul",
+        jobUrl: "https://www.dogusteknoloji.com/",
+        summary: "Doğuş Group's technology arm. Large-scale enterprise .NET, SAP integration, and customer AI platforms."
+      },
+      {
+        rank: 18,
+        id: "VIP-SABANCIDX",
+        company: "SabancıDx",
+        role: "Senior Software Architect (.NET / Cloud / SAP / Enterprise AI)",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Üsküdar (Küçük Çamlıca)",
+        email: "ik@sabancidx.com",
+        phone: "+902165587700",
+        phoneDisplay: "+90 (216) 558 77 00",
+        address: "Küçük Çamlıca Mah. Kısıklı Cad. No:56, Üsküdar, İstanbul",
+        mapQuery: "SabancıDx Küçük Çamlıca Üsküdar İstanbul",
+        jobUrl: "https://www.sabancidx.com/tr/kariyer",
+        summary: "Sabancı Holding's digital transformation and B2B SaaS hub. Exact match for your Pilz enterprise portal & SAP background."
+      },
+      {
+        rank: 19,
+        id: "VIP-KOCSISTEM",
+        company: "KoçSistem",
+        role: "Lead .NET / Full-Stack Architect & Enterprise AI Lead",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Üsküdar / Çamlıca",
+        email: "kocsistem.ik@kocsistem.com.tr",
+        phone: "+902165561000",
+        phoneDisplay: "+90 (216) 556 10 00",
+        address: "Bulgurlu Mah. Üsküdar Cad. No:1, Çamlıca / Üsküdar, İstanbul",
+        mapQuery: "KoçSistem Çamlıca Üsküdar İstanbul",
+        jobUrl: "https://www.kocsistem.com.tr/kariyer/",
+        summary: "Koç Holding's premier technology company. Extensive Microsoft enterprise stack, Cloud, and R&D centers."
+      },
+      {
+        rank: 20,
+        id: "VIP-IYZICO",
+        company: "iyzico (Prosus / PayU Global)",
+        role: "Senior Software Engineer / FinTech Solutions Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Üsküdar / Altunizade (M5 Metro)",
+        email: "hr@iyzico.com",
+        phone: "+902165990100",
+        phoneDisplay: "+90 (216) 599 01 00",
+        address: "Burhaniye Mah. Kısıklı Cad. No:35/A, Üsküdar / Altunizade, İstanbul",
+        mapQuery: "iyzico Altunizade Üsküdar İstanbul",
+        jobUrl: "https://www.iyzico.com/kariyer",
+        summary: "Prosus-backed global payments fintech. Modern engineering culture, high transaction volume, competitive pay."
+      },
+      {
+        rank: 21,
+        id: "VIP-NTTDATA",
+        company: "NTT DATA Business Solutions Turkey",
+        role: "Senior Software Architect / Enterprise .NET & SAP Integration Lead",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Ataşehir (Nidakule Ataşehir Kuzey)",
+        email: "kariyer-tr@nttdata.com",
+        phone: "+902165473800",
+        phoneDisplay: "+90 (216) 547 38 00",
+        address: "Nidakule Ataşehir Kuzey, Barbaros Mah. Begonya Sok. No:3, Ataşehir, İstanbul",
+        mapQuery: "Nidakule Ataşehir Kuzey Barbaros İstanbul",
+        jobUrl: "https://nttdata-solutions.com/tr/kariyer/",
+        summary: "Global SAP & Microsoft enterprise consulting powerhouse in Ataşehir. Large engineering & consulting teams."
+      },
+      {
+        rank: 22,
+        id: "VIP-ATOS",
+        company: "Atos Turkey",
+        role: "Lead Application Modernization & .NET / Cloud Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Kadıköy (Business Istanbul · M4 Metro)",
+        email: "turkey.info@atos.net",
+        phone: "+902166651000",
+        phoneDisplay: "+90 (216) 665 10 00",
+        address: "Business Istanbul B Blok, Merdivenköy Mah. D-100 Karayolu No:2, Kadıköy, İstanbul",
+        mapQuery: "Business Istanbul Merdivenköy Kadıköy",
+        jobUrl: "https://atos.net/en/careers",
+        summary: "Located right on M4 Metro at Göztepe/Yenisahra. Specializes in enterprise modernization, SAP, and Cloud."
+      },
+      {
+        rank: 23,
+        id: "VIP-PARGESOFT",
+        company: "Pargesoft",
+        role: "Senior .NET / Dynamics 365 ERP & Cloud Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Ümraniye (Akkom Ofis Park)",
+        email: "ik@pargesoft.com",
+        phone: "+902165758888",
+        phoneDisplay: "+90 (216) 575 88 88",
+        address: "Akkom Ofis Park 2. Blok No:4, Saray Mah. Dr. Adnan Büyükdeniz Cad., Ümraniye, İstanbul",
+        mapQuery: "Akkom Ofis Park Ümraniye İstanbul",
+        jobUrl: "https://pargesoft.com/en/career-at-pargesoft/",
+        summary: "Premier Microsoft Dynamics ERP/CRM, Azure & AI solutions provider. Fast-track R&D work permit eligibility."
+      },
+      {
+        rank: 24,
+        id: "VIP-NOZZLE",
+        company: "Nozzle Software",
+        role: "Senior Software Developer (.NET / Web API / MSSQL / React)",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Ataşehir (Varyap Meridian Grand Tower)",
+        email: "hr@nozzlesoft.com",
+        phone: "+902165105050",
+        phoneDisplay: "+90 (216) 510 50 50",
+        address: "Varyap Meridian Grand Tower A Blok, Barbaros Mah. Mor Sümbül Sok., Ataşehir, İstanbul",
+        mapQuery: "Varyap Meridian Grand Tower Ataşehir İstanbul",
+        jobUrl: "https://nozzlesoft.com/careers/software-developer/",
+        summary: "Maritime ERP/SaaS platform built in .NET & MSSQL in Ataşehir. Active opening for Senior .NET Developer."
+      },
+      {
+        rank: 25,
+        id: "VIP-PAPARA",
+        company: "Papara",
+        role: "Senior .NET Core & React Architect / Principal Software Engineer",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Üsküdar / Altunizade (M5 Metro)",
+        email: "kariyer@papara.com",
+        phone: "08503400340",
+        phoneDisplay: "0850 340 03 40",
+        address: "Altunizade Mah. Mahir İz Cad. No:26, Üsküdar, İstanbul",
+        mapQuery: "Papara Altunizade Üsküdar İstanbul",
+        jobUrl: "https://papara.com/kariyer",
+        summary: "One of EMEA's largest high-scale .NET Core + React + Redis architectures. Top compensation."
+      },
+      {
+        rank: 26,
+        id: "VIP-MIDAS",
+        company: "Midas",
+        role: "Senior Full-Stack / Backend Software Architect",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Kanyon Ofis Kat:14 · M2 Metro)",
+        email: "talent@getmidas.com",
+        phone: "08502412241",
+        phoneDisplay: "0850 241 22 41",
+        address: "Kanyon Ofis Binası Kat:14, Esentepe Mah. Büyükdere Cad. No:185, Levent, İstanbul",
+        mapQuery: "Kanyon Ofis Binası Levent İstanbul",
+        jobUrl: "https://www.getmidas.com/kariyer/",
+        summary: "Direct underground exit from Levent M2 Metro. High USD-indexed pay, elite engineering culture."
+      },
+      {
+        rank: 27,
+        id: "VIP-SAHIBINDEN",
+        company: "sahibinden.com (Sahibinden Teknoloji)",
+        role: "Senior Software Architect / Lead Full-Stack & AI Engineer",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Kozyatağı (DeBaren Plaza · M4 Metro)",
+        email: "ik@sahibinden.com",
+        phone: "+902165777000",
+        phoneDisplay: "+90 (216) 577 70 00",
+        address: "DeBaren Plaza, İçerenköy Mah. Çayır Cad. No:1, Kozyatağı / Ataşehir, İstanbul",
+        mapQuery: "DeBaren Plaza Kozyatağı Ataşehir İstanbul",
+        jobUrl: "https://ik.sahibinden.com",
+        summary: "Direct M4 Metro ride from Kartal. Certified Ministry R&D Center (Ar-Ge Merkezi) with quota-exempt permits."
+      },
+      {
+        rank: 28,
+        id: "VIP-PARAM",
+        company: "Param Tech (TURK Elektronik Para)",
+        role: "Senior .NET Core / Full-Stack Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Ümraniye (Cessas Plaza)",
+        email: "ik@param.com.tr",
+        phone: "08509889999",
+        phoneDisplay: "0850 988 99 99",
+        address: "Cessas Plaza No:4, Saray Mah. Dr. Adnan Büyükdeniz Cad., Ümraniye, İstanbul",
+        mapQuery: "Cessas Plaza Ümraniye İstanbul",
+        jobUrl: "https://param.com.tr/kariyer",
+        summary: "Massive .NET Core & React financial technology group expanding across the UK, Czechia, and Germany."
+      },
+      {
+        rank: 29,
+        id: "VIP-TAZTECH",
+        company: "Taz Technology (TazMemory.AI)",
+        role: "Senior Full-Stack & Enterprise AI/LLM Engineer (.NET + React)",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak / Sarıyer (Seba Office Boulevard)",
+        email: "hr@taztech.tr",
+        phone: "+902129098829",
+        phoneDisplay: "+90 (212) 909 88 29",
+        address: "Seba Office Boulevard, Ayazağa Mah. Mimar Sinan Sok., Sarıyer, İstanbul",
+        mapQuery: "Seba Office Boulevard Ayazağa Sarıyer İstanbul",
+        jobUrl: "https://taztech.tr/en/kariyer",
+        summary: "Builds enterprise AI & LLM solutions using .NET backend and React/Next.js frontend. Direct stack match."
+      },
+      {
+        rank: 30,
+        id: "VIP-208SOFT",
+        company: "208 Software Solutions",
+        role: "Senior .NET Backend & Full-Stack Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Kozyatağı / Ataşehir",
+        email: "info@208softwaresolutions.com",
+        phone: "+902167061208",
+        phoneDisplay: "+90 (216) 706 12 08",
+        address: "Kozyatağı Mah. Bayar Cad., Kadıköy / Ataşehir, İstanbul",
+        mapQuery: "Kozyatağı Bayar Caddesi Kadıköy İstanbul",
+        jobUrl: "https://www.208softwaresolutions.com/en/careers/",
+        summary: "Software engineering house building enterprise .NET and web platforms. Email info@208softwaresolutions.com."
+      },
+      {
+        rank: 31,
+        id: "VIP-CRENNO",
+        company: "CRENNO",
+        role: "Mid-Level / Senior .NET Core Developer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak / Sarıyer",
+        email: "hr@crenno.com",
+        phone: "+902122850022",
+        phoneDisplay: "+90 (212) 285 00 22",
+        address: "Maslak Mah. Büyükdere Cad., Sarıyer, İstanbul",
+        mapQuery: "Maslak Büyükdere Caddesi Sarıyer İstanbul",
+        jobUrl: "https://jobs.smartrecruiters.com/CRENNO/744000109920915-mid-level-net-developer-cr-mnde02-",
+        summary: "Digital product studio. Active SmartRecruiters opening for .NET Core / Microservices Developer."
+      },
+      {
+        rank: 32,
+        id: "VIP-UKX",
+        company: "UKX Danışmanlık",
+        role: "Full-Stack React / Next.js / TypeScript / LLM Developer",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Kadıköy / Ataşehir",
+        email: "hr@ukx.com.tr",
+        phone: "+902164503000",
+        phoneDisplay: "+90 (216) 450 30 00",
+        address: "Barbaros Mah., Ataşehir, İstanbul",
+        mapQuery: "Barbaros Mahallesi Ataşehir İstanbul",
+        jobUrl: "https://kariyermerkezi.bogazici.edu.tr/en/job/9150",
+        summary: "Asian-side software consultancy with active posting for Full-Stack React, Next.js, TS, and LLM APIs."
+      },
+      {
+        rank: 33,
+        id: "VIP-COLENDI",
+        company: "Colendi",
+        role: "Senior .NET / Full-Stack & AI Architect",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Maya Akar Center Kat:18 · M2 Metro)",
+        email: "hr@colendi.com",
+        phone: "+902129093593",
+        phoneDisplay: "+90 (212) 909 35 93",
+        address: "Maya Akar Center Kat:18, Büyükdere Cad. No:100-102, Esentepe / Levent, İstanbul",
+        mapQuery: "Maya Akar Center Esentepe Şişli İstanbul",
+        jobUrl: "https://colendi.com/careers",
+        summary: "$700M+ global AI banking & credit scale-up headquartered in London & Levent. Fast-growing engineering team."
+      },
+      {
+        rank: 34,
+        id: "VIP-DELIVERYHERO",
+        company: "Yemeksepeti / Delivery Hero Tech Hub",
+        role: "Senior Full-Stack / AI Engineer",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Yemeksepeti Park · M2 Metro)",
+        email: "ik@yemeksepeti.com",
+        phone: "+902123591800",
+        phoneDisplay: "+90 (212) 359 18 00",
+        address: "Yemeksepeti Park, Büyükdere Cad. No:183, Levent / Beşiktaş, İstanbul",
+        mapQuery: "Yemeksepeti Park Levent Beşiktaş İstanbul",
+        jobUrl: "https://kariyer.yemeksepeti.com",
+        summary: "Part of Berlin-based Delivery Hero SE (DAX tech giant). Your Pilz German multinational background is an asset."
+      },
+      {
+        rank: 35,
+        id: "VIP-ACCENTURE",
+        company: "Accenture Turkey",
+        role: "Lead Software Test Automation / Full-Stack Solutions Engineer",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Pendik (Teknopark İstanbul) / Ataşehir",
+        email: "accenture.turkey@accenture.com",
+        phone: "+902165707000",
+        phoneDisplay: "+90 (216) 570 70 00",
+        address: "Teknopark İstanbul, Sanayi Mah., Pendik / Ataşehir Nidakule, İstanbul",
+        mapQuery: "Accenture Teknopark İstanbul Pendik",
+        jobUrl: "https://www.accenture.com/tr-tr/careers",
+        vipBadge: "💬 Applied: Lead Software Test Automation",
+        summary: "Already applied to Lead Software Test Automation (#4486082087). Global IT consultancy with enterprise clients."
+      },
+      {
+        rank: 36,
+        id: "VIP-MASTERCARD",
+        company: "Mastercard Turkey Tech Hub",
+        role: "Principal / Senior Software Engineer (.NET / APIs / Payments)",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Maya Akar Center Kat:15 · M2 Metro)",
+        email: "turkey@mastercard.com",
+        phone: "+902123177600",
+        phoneDisplay: "+90 (212) 317 76 00",
+        address: "Maya Akar Center Kat:15, Büyükdere Cad. No:100-102, Esentepe / Beşiktaş, İstanbul",
+        mapQuery: "Maya Akar Center Beşiktaş İstanbul",
+        jobUrl: "https://mastercard.jobs",
+        summary: "Global payments engineering hub in Levent. High-security distributed systems, microservices, and APIs."
+      },
+      {
+        rank: 37,
+        id: "VIP-CANONICAL",
+        company: "Canonical (Ubuntu)",
+        role: "Senior Full-Stack Engineer (React / TypeScript / Cloud / AI)",
+        cluster: "CLUSTER_REMOTE",
+        clusterLabel: "🌍 Global Remote in Türkiye (USD Pay)",
+        email: "careers@canonical.com",
+        phone: "Global Remote",
+        phoneDisplay: "Remote / Online",
+        address: "100% Remote across Türkiye (USD Compensation)",
+        mapQuery: "Canonical Ubuntu London",
+        jobUrl: "https://canonical.com/careers",
+        summary: "Continuously hires senior software engineers in Turkey paying top USD salary. Your published VS Code extension shines."
+      },
+      {
+        rank: 38,
+        id: "VIP-BOSCHFESTO",
+        company: "Bosch Digital / Festo Türkiye",
+        role: "Lead Software Architect / Digital Transformation & AI Lead",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Küçükyalı (M4 Metro) / Tuzla",
+        email: "info_tr@festo.com",
+        phone: "+902164320000",
+        phoneDisplay: "+90 (216) 432 00 00",
+        address: "Bosch: Küçükyalı Plaza (M4 Metro) / Festo: Tuzla Mermerciler OSB, İstanbul",
+        mapQuery: "Bosch Küçükyalı Plaza Maltepe İstanbul",
+        jobUrl: "https://www.festo.com/tr/tr/e/kariyer-id_6982/",
+        vipBadge: "🇩🇪 Direct German Automation Peer (Pilz GmbH)",
+        summary: "Festo is Pilz GmbH's direct German automation peer; Bosch HQ is at Küçükyalı M4 Metro. Walk-ins with GM letter succeed."
+      },
+      {
+        rank: 39,
+        id: "VIP-IBM",
+        company: "IBM Turkey",
+        role: "Cloud & AI Solutions Architect / Senior Engineer",
+        cluster: "CLUSTER_LEVENT",
+        clusterLabel: "📍 Levent (Levent 199 · M2 Metro)",
+        email: "turkey@ibm.com",
+        phone: "+902123171000",
+        phoneDisplay: "+90 (212) 317 10 00",
+        address: "Levent 199, Büyükdere Cad. No:199, Levent / Şişli, İstanbul",
+        mapQuery: "Levent 199 Büyükdere Caddesi Şişli İstanbul",
+        jobUrl: "https://www.ibm.com/careers",
+        summary: "Located in Levent 199. Enterprise Cloud, Red Hat OpenShift, AI, and architecture consulting."
+      },
+      {
+        rank: 40,
+        id: "VIP-ORACLE",
+        company: "Oracle Turkey",
+        role: "Cloud Solutions Architect / Enterprise Application Engineer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak (Maslak Uniq B Blok)",
+        email: "oracle_tr@oracle.com",
+        phone: "+902123296700",
+        phoneDisplay: "+90 (212) 329 67 00",
+        address: "Maslak Uniq, Ayazağa Cad. No:4 B Blok Kat:1, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Maslak Uniq Sarıyer İstanbul",
+        jobUrl: "https://www.oracle.com/corporate/careers/",
+        summary: "Enterprise database, ERP, and OCI cloud solutions hub in Maslak Uniq."
+      },
+      {
+        rank: 41,
+        id: "VIP-JUNIOR-MISC",
+        company: "Boutique / Additional Tech Leads",
+        role: "Software Engineering & Tech Hubs",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Istanbul Hybrid & Boutique",
+        email: "ik@sahibinden.com",
+        phone: "",
+        phoneDisplay: "See details",
+        address: "Narkoz, APLIMAX, Telener, Cyber2Tech, Carinok tech offices across Istanbul",
+        mapQuery: "Istanbul",
+        jobUrl: "https://www.linkedin.com/jobs/",
+        summary: "Additional boutique and junior postings from search. Priority should focus on the top 40 enterprise firms above."
+      }
+    ];
+
+    function getVipChecklistState() {
+      try {
+        return JSON.parse(localStorage.getItem("jr_vip_checklist_v1") || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveVipChecklistState(st) {
+      localStorage.setItem("jr_vip_checklist_v1", JSON.stringify(st));
+    }
+
+    function toggleVipCheck(id, field, value) {
+      const st = getVipChecklistState();
+      if (!st[id]) st[id] = { emailed: false, called: false, walked: false, applied: false };
+      st[id][field] = !!value;
+      saveVipChecklistState(st);
+      renderVipChecklist();
+      showToast(`Saved check for ${id}!`, true);
+    }
+
+    function buildVipEmail(item) {
+      const isEnglish = /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard)\b/i.test(item.company);
+      if (isEnglish) {
+        return {
+          subject: `Senior Software & AI Architect — ${item.company} — Hessam Barasm Mamagani`,
+          body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company}'s engineering culture and high-scale technical challenges strongly align with the enterprise architectures I lead.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led the end-to-end architecture and delivery of 5 production platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting operational turnaround time by 80%), and multi-model Agentic AI/RAG automation. Additionally, I have mentored 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 10–15 minute call to discuss how I can contribute.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        };
+      }
+      return {
+        subject: `Tanışma & Başvuru: ${item.role} — Hessam Barasm Mamagani`,
+        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki ${item.role} pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 zaman tasarrufu), çok kiracılı SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca mimari liderlikle hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz bu hafta 10-15 dakikalık bir görüşmede ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+      };
+    }
+
+    function buildVipDm(item) {
+      const isEnglish = /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard)\b/i.test(item.company);
+      if (isEnglish) {
+        return `Hello, I recently shared my CV with ${item.company}'s talent team for ${item.role}. At German multinational Pilz GmbH & Co. KG, I lead architecture across 5 enterprise platforms—automating SAP & e-Invoice workflows by 80% and deploying multi-model Agentic AI/RAG systems. I hold an active work permit in Istanbul and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. Would you be open to a brief 10-minute intro call this week? (Phone: +90 539 229 4251 | Portfolio: https://hessam-mamagani.github.io/)`;
+      }
+      return `Merhaba, ${item.company} bünyesindeki ${item.role} vizyonunuz için özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı tavsiye mektubunu ilettim. Pilz GmbH bünyesinde 5 kurumsal platformun mimarisini uçtan uca yönettim; SAP ve e-Fatura süreçlerini %80 hızlandırıp kurumsal AI sistemlerini canlıya aldım. İstanbul'da aktif çalışma iznim mevcuttur. Bu hafta 10 dakikalık kısa bir tanışma görüşmesi gerçekleştirebilir miyiz? (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+    }
+
+    function renderVipChecklist() {
+      const container = document.getElementById("checklistContainer");
+      if (!container) return;
+      const q = (document.getElementById("checklistSearch")?.value || "").toLowerCase().trim();
+      const filter = document.getElementById("checklistFilter")?.value || "ALL";
+      const checks = getVipChecklistState();
+
+      const appliedNames = new Set(STATE.applied.map(a => (a.company || "").toLowerCase()));
+
+      let totalEmailed = 0;
+      let totalCalled = 0;
+      let totalWalked = 0;
+      let totalApplied = 0;
+
+      VIP_CHECKLIST_ALL.forEach(item => {
+        const c = checks[item.id] || {};
+        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
+        if (c.emailed) totalEmailed++;
+        if (c.called) totalCalled++;
+        if (c.walked) totalWalked++;
+        if (c.applied || isCrmApplied) totalApplied++;
+      });
+
+      const badge = document.getElementById("checklistProgressBadge");
+      if (badge) {
+        badge.textContent = `📧 ${totalEmailed}/41 Emailed · 📞 ${totalCalled}/41 Called · 🚶 ${totalWalked}/41 Walked · 🌐 ${totalApplied}/41 Applied`;
+      }
+
+      const filtered = VIP_CHECKLIST_ALL.filter(item => {
+        const c = checks[item.id] || {};
+        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
+        const hasApplied = c.applied || isCrmApplied;
+
+        if (filter === "PENDING" && c.emailed) return false;
+        if (filter === "EMAILED" && !c.emailed) return false;
+        if (filter === "CALLED" && !c.called) return false;
+        if (filter === "WALKED" && !c.walked) return false;
+        if (filter === "APPLIED" && !hasApplied) return false;
+        if (filter === "CONNECTIONS" && !item.vipBadge) return false;
+        if (filter === "CLUSTER_MASLAK" && item.cluster !== "CLUSTER_MASLAK") return false;
+        if (filter === "CLUSTER_LEVENT" && item.cluster !== "CLUSTER_LEVENT") return false;
+        if (filter === "CLUSTER_ASIAN" && item.cluster !== "CLUSTER_ASIAN") return false;
+
+        if (q) {
+          const haystack = `${item.company} ${item.role} ${item.email} ${item.phoneDisplay} ${item.address} ${item.clusterLabel} ${item.summary} ${item.vipBadge || ""}`.toLowerCase();
+          if (!haystack.includes(q)) return false;
+        }
+        return true;
+      });
+
+      if (!filtered.length) {
+        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No companies match this search or filter. Try switching filter to "All (41 Companies)".</div>`;
+        return;
+      }
+
+      if (VIP_VIEW_MODE === "cards") {
+        container.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
+        container.innerHTML = filtered.map(item => {
+          const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
+          const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
+          const isApplied = c.applied || isCrmApplied;
+          const mail = buildVipEmail(item);
+          const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+          const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
+          const dmText = buildVipDm(item);
+          const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
+
+          return `
+            <div class="glass rounded-xl p-4 border ${c.emailed && isApplied ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-slate-800 hover:border-emerald-500/30'} transition flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-200 border border-slate-700">#${item.rank}</span>
+                    <span class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel}</span>
+                  </div>
+                  ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : isApplied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ In CRM</span>` : ""}
+                </div>
+                <h3 class="text-base font-bold text-white">${item.company}</h3>
+                <p class="text-xs text-blue-300 font-medium mt-0.5">${item.role}</p>
+                <p class="text-xs text-slate-300/90 mt-1.5 leading-relaxed">${item.summary}</p>
+              </div>
+
+              <div class="pt-2 border-t border-slate-800/80 space-y-2 text-xs">
+                <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+                  <div>
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Email</span>
+                    <a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline">${item.email}</a>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Phone</span>
+                    ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline">📞 ${item.phoneDisplay}</a>` : `<span class="text-slate-400">${item.phoneDisplay}</span>`}
+                  </div>
+                </div>
+
+                <div class="flex items-start justify-between gap-2 bg-slate-900/40 p-2 rounded border border-slate-800/60">
+                  <div class="text-[11px] text-slate-300 flex-1">
+                    <span class="text-slate-400 font-semibold">📍 Address:</span> ${item.address}
+                  </div>
+                  <a href="${mapsHref}" target="_blank" class="shrink-0 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-blue-300 text-[11px] font-semibold flex items-center gap-1 transition">
+                    🗺️ Maps
+                  </a>
+                </div>
+
+                <div class="bg-black/40 p-2.5 rounded-lg border border-emerald-500/20">
+                  <span class="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block mb-1.5">Action Checklist (Click to Tick):</span>
+                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                      <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
+                      <span class="${c.emailed ? 'font-bold text-emerald-300' : ''}">📧 Emailed</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                      <input type="checkbox" ${c.called ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
+                      <span class="${c.called ? 'font-bold text-emerald-300' : ''}">📞 Called</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                      <input type="checkbox" ${c.walked ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
+                      <span class="${c.walked ? 'font-bold text-emerald-300' : ''}">🚶 Walked In</span>
+                    </label>
+                    <label class="flex items-center gap-1.5 cursor-pointer text-slate-200 select-none">
+                      <input type="checkbox" ${isApplied ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
+                      <span class="${isApplied ? 'font-bold text-emerald-300' : ''}">🌐 Applied</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5 pt-1">
+                  <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-1">
+                    ✉️ Open Gmail
+                  </a>
+                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
+                    📋 Copy Email
+                  </button>
+                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+                    💬 Copy DM
+                  </button>
+                  <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search for your 1st-degree connections at ${item.company}">
+                    👥 My 1st-Deg Connections
+                  </a>
+                  <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition ml-auto">
+                    ↗ Job Link
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+        return;
+      }
+
+      // DEFAULT: COMPACT ACCORDION LIST VIEW (SCROLL-FREE SCANNING)
+      container.className = "space-y-2";
+      container.innerHTML = filtered.map(item => {
+        const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
+        const isCrmApplied = [...appliedNames].some(name => name.includes(item.company.toLowerCase().slice(0, 5)));
+        const isApplied = c.applied || isCrmApplied;
+        const isExpanded = VIP_EXPANDED_IDS.has(item.id);
+        const mail = buildVipEmail(item);
+        const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+        const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
+        const dmText = buildVipDm(item);
+        const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(item.company.split("(")[0].trim())}`;
+
+        return `
+          <div class="glass rounded-xl border ${c.emailed && isApplied ? 'border-emerald-500/50 bg-emerald-950/15' : 'border-slate-800 hover:border-slate-700'} transition overflow-hidden">
+            <!-- Compact Single-Row Bar -->
+            <div class="p-3 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) toggleVipExpand('${item.id}')">
+              <div class="flex items-center gap-2.5 flex-1 min-w-[280px]">
+                <span class="px-2 py-0.5 rounded text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">#${item.rank}</span>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm font-bold text-white hover:text-blue-300 transition">${item.company}</span>
+                    <span class="text-[11px] px-2 py-0.2 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel.split("(")[0].trim()}</span>
+                    ${item.vipBadge ? `<span class="px-2 py-0.2 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ""}
+                    ${isApplied ? `<span class="px-1.5 py-0.2 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Applied</span>` : ""}
+                  </div>
+                  <p class="text-xs text-slate-400 font-medium truncate max-w-md">${item.role}</p>
+                </div>
+              </div>
+
+              <!-- Inline Action Checkboxes -->
+              <div class="flex items-center gap-3 shrink-0 text-xs bg-black/40 px-3 py-1.5 rounded-lg border border-slate-800" onclick="event.stopPropagation()">
+                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                  <input type="checkbox" ${c.emailed ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'emailed', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.emailed ? 'font-bold text-emerald-300' : 'text-slate-400'}">📧 Email</span>
+                </label>
+                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                  <input type="checkbox" ${c.called ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'called', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.called ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call</span>
+                </label>
+                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                  <input type="checkbox" ${c.walked ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'walked', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${c.walked ? 'font-bold text-emerald-300' : 'text-slate-400'}">🚶 Walk</span>
+                </label>
+                <label class="flex items-center gap-1 cursor-pointer text-slate-200">
+                  <input type="checkbox" ${isApplied ? "checked" : ""} onchange="toggleVipCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
+                  <span class="${isApplied ? 'font-bold text-emerald-300' : 'text-slate-400'}">🌐 Apply</span>
+                </label>
+              </div>
+
+              <!-- Quick Buttons -->
+              <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition">
+                  ✉️ Gmail
+                </a>
+                <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 DM copied!')" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+                  💬 DM
+                </button>
+                <a href="${myConnectionsHref}" target="_blank" class="px-2 py-1 rounded bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search your 1st-degree connections at ${item.company}">
+                  👥 My Connections
+                </a>
+                <button onclick="toggleVipExpand('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+                  ${isExpanded ? '▲ Hide' : '▼ Details'}
+                </button>
+              </div>
+            </div>
+
+            <!-- Expanded Drawer Details -->
+            ${isExpanded ? `
+              <div class="p-4 bg-slate-950/70 border-t border-slate-800/80 space-y-3 text-xs">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Email</span>
+                    <a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline text-xs">${item.email}</a>
+                  </div>
+                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800">
+                    <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Phone</span>
+                    ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline text-xs">📞 ${item.phoneDisplay}</a>` : `<span class="text-slate-400 text-xs">${item.phoneDisplay}</span>`}
+                  </div>
+                  <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                    <div>
+                      <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider">Career Portal</span>
+                      <a href="${item.jobUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold text-xs">↗ Open Active Job Post</a>
+                    </div>
+                    <a href="${mapsHref}" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600/30 transition">
+                      🗺️ Maps
+                    </a>
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300">
+                  <span class="text-slate-400 font-semibold">📍 Full Building Address:</span> ${item.address} &middot; <span class="italic text-slate-400">${item.summary}</span>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(`To: ${item.email}\nSubject: ${mail.subject}\n\n${mail.body}`)}'), this, '📧 Email copied!')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition">
+                    📋 Copy Full Pre-Filled Email
+                  </button>
+                  <button onclick="copyTextSafe(decodeURIComponent('${encodeURIComponent(dmText)}'), this, '💬 LinkedIn DM copied!')" class="px-3 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition">
+                    💬 Copy Short LinkedIn DM
+                  </button>
+                  <a href="${myConnectionsHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-semibold transition">
+                    👥 Open LinkedIn & Filter My 1st-Deg Connections
+                  </a>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function openAddModal() {
       {
         rank: 1,
         id: "VIP-TRENDYOL",
