@@ -262,6 +262,10 @@
 
     const VAULT_ITEMS = [
       {
+        title: "Peer-to-Peer Short DM — LinkedIn / WhatsApp (TR & EN)",
+        text: `TR (Peer-to-Peer Developer Pitch):\nMerhaba [İsim] Bey,\n\nUzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.\n\nPilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nTüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ekibiniz bünyesindeki yazılım / mühendislik rollerinde yer almayı çok istiyorum.\n\nGüncel özgeçmişimi bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe / İK'ya yönlendirmenizi rica ederim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/\n\n---\nEN (Peer-to-Peer Developer Pitch):\nHi [Name],\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and cutting turnaround time by 80%.\n\nI would love to contribute hands-on to the engineering team. My CV is attached (based in Istanbul with active work permit).\n\nI would welcome the opportunity for you to review my background or connect me with the engineering hiring team.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`
+      },
+      {
         title: "Links & Direct CV Downloads (Works on Phone & Laptop)",
         text: "GitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/\nPortfolio: https://hessam-mamagani.github.io/\nDownload EN CV (PDF): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_EN.pdf\nDownload TR CV (PDF): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_TR.pdf"
       },
@@ -1104,35 +1108,31 @@
       if (item.isProactive) {
         if (item.lang === "EN") {
           return {
-            subject: `Executive Introduction — ${item.role} — Hessam Barasm Mamagani`,
-            body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out directly because ${item.company}'s engineering culture and product vision strongly align with the enterprise systems I lead and architect.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led end-to-end digital transformation and architected 5 production platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting manual processing time by 80%), multi-tenant B2B SaaS, and enterprise AI/RAG automation. Previously, I also mentored and trained 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I hold an active work permit in Istanbul (through 31.12.2026) and would welcome a brief 15-minute call or in-person coffee to share my live systems (eventracer.com/en, pilztr.online/portal).\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+            subject: `Software Engineering Introduction — ${item.company} — Hessam Barasm Mamagani`,
+            body: `Dear ${item.company} Engineering & Hiring Team,\n\nI am reaching out regarding software engineering roles at ${item.company}.\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI. At Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, automating SAP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\nMy CV is attached along with a recommendation letter from our General Manager Yavuz Çopur (based in Istanbul with active work permit). I would welcome the opportunity to connect with your technical team to explore how I can contribute hands-on.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
           };
         }
         return {
           subject: `Tanışma & Başvuru: ${item.role} — Hessam Barasm Mamagani`,
-          body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki mevcut veya açılacak ${item.role} pozisyonları için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 hızlanma), çok kiracılı B2B SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca liderlik ederek hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz canlı sistemlerimi paylaşmak üzere 15 dakikalık bir online görüşme veya ofisinizde yüz yüze tanışma talep ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          body: `Sayın ${item.company} Teknoloji Yönetimi ve İşe Alım Ekibi,\n\n${item.company}'in yazılım ve mühendislik vizyonunu ilgiyle takip ediyor; ekibinizdeki ${item.role} pozisyonu için doğrudan iletişime geçmek istiyorum.\n\nUzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Pilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka sistemlerini canlıya aldık.\n\nGüncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu ekte bilgilerinize sunarım (İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık roller için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
       if (item.lang === "EN") {
         return {
           subject: `Application Follow-Up: ${item.role} — Hessam Barasm Mamagani`,
-          body: `Dear ${item.company} Hiring & Talent Acquisition Team,\n\nI recently applied for the "${item.role}" position at ${item.company} and wanted to follow up directly with my CV and the signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nAt Pilz Türkiye (Pilz GmbH & Co. KG), I have led end-to-end architecture and delivery of 5 enterprise production platforms—streamlining CRM/ERP operations, automating SAP & e-Invoice workflows by 80%, and deploying production AI/RAG systems, in addition to mentoring 150+ engineers across 640+ hours of live instruction.\n\nI am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 15-minute conversation this week to discuss how I can contribute to ${item.company}.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          body: `Dear ${item.company} Hiring Team,\n\nI recently applied for the ${item.role} position at ${item.company} and wanted to follow up directly with my CV and a recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nAt Pilz Türkiye (Pilz GmbH & Co. KG), I engineered 5 production enterprise platforms on .NET and Azure end-to-end, solving SAP & e-Invoice bottlenecks and accelerating processing times by 80%.\n\nI am based in Istanbul with an active work permit and would welcome the chance to connect with your technical team to discuss how I can add immediate value.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
-      const trImpactParagraph = isMgmtOrErp
-        ? `Halihazırda Pilz Türkiye (Pilz GmbH) bünyesinde kurumsal dijital dönüşüm, SAP/ERP ve e-Fatura iş süreçleri otomasyonu (manuel operasyonlarda %80 zaman tasarrufu), kurumsal CRM/iş uygulamaları ve yapay zeka destekli yönetim platformlarını uçtan uca liderlik ederek hayata geçirdim. Ayrıca 15+ yıllık mühendislik ve proje yönetimi tecrübemle ekipleri koordine ederek yüksek ölçekli kurumsal projeleri canlıya aldım.`
-        : `Halihazırda Pilz Türkiye (Pilz GmbH) bünyesinde kurumsal CRM/ERP platformları, SAP/iş süreçleri otomasyonu, B2B SaaS sistemleri ve kurumsal yapay zeka çözümlerini uçtan uca mimar olarak tasarlayıp canlıya aldım. Bunun öncesinde 640+ saat canlı yazılım eğitimiyle 150'den fazla yazılım mühendisi yetiştirdim.`;
-
       return {
-        subject: `Başvuru Takibi & Referans Mektubu: ${item.role} — Hessam Barasm Mamagani`,
-        body: `Sayın ${item.company} İnsan Kaynakları ve Teknoloji Yönetimi Ekibi,\n\n"${item.role}" pozisyonunuz için gerçekleştirdiğim başvurumu, özgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu (ekte) doğrudan dikkatinize sunmak istedim.\n\n${trImpactParagraph}\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim (31.12.2026'ya kadar geçerli) bulunmaktadır. Uygun görürseniz bu hafta 15 dakikalık kısa bir görüşmede canlı projelerimi ve ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla, iyi çalışmalar dilerim,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Başvuru Takibi & CV: ${item.role} — Hessam Barasm Mamagani`,
+        body: `Sayın ${item.company} İşe Alım ve Teknik Yönetim Ekibi,\n\n${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim; güncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu doğrudan dikkatinize sunmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP ve e-Fatura iş süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye yönlendirmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
 
     function buildCallScript(item) {
-      return `📞 20-Second Executive Call Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. İnsan Kaynakları (İşe Alım) ekibinden yetkili kişiyle görüşebilir miyim? ${item.role} pozisyonu için arıyorum."\n\n2. To HR: "Merhaba, ben Hessam Mamagani. ${item.role} pozisyonunuz için başvurumu ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubunu ilettim. Pilz Türkiye'de kurumsal dijital dönüşüm, SAP/ERP iş süreçleri otomasyonu ve yazılım projelerine liderlik ediyorum. Şu an 31 Aralık'a kadar aktif çalışma iznim mevcut — uygun görürseniz bu hafta 15 dakikalık kısa bir tanışma görüşmesi planlayabilir miyiz?"`;
+      return `📞 20-Second Direct Call Script for ${item.company}:\n\n1. To Reception: "Merhaba, iyi çalışmalar. İnsan Kaynakları / Yazılım İşe Alım ekibinden yetkili kişiyle görüşebilir miyim? ${item.role} başvurusu için arıyorum."\n\n2. To HR / Hiring Lead: "Merhaba, ben Hessam Mamagani. ${item.role} pozisyonunuz için başvurumu ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un referans mektubunu iletmiştim. Pilz bünyesinde .NET ve Azure mimarisiyle kurumsal sistemler geliştiren kıdemli bir yazılımcıyım; aktif çalışma iznim mevcut. Uygun görürseniz profilimi teknik yöneticiye iletebilir misiniz?"`;
     }
 
     let CURRENT_OUTREACH_ITEMS = [];
@@ -2229,7 +2229,7 @@
 
       const pitch = a.aiPitch || d.aiPitch || (
         d.title
-          ? `Merhaba, ${d.company} bünyesindeki ${d.title} pozisyonunuzu ilgiyle inceledim. Pilz Türkiye bünyesinde kurumsal dijital dönüşüme liderlik ederek .NET Core, C#, React ve SAP entegrasyonlu yüksek performanslı sistemler geliştirdim. Deneyimimin ekibinize hızla değer katacağına inanıyorum.`
+          ? `Merhaba, ${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu ilettim. Uzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Pilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka sistemlerini canlıya aldık. Güncel özgeçmişimi bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe iletmenizi rica ederim. (+90 539 229 4251 | https://hessam-mamagani.github.io/)`
           : ""
       );
 
@@ -2356,8 +2356,8 @@
         : `At Pilz Türkiye, I led the end-to-end architecture and delivery of 5 production enterprise platforms spanning CRM/ERP operations, business intelligence, and workflow automation.`;
 
       const email = isEn
-        ? `Subject: Application: ${d.title} – Hessam Barasm Mamagani\n\nDear ${d.company} Hiring Team,\n\nI am writing to apply for the ${d.title} position at ${d.company}.\n\n${enProjectParagraph}\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I would welcome the opportunity to share a brief walkthrough of these live systems in an introductory conversation.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`
-        : `Konu: ${d.title} Başvurusu – Hessam Barasm Mamagani\n\nSayın ${d.company} İK ve İşe Alım Ekibi,\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu iletmekten memnuniyet duyarım.\n\n${trProjectParagraph}\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Uygun görmeniz halinde kısa bir tanışma görüşmesinde projelerimi paylaşmak isterim.\n\nSaygılarımla,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`;
+        ? `Subject: Application: ${d.title} – Hessam Barasm Mamagani\n\nDear ${d.company} Hiring Team,\n\nI am writing to apply for the ${d.title} position at ${d.company}.\n\n${enProjectParagraph}\n\nI have attached my CV along with a recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (based in Istanbul with active work permit). I would welcome the opportunity to connect with your technical team to explore how I can contribute hands-on.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`
+        : `Konu: ${d.title} Başvurusu – Hessam Barasm Mamagani\n\nSayın ${d.company} İşe Alım Ekibi,\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu iletmekten memnuniyet duyarım.\n\n${trProjectParagraph}\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu ekte bilgilerinize sunarım (İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun görmeniz halinde ekibinizle teknik detayları paylaşmak ve sorularınızı yanıtlamak isterim.\n\nSaygılarımla,\nHessam Barasm Mamagani\n+90 539 229 4251 | hessam.mamagani@gmail.com\nhttps://hessam-mamagani.github.io/`;
 
       out.textContent = email;
       navigator.clipboard.writeText(email);
@@ -3300,16 +3300,16 @@
           body: item.aiIntel.customEmailBody
         };
       }
-      const isEnglish = item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sompo|getir|onftech)\b/i.test(item.company);
+      const isEnglish = item.lang === "EN" || (item.lang !== "TR" && /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company));
       if (isEnglish) {
         return {
-          subject: `Senior Software & AI Architect — ${item.company} — Hessam Barasm Mamagani`,
-          body: `Dear ${item.company} Technology Leadership & Talent Acquisition Team,\n\nI am reaching out regarding ${item.role} at ${item.company}.\n\nCurrently, as Project Development Engineer & Solutions Architect at Pilz Türkiye (German multinational Pilz GmbH & Co. KG), I have led the end-to-end architecture and delivery of 5 production enterprise platforms—spanning enterprise CRM/ERP operations, automated SAP & e-Invoice workflows (cutting operational turnaround time by 80%), and multi-model Agentic AI/RAG automation. Additionally, I have mentored 150+ software engineers across 640+ hours of live engineering cohorts.\n\nI have attached my CV along with a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur. I am based in Istanbul with an active work permit (valid through 31.12.2026) and would welcome a brief 10–15 minute call to discuss how I can contribute.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Software Engineering Role — ${item.company} — Hessam Barasm Mamagani`,
+          body: `Dear ${item.company} Hiring Team,\n\nI recently applied for the ${item.role} position at ${item.company} and wanted to follow up directly with my CV and a recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI. At Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and cutting operational turnaround time by 80%.\n\nI am based in Istanbul with an active work permit. I would welcome the opportunity to connect with your technical team to explore how I can contribute hands-on.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
       return {
-        subject: `Tanışma & Başvuru: ${item.role} — Hessam Barasm Mamagani`,
-        body: `Sayın ${item.company} Teknoloji Yönetimi ve İnsan Kaynakları Ekibi,\n\n${item.company}'in teknoloji vizyonunu yakından takip ediyor; ekibinizdeki ${item.role} pozisyonu için doğrudan iletişime geçmek istiyorum.\n\nHalihazırda Alman çok uluslu Pilz GmbH Türkiye bünyesinde Proje Geliştirme Mühendisi ve Çözüm Mimarı olarak; kurumsal CRM/ERP platformları, SAP ve e-Fatura iş süreçleri otomasyonu (operasyonel süreçlerde %80 zaman tasarrufu), çok kiracılı SaaS sistemleri ve kurumsal yapay zeka (AI) çözümlerini uçtan uca mimari liderlikle hayata geçirdim. Bunun öncesinde 640+ saatlik uygulamalı eğitimlerle 150'den fazla yazılım mühendisi yetiştirdim.\n\nÖzgeçmişimi ve Pilz Türkiye Genel Müdürü Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunarım. Aktif çalışma iznim (31.12.2026'ya kadar geçerli) mevcuttur. Uygun görürseniz bu hafta 10-15 dakikalık bir görüşmede ekibinize katabileceğim değeri paylaşmak isterim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Başvuru Takibi & CV: ${item.role} — Hessam Barasm Mamagani`,
+        body: `Sayın ${item.company} İşe Alım ve Teknik Yönetim Ekibi,\n\n${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim; güncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nUzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Pilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka sistemlerini canlıya aldık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
@@ -3319,17 +3319,57 @@
         if (target === "hr" && item.aiIntel.customHrDm) return item.aiIntel.customHrDm;
         if (item.aiIntel.customExecutiveDm) return item.aiIntel.customExecutiveDm;
       }
-      const isEnglish = item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sompo|getir|onftech)\b/i.test(item.company);
+      const isEnglish = item.lang === "EN" || (item.lang !== "TR" && /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company));
       if (isEnglish) {
         if (target === "hr") {
-          return `Hi, I recently submitted my application for the ${item.role} position at ${item.company}. At Pilz Türkiye (German Pilz GmbH), I led delivery of 5 enterprise automation platforms reducing operational turnaround by 80%, backed by a signed recommendation letter from our General Manager Yavuz Çopur. Active work permit in Istanbul through 31.12.2026. Would love to jump on a brief 10-minute introductory call this week! (+90 539 229 4251)`;
+          return `Hi, I recently applied for the ${item.role} position at ${item.company}.
+
+At Pilz Türkiye (German multinational Pilz GmbH), I engineered 5 production platforms on .NET and Azure end-to-end, automating SAP & e-Invoice pipelines and cutting turnaround time by 80%.
+
+I have shared my CV along with a recommendation letter from our General Manager Yavuz Çopur (based in Istanbul with active work permit).
+
+I would appreciate it if you could review my profile for open roles or forward it to the engineering hiring team.
+
+Best regards,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
         }
-        return `Hello, I recently applied for ${item.role} at ${item.company} and wanted to connect directly. At Pilz Türkiye (German multinational Pilz GmbH), I architected 5 production platforms—cutting SAP & e-Invoice turnaround by 80% and deploying multi-model Agentic AI/RAG systems. I hold an active work permit in Istanbul and a signed recommendation letter from our General Manager Yavuz Çopur. Would you be open to a brief 10-minute intro call this week? (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        return `Hello, I recently applied for ${item.role} at ${item.company} and wanted to reach out directly.
+
+I am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI.
+
+At Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and accelerating workflows by 80%.
+
+I would love to contribute hands-on to ${item.company}'s engineering initiatives. My CV is attached (based in Istanbul with active work permit).
+
+I'd welcome the chance for you to review my background or connect me with the engineering hiring team.
+
+Best regards,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
       if (target === "hr") {
-        return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim. Alman Pilz GmbH Türkiye'de SAP ve e-Fatura süreçlerini %80 hızlandıran kurumsal platformlara liderlik ettim. Genel Müdürümüz Yavuz Çopur'un referansı ve aktif çalışma iznimle bu hafta 10-15 dakikalık bir tanışma görüşmesi yapmaktan memnuniyet duyarım. (+90 539 229 4251)`;
+        return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim.
+
+Alman Pilz GmbH Türkiye'de .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura iş süreçlerini %80 hızlandırdım.
+
+Özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Yavuz Çopur'un referans mektubunu ekte paylaşıyorum (İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur).
+
+Uygun göreceğiniz açık roller için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.
+
+İyi çalışmalar dilerim,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
-      return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu ilettim ve doğrudan da tanışmak istedim. Alman Pilz GmbH Türkiye'de kurumsal CRM/ERP, SAP ve e-Fatura süreçlerini %80 hızlandıran 5 kurumsal platformun mimarisini yönettim; öncesinde 150+ yazılımcı yetiştirdim. Canlı sistemlerimi ve ekibinize katabileceğim değeri 10 dakikalık kısa bir görüşmede paylaşmak isterim. (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim.
+
+Uzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.
+
+Pilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.
+
+Tüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ${item.company} bünyesindeki yazılım / mühendislik ekiplerinde yer almayı çok istiyorum.
+
+Güncel özgeçmişimi bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Açık pozisyonlar için profilimi değerlendirmenizi veya ilgili ekibe iletmenizi rica ederim.
+
+Vaktiniz için çok teşekkürler,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
     }
     function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
 
