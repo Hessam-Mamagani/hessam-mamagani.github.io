@@ -1767,6 +1767,34 @@
         } catch {}
       }
 
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
+
+      if (mode === "email") {
+        try {
+          const orRes = await fetch("https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/generate-outreach", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              company: item.company,
+              role: item.role,
+              type: "email",
+              lang: chosenLang
+            })
+          });
+          if (orRes.ok) {
+            const orData = await orRes.json();
+            if (orData.ok && orData.text) {
+              if (!aiIntel) aiIntel = {};
+              const lines = orData.text.split("\n");
+              const subjLine = lines.find(l => /^subject:\s*/i.test(l.trim()));
+              aiIntel.customEmailSubject = subjLine ? subjLine.replace(/^subject:\s*/i, "").trim() : `Software Engineering Role — ${item.company} — Hessam Barasm Mamagani`;
+              aiIntel.customEmailBody = lines.filter(l => !/^subject:\s*/i.test(l.trim())).join("\n").trim();
+            }
+          }
+        } catch {}
+      }
+
       // 2. Fallback / Enrich with Client-Side Executive Knowledge Base + Live Clearbit Domain Resolver
       const cleanComp = item.company.split("(")[0].trim();
       const kbKey = Object.keys(EXECUTIVE_INTEL_KB).find(k => item.company.toLowerCase().includes(k) || k.includes(item.company.toLowerCase().split("(")[0].trim()));
@@ -3400,20 +3428,48 @@
     function saveVipChecklistState(st) { savePipelineCheckState(st); }
     function toggleVipCheck(id, field, value) { togglePipelineCheck(id, field, value); }
 
+    function getPreferredLang(id, fallback = "EN") {
+      try {
+        const saved = localStorage.getItem(`jr_lang_${id}`);
+        if (saved && (saved === "EN" || saved === "TR" || saved === "MULTI")) return saved;
+      } catch {}
+      return fallback;
+    }
+
+    function setPreferredLang(id, lang) {
+      try {
+        localStorage.setItem(`jr_lang_${id}`, lang);
+      } catch {}
+      renderUnifiedPipeline();
+      const label = lang === "MULTI" ? "Bilingual (TR + EN)" : lang === "TR" ? "Türkçe" : "English";
+      showToast(`🌐 Outreach language switched to ${label}!`, true);
+    }
+
     function buildUnifiedEmail(item) {
-      if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody) {
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
+
+      if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody && chosenLang === "EN") {
         return {
           subject: item.aiIntel.customEmailSubject,
           body: item.aiIntel.customEmailBody
         };
       }
-      const isEnglish = item.lang === "EN" || (item.lang !== "TR" && /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company));
-      if (isEnglish) {
+
+      if (chosenLang === "MULTI") {
+        return {
+          subject: `Başvuru & CV: ${item.role} (TR & EN) — Hessam Barasm Mamagani`,
+          body: `Sayın ${item.company} İşe Alım Ekibi / Dear ${item.company} Hiring Team,\n\n[TR — Yerel İK ve İşe Alım Notu]\n${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim. Güncel İngilizce ve Türkçe özgeçmişim ile Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, Azure ve kurumsal yapay zeka mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık. İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur.\n\n---\n\n[EN — Executive Summary for Engineering Leadership]\nI recently applied for the ${item.role} position at ${item.company} and wanted to follow up directly with my CV and a recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI. At Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and cutting operational turnaround time by 80%.\n\nI am based in Istanbul with an active work permit. I would welcome the opportunity to connect with your technical team to explore how I can contribute hands-on.\n\nSaygılarımla / Best regards,\n\nHessam Barasm Mamagani\nTel / Phone: +90 539 229 4251\nE-posta / Email: hessam.mamagani@gmail.com\nPortfolyo / Portfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        };
+      }
+
+      if (chosenLang === "EN") {
         return {
           subject: `Software Engineering Role — ${item.company} — Hessam Barasm Mamagani`,
           body: `Dear ${item.company} Hiring Team,\n\nI recently applied for the ${item.role} position at ${item.company} and wanted to follow up directly with my CV and a recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, Azure, modern Cloud, and Enterprise AI. At Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and cutting operational turnaround time by 80%.\n\nI am based in Istanbul with an active work permit. I would welcome the opportunity to connect with your technical team to explore how I can contribute hands-on.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
+
       return {
         subject: `Başvuru Takibi & CV: ${item.role} — Hessam Barasm Mamagani`,
         body: `Sayın ${item.company} İşe Alım ve Teknik Yönetim Ekibi,\n\n${item.company} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim; güncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nUzun süredir Microsoft ekosistemi (.NET, C#, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Pilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka sistemlerini canlıya aldık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
@@ -3422,12 +3478,36 @@
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
 
     function buildUnifiedDm(item, target = "cto") {
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
+
       if (item.aiIntel) {
-        if (target === "hr" && item.aiIntel.customHrDm) return item.aiIntel.customHrDm;
-        if (item.aiIntel.customExecutiveDm) return item.aiIntel.customExecutiveDm;
+        if (target === "hr" && item.aiIntel.customHrDm && chosenLang === "EN") return item.aiIntel.customHrDm;
+        if (item.aiIntel.customExecutiveDm && chosenLang === "EN") return item.aiIntel.customExecutiveDm;
       }
-      const isEnglish = item.lang === "EN" || (item.lang !== "TR" && /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company));
-      if (isEnglish) {
+
+      if (chosenLang === "MULTI") {
+        if (target === "hr") {
+          return `Merhaba, ${item.company} bünyesindeki ${item.role} başvurum kapsamında doğrudan iletişime geçmek istedim.
+
+Alman Pilz GmbH Türkiye'de .NET ve Azure ile 5 kurumsal platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdım. İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur.
+
+(Attached is my English CV & Pilz GM recommendation letter. I'd appreciate it if you could share my profile with the engineering hiring team).
+
+İyi çalışmalar / Best regards,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        }
+        return `Hello / Merhaba, I recently applied for ${item.role} at ${item.company}.
+
+Alman Pilz GmbH Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu uçtan uca geliştirdim (SAP & e-Fatura süreçlerinde %80 hızlanma). İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur.
+
+I am a Senior Full-Stack Developer (.NET, Azure, Enterprise AI) based in Istanbul with an active work permit. My CV and Pilz GM reference letter are attached. Would love to connect with your technical team.
+
+Best regards / Saygılarımla,
+Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      }
+
+      if (chosenLang === "EN") {
         if (target === "hr") {
           return `Hi, I recently applied for the ${item.role} position at ${item.company}.
 
@@ -3453,6 +3533,7 @@ I'd welcome the chance for you to review my background or connect me with the en
 Best regards,
 Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
+
       if (target === "hr") {
         return `Merhaba, ${item.company} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim.
 
@@ -3617,6 +3698,8 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
     }
 
     function renderPipelineDrawerHtml(item, checks, mail, dmText, gmailHref, mapsHref, myConnectionsHref) {
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
       const hrDmText = buildUnifiedDm(item, "hr");
       const isMicrosoft = item.id === "VIP-MICROSOFT" || item.company.toLowerCase().includes("microsoft");
       const emailDisplay = isMicrosoft
@@ -3627,6 +3710,19 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
 
       return `
         <div class="p-4 bg-slate-950/80 border-t border-slate-800/80 space-y-3.5 text-xs">
+          <!-- Language Selector Banner -->
+          <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-slate-900/90 border border-slate-800 flex-wrap">
+            <div class="flex items-center gap-1.5 text-slate-300 font-semibold text-xs">
+              <span>🌐 Target Recruiter Language:</span>
+              <span class="text-slate-400 font-normal">(Updates Gmail, Email & DMs instantly)</span>
+            </div>
+            <div class="flex items-center gap-1 bg-black/60 p-1 rounded-lg border border-slate-700">
+              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2.5 py-1 rounded text-xs font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 English</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2.5 py-1 rounded text-xs font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 Türkçe</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2.5 py-1 rounded text-xs font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish intro for recruiter + English engineering summary">🌐 Bilingual (TR + EN)</button>
+            </div>
+          </div>
+
           <!-- Top Contact Strip -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
             <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
@@ -3703,6 +3799,8 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
     }
 
     function renderPipelineRow(item, checks) {
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
       const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
       const isApplied = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
       const isExpanded = PIPELINE_EXPANDED_IDS.has(String(item.id));
@@ -3729,6 +3827,13 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
                 </div>
                 <p class="text-xs text-slate-400 font-medium truncate max-w-md">${item.role}</p>
               </div>
+            </div>
+
+            <!-- Language Switcher Pill -->
+            <div class="flex items-center gap-0.5 bg-black/60 p-1 rounded-lg border border-slate-700/80 text-[10px] shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="English (Global Hiring / EMEA)">🇬🇧 EN</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Türkçe (Local Istanbul Recruiter)">🇹🇷 TR</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish intro for recruiter + English engineering summary">🌐 Both</button>
             </div>
 
             <!-- Inline Checkboxes -->
@@ -3775,6 +3880,8 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
     }
 
     function renderPipelineCard(item, checks) {
+      const defaultLang = (item.lang === "EN" || /\b(amadeus|insider|aws|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle)\b/i.test(item.company)) ? "EN" : "TR";
+      const chosenLang = getPreferredLang(item.id, defaultLang);
       const c = checks[item.id] || { emailed: false, called: false, walked: false, applied: false };
       const isApplied = item.category === "APPLIED" || item.hasAppliedInCrm || c.applied;
       const mail = buildUnifiedEmail(item);
@@ -3794,7 +3901,14 @@ Hessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
                 </span>
                 <span class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel}</span>
               </div>
-              ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : isApplied && item.category !== 'APPLIED' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ In CRM</span>` : ""}
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <div class="flex items-center gap-0.5 bg-black/60 p-0.5 rounded-lg border border-slate-700/80 text-[10px]">
+                  <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
+                  <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
+                  <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish Recruiter Note + English Engineering Summary">🌐 Both</button>
+                </div>
+                ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : isApplied && item.category !== 'APPLIED' ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">✅ In CRM</span>` : ""}
+              </div>
             </div>
             <h3 class="text-base font-bold text-white">${item.company}</h3>
             <p class="text-xs text-blue-300 font-medium mt-0.5">${item.role}</p>
