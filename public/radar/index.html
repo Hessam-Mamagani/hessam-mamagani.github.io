@@ -1425,14 +1425,65 @@
         ],
         officeAndMetro: "📍 İstanbul Merkez Ofis (+90 212 629 60 60)",
         walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları (Sema Tongur / Ezgi Eröz), and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
+      },
+      "lc waikiki": {
+        domain: "lcwaikiki.com",
+        emails: ["hr@lcwaikiki.com", "ik@lcwaikiki.com"],
+        phone: "444 4 529",
+        ctoAndEngLeads: [
+          { name: "Okan Cakici", title: "CTO — LC Waikiki", linkedinUrl: "https://www.linkedin.com/in/okan-cakici-7a93151/" },
+          { name: "Fatih Taşcı", title: "VP of Engineering — LC Waikiki", linkedinUrl: "https://www.linkedin.com/in/fatihta%C5%9Fc%C4%B1/" }
+        ],
+        hrAndRecruiters: [
+          { name: "Olcay Batu Coşkuner", title: "Recruitment & Talent Management Account Manager — LC Waikiki", linkedinUrl: "https://www.linkedin.com/in/olcay-batu-co%C5%9Fkuner-85052696/" },
+          { name: "Merve S.", title: "Group HR Manager | IT Talent Acquisition & HRBP — LC Waikiki", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Merve%20IT%20HRBP%20LC%20Waikiki" }
+        ],
+        officeAndMetro: "🚇 M3 Kirazlı / M7 Mahmutbey Metro (Bağcılar Gülbahar Cad. No:41 Genel Müdürlük)",
+        walkInVerdict: "🔥 Application Viewed! Send the Manager DM to CTO Okan Cakici & VP Fatih Taşcı on LinkedIn, and the HR DM to Olcay Batu Coşkuner."
       }
     };
+
+    function copyTextSafe(text, btn, toastMsg) {
+      if (!text) return;
+      const doCopy = async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.focus();
+          ta.select();
+          try { document.execCommand("copy"); } catch {}
+          document.body.removeChild(ta);
+        }
+      };
+      doCopy();
+      if (btn) {
+        const old = btn.innerHTML;
+        btn.innerHTML = "✅ Copied!";
+        setTimeout(() => { btn.innerHTML = old; }, 1600);
+      }
+      if (toastMsg) showToast(toastMsg, true);
+    }
+
+    function copyAiDm(idx, target, btn) {
+      const item = CURRENT_OUTREACH_ITEMS[idx];
+      if (!item || !item.aiIntel) return;
+      const text = target === "hr"
+        ? (item.aiIntel.customHrDm || item.aiIntel.customExecutiveDm || "")
+        : (item.aiIntel.customExecutiveDm || "");
+      copyTextSafe(text, btn, target === "hr" ? "📋 Copied LinkedIn HR DM to clipboard!" : "📋 Copied LinkedIn Manager/CTO DM to clipboard!");
+    }
 
     function renderAiIntelHtml(intel, item, idx) {
       if (!intel) return "";
       const ctoList = intel.ctoAndEngLeads || [];
       const hrList = intel.hrAndRecruiters || [];
       const dmText = intel.customExecutiveDm || "";
+      const hrDmText = intel.customHrDm || "";
       const emailToUse = intel.bestEmail || item.email || "";
       const renderProfileLink = (url) => {
         if (!url) return "";
@@ -1498,13 +1549,25 @@
 
         ${dmText ? `
           <div class="p-2.5 rounded-lg bg-indigo-950/50 border border-indigo-500/30 space-y-1.5">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-indigo-200 text-[11px]">💬 AI Tailored Message (For CTO / HR DM or Email):</span>
-              <button onclick="navigator.clipboard.writeText(decodeURIComponent('${encodeURIComponent(dmText)}')); showToast('📋 Copied AI Executive DM to clipboard!', true);" class="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold">
-                📋 Copy AI Message
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-indigo-200 text-[11px]">💬 LinkedIn Direct Message — For CTO / Hiring Manager (Send on LinkedIn):</span>
+              <button type="button" onclick="copyAiDm(${idx}, 'cto', this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+                📋 Copy Manager DM
               </button>
             </div>
-            <p class="text-slate-200 italic leading-relaxed">"${dmText}"</p>
+            <p class="text-slate-200 italic leading-relaxed whitespace-pre-line">"${dmText}"</p>
+          </div>
+        ` : ""}
+
+        ${hrDmText ? `
+          <div class="p-2.5 rounded-lg bg-blue-950/40 border border-blue-500/30 space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-bold text-blue-200 text-[11px]">👩‍💼 LinkedIn Direct Message — For HR / Talent Acquisition (Send on LinkedIn):</span>
+              <button type="button" onclick="copyAiDm(${idx}, 'hr', this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold shrink-0 cursor-pointer">
+                📋 Copy HR DM
+              </button>
+            </div>
+            <p class="text-slate-200 italic leading-relaxed whitespace-pre-line">"${hrDmText}"</p>
           </div>
         ` : ""}
       `;
@@ -1574,10 +1637,14 @@
         if (!foundPhoneDisplay && inferredPhone) foundPhoneDisplay = inferredPhone;
 
         const leadPerson = kb?.ctoAndEngLeads?.[0]?.name || `${cleanComp} Yönetimi`;
+        const hrPerson = kb?.hrAndRecruiters?.[0]?.name || `${cleanComp} İnsan Kaynakları Ekibi`;
         const isEn = item.lang === "EN";
         const customDm = isEn
-          ? `Hi ${leadPerson.split("/")[0].trim()}, I’m reaching out directly regarding the ${item.role} position at ${cleanComp}. At Pilz Türkiye (subsidiary of Pilz GmbH), I lead our enterprise software and digital transformation initiatives end-to-end—covering CRM/ERP workflows, SAP & e-Invoice automation, and AI-driven internal tools. With an active work permit in Istanbul (through Dec 2026) and a signed recommendation from our General Manager, I would welcome a brief 15-minute introductory conversation this week.`
-          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için doğrudan iletişime geçmek istedim. Pilz Türkiye'de kurumsal iş uygulamaları, SAP/ERP entegrasyonu ve dijital dönüşüm projelerine liderlik ediyorum; satıştan faturalamaya tüm operasyonel süreçleri uçtan uca dijitalleştiren 5 kurumsal platformu hayata geçirdim. Genel Müdürümüz Yavuz Çopur'un imzalı referans mektubu ve aktif çalışma iznimle bu hafta 15 dakikalık kısa bir tanışma görüşmesi yapmayı çok isterim.`;
+          ? `Hi ${leadPerson.split("/")[0].trim()}, I recently applied for the ${item.role} role at ${cleanComp} and wanted to connect directly. At Pilz Türkiye (German multinational Pilz GmbH), I architected 5 production enterprise platforms end-to-end—spanning CRM/ERP, SAP & e-Invoice automation, AI workflows, and a B2B SaaS platform serving 9,000+ companies—cutting operational turnaround by 80%, after previously training 150+ software engineers. As I evaluate my next high-impact role, I would love to share a 10-minute live walkthrough of these running systems this week. Feel free to reach me here or directly at +90 539 229 4251. Best regards, Hessam Barasm Mamagani`
+          : `Merhaba ${leadPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu ilettim ve doğrudan da tanışmak istedim. Alman Pilz GmbH Türkiye'de kurumsal CRM/ERP, SAP ve e-Fatura otomasyonu ile 9.000+ firmaya hizmet veren B2B SaaS sistemleri dahil 5 canlı kurumsal platformu sıfırdan mimarlayıp hayata geçirerek operasyonel süreçleri %80 hızlandırdım; öncesinde de 640+ saat canlı eğitimle 150'den fazla yazılımcı yetiştirdim. Kariyerimin bir sonraki adımını değerlendirdiğim bu dönemde, canlıda çalışan bu sistemleri ve ${cleanComp} ekibine katabileceğim değeri bu hafta 10 dakikalık kısa bir görüşmede paylaşmayı çok isterim. Bana buradan veya +90 539 229 4251 numaramdan doğrudan ulaşabilirsiniz. Selamlar, Hessam Barasm Mamagani`;
+        const customHrDm = isEn
+          ? `Hi ${hrPerson.split("/")[0].trim()}, I recently submitted my application for the ${item.role} position at ${cleanComp}. At Pilz Türkiye (Pilz GmbH), I led the end-to-end delivery of 5 enterprise digital transformation and automation platforms that reduced operational turnaround by 80%, backed by a personal recommendation from our General Manager Yavuz Çopur. I am currently in active discussions for my next chapter in Istanbul and would love to prioritize ${cleanComp}—happy to jump on a brief 10-minute introductory call this week. You can reach me anytime here or at +90 539 229 4251. Best regards, Hessam Barasm Mamagani`
+          : `Merhaba ${hrPerson.split("/")[0].trim()}, ${cleanComp} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim. Alman Pilz GmbH Türkiye'de satıştan SAP/ERP ve e-Fatura otomasyonuna kadar tüm süreçleri uçtan uca dijitalleştiren 5 canlı kurumsal platformun liderliğini üstlenerek operasyonel süreleri %80 kısalttım. Genel Müdürümüz Yavuz Çopur'un referansıyla, yeni dönem kariyer adımlarımı değerlendirdiğim bu süreçte ${cleanComp} ile bu hafta 10-15 dakikalık bir tanışma görüşmesi yapmaktan büyük memnuniyet duyarım. Bana buradan veya +90 539 229 4251 numaramdan her zaman ulaşabilirsiniz. İyi çalışmalar dilerim, Hessam Barasm Mamagani`;
 
         aiIntel = {
           poweredBy: "Gemini AI & Executive Intelligence Graph",
@@ -1599,7 +1666,8 @@
           phoneDisplay: inferredPhone,
           officeAndMetro: kb?.officeAndMetro || `${item.location} (Accessible via Istanbul Metro)`,
           walkInVerdict: kb?.walkInVerdict || "Send the tailored AI Executive Message above on LinkedIn AND email HR with your signed Pilz GM Reference Letter attached.",
-          customExecutiveDm: customDm
+          customExecutiveDm: customDm,
+          customHrDm: customHrDm
         };
       } else if (kb) {
         if (!aiIntel.ctoAndEngLeads?.length) {
@@ -1681,7 +1749,7 @@
       if (mBtn) mBtn.href = `mailto:${targetEmail}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
 
       if (mode === "email" && aiIntel?.customExecutiveDm) {
-        navigator.clipboard.writeText(aiIntel.customExecutiveDm);
+        copyTextSafe(aiIntel.customExecutiveDm, null, null);
       }
 
       btn.disabled = false;
@@ -1693,19 +1761,13 @@
       const item = CURRENT_OUTREACH_ITEMS[idx];
       if (!item) return;
       const mail = buildOutreachEmail(item);
-      navigator.clipboard.writeText(`To: ${item.email || "HR"}\nSubject: ${mail.subject}\n\n${mail.body}`);
-      const old = btn.textContent;
-      btn.textContent = "✅ Copied!";
-      setTimeout(() => (btn.textContent = old), 1500);
+      copyTextSafe(`To: ${item.email || "HR"}\nSubject: ${mail.subject}\n\n${mail.body}`, btn, "📧 Copied full tailored email to clipboard!");
     }
 
     function copyCallScript(idx, btn) {
       const item = CURRENT_OUTREACH_ITEMS[idx];
       if (!item) return;
-      navigator.clipboard.writeText(buildCallScript(item));
-      const old = btn.textContent;
-      btn.textContent = "✅ Script Copied!";
-      setTimeout(() => (btn.textContent = old), 1500);
+      copyTextSafe(buildCallScript(item), btn, "📞 Copied call script to clipboard!");
     }
 
     async function markOutreachContacted(idx) {
