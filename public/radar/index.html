@@ -613,64 +613,9 @@
       localStorage.setItem("jr_skipped_cache", JSON.stringify(list));
     }
 
-    let IS_SAVING_GH = false;
-    let SAVE_QUEUED_GH = false;
-
     async function ghSaveDb() {
-      if (IS_LOCAL) return;
-      const token = getGhToken();
-      if (!token) return;
-      if (IS_SAVING_GH) {
-        SAVE_QUEUED_GH = true;
-        return;
-      }
-      IS_SAVING_GH = true;
-      try {
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const body = {
-            message: "chore(job-radar): sync applications & skipped state from web/mobile",
-            content: utf8ToB64(JSON.stringify(STATE, null, 2)),
-            sha: DB_SHA
-          };
-          const res = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_DB_PATH}`, {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/vnd.github+json",
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(body)
-          });
-          if (res.ok) {
-            const out = await res.json();
-            DB_SHA = out.content.sha;
-            break;
-          } else if (res.status === 409 || res.status === 422) {
-            // SHA changed on GitHub (e.g. fast double-click or PC background sync) -> fetch latest & merge!
-            const latest = await ghFetchFile(GH_DB_PATH);
-            DB_SHA = latest.sha;
-            const mergedSkipped = new Set([
-              ...(latest.data.skipped || []).map(String),
-              ...(STATE.skipped || []).map(String),
-              ...getLocalSkippedCache().map(String)
-            ]);
-            STATE.skipped = [...mergedSkipped];
-            const existingMap = new Map((latest.data.applied || []).map(a => [String(a.id), a]));
-            for (const a of STATE.applied) {
-              existingMap.set(String(a.id), a);
-            }
-            STATE.applied = [...existingMap.values()];
-          } else {
-            break;
-          }
-        }
-      } finally {
-        IS_SAVING_GH = false;
-        if (SAVE_QUEUED_GH) {
-          SAVE_QUEUED_GH = false;
-          ghSaveDb();
-        }
-      }
+      // Pure Cloudflare D1 mode: disabled legacy browser-to-GitHub commits to keep git history clean.
+      return;
     }
 
     const TOTP_SECRET = new Uint8Array([245,8,58,11,154,216,206,241,238,158,234,22,155,227,226,163,180,27,12,71]);
@@ -806,16 +751,14 @@
 
         localStorage.setItem("jr_pipeline_checks_v2", JSON.stringify(STATE.outreachChecks || {}));
 
-        const mergedSkipped = new Set([
-          ...(STATE.skipped || []).map(String),
-          ...getLocalSkippedCache().map(String)
-        ]);
-        if (mergedSkipped.size > (STATE.skipped || []).length) {
-          STATE.skipped = [...mergedSkipped];
-          ghSaveDb();
-        } else {
-          STATE.skipped = [...mergedSkipped];
+        const d1SkippedSet = new Set((STATE.skipped || []).map(String));
+        for (const cachedId of getLocalSkippedCache().map(String)) {
+          if (!d1SkippedSet.has(cachedId)) {
+            d1SkippedSet.add(cachedId);
+            d1Post("/api/skip", { id: cachedId });
+          }
         }
+        STATE.skipped = [...d1SkippedSet];
         updateHeaderCounts();
         setActiveCountry(ACTIVE_COUNTRY);
         renderVault();
@@ -2584,14 +2527,8 @@
           if (lr.ok) localFeed = await lr.json();
         } catch {}
 
-        let ghFeed = null;
-        try {
-          const feedFile = await ghFetchFile(GH_FEED_PATH);
-          ghFeed = feedFile.data;
-        } catch {}
-
         const combinedMap = new Map();
-        for (const j of [...(cfFeed?.jobs || []), ...(localFeed?.jobs || []), ...(ghFeed?.jobs || [])]) {
+        for (const j of [...(cfFeed?.jobs || []), ...(localFeed?.jobs || [])]) {
           if (j && j.id && !combinedMap.has(String(j.id))) {
             combinedMap.set(String(j.id), j);
           }
@@ -2603,7 +2540,7 @@
           .filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isIstanbulOrRemoteClient(j))
           .sort((a, b) => (b.score || 0) - (a.score || 0));
 
-        const latestTimeStr = localFeed?.scannedAt || ghFeed?.scannedAt;
+        const latestTimeStr = cfFeed?.scannedAt || localFeed?.scannedAt;
         const scannedTime = latestTimeStr ? new Date(latestTimeStr).toLocaleString() : "Recent";
         document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes automatically every 90s).`;
         document.getElementById("scanCountBadge").textContent = `${LAST_SCAN_JOBS.length} Unseen Istanbul/Remote Jobs`;
