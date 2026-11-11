@@ -224,7 +224,7 @@
               <span id="pipelineProgressBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Loading Pipeline...</span>
             </div>
             <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              Sorted <strong>Top Giants #1 First</strong> per country with deduplicated companies. Track all 6 channels (<strong>🌐 Apply · 📧 Email · 👨‍💻 Tech DM · 👩‍💼 HR DM · 👥 1st-Deg · 📞 Call/Walk</strong>) synced to Cloudflare D1. Turkish firms default to <strong>🇹🇷 TR</strong>; global tech hubs default to <strong>🇬🇧 EN</strong>.
+              Sorted <strong>Top Giants #1 First</strong> per country with deduplicated companies. Track all 6 channels (<strong>🌐 Apply · 📧 Email · 👨‍💻 Tech DM · 👩‍💼 HR DM · 👥 1st-Deg · 📞 Call/Walk</strong>) synced to Cloudflare D1. Türkiye companies default to <strong>🌐 TR + EN</strong>; AI verifies real HR mailboxes via live DNS MX.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
@@ -240,6 +240,7 @@
             <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
               <option value="ALL">🏆 All (Top Giants #1 First)</option>
               <option value="TOP_GIANTS">🏢 Top Ranked Giants Only (#1–#45)</option>
+              <option value="PENDING_EMAIL">📧 Email Queue — Not Emailed Yet</option>
               <option value="HOT_SIGNALS">🔥 Hot Signals (Invite / CV Downloaded / Viewed)</option>
               <option value="UNFINISHED_PORTAL">⏳ Clicked Apply (Finish External Portal)</option>
               <option value="NEEDS_OUTREACH">📬 Applied — Needs Email / LinkedIn DM</option>
@@ -2026,13 +2027,22 @@
              (typeof getUnifiedPipelineList === "function" ? getUnifiedPipelineList().find(x => String(x.id) === String(idOrIdx)) : null);
     }
 
+    const PUBLIC_BLACKHOLE_EMAIL_CLIENT_RE = /^(info|iletisim|iletişim|destek|support|hello|contact|help|yardim|yardım|musterihizmetleri|press|media|marketing|sales|satis|satış|kvkk|bilgi|trinfo|tr-info|turkey\.info|info\.tr|info_tr|turkey|oracle_tr|noreply|no-reply|donotreply)@/i;
+    const BLOCKED_GIANT_EMAIL_CLIENT_RE = /^(hr|jobs|careers|talent)@(amazon|aws|google|microsoft|apple|meta)\.com$|^aws-turkey@amazon\.com$|^google-turkey@google\.com$|^trinfo@microsoft\.com$/i;
+
+    function isCleanHrEmail(e) {
+      const s = String(e || "").trim();
+      return !!s && s.includes("@") && !PUBLIC_BLACKHOLE_EMAIL_CLIENT_RE.test(s) && !BLOCKED_GIANT_EMAIL_CLIENT_RE.test(s);
+    }
+
+    function stripRoleBadgeClient(roleStr = "") {
+      return String(roleStr || "").replace(/\s*\(\+\d+\s+more\s+active\s+roles?\)/gi, "").trim();
+    }
+
     function getDefaultLangForItem(item) {
-      if (!item) return "TR";
+      if (!item) return "MULTI";
       if (item.countryGroup === "GLOBAL_REMOTE" || item.countryGroup === "ABROAD") return "EN";
-      if (/\b(amadeus|insider|aws|amazon|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sap|bosch|siemens|hitachi|accenture|dream games|peak|commencis|alignerr|wise|teleport)\b/i.test(item.company || "")) {
-        return "EN";
-      }
-      return item.lang === "EN" ? "EN" : "TR";
+      return "MULTI";
     }
 
     function extractRealFirstName(fullName = "") {
@@ -2178,6 +2188,7 @@
       let foundPhone = "";
       let foundPhoneDisplay = "";
       let foundEmail = "";
+      let foundEmailVerification = null;
 
       const apiBases = IS_LOCAL
         ? ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]
@@ -2191,7 +2202,7 @@
             body: JSON.stringify({
               id: item.primaryCrmId || item.id,
               company: item.company,
-              role: item.role,
+              role: item.cleanRole || stripRoleBadgeClient(item.role),
               country: targetCountry,
               lang: chosenLang
             })
@@ -2203,8 +2214,11 @@
               foundPhone = f.contactPhone || f.contactPhoneDisplay.replace(/[^\d+]/g, "");
               foundPhoneDisplay = f.contactPhoneDisplay;
             }
-            if (f.contactEmail && !FAKE_EMAIL_CHECK.test(f.contactEmail.trim())) {
+            if (f.contactEmail && isCleanHrEmail(f.contactEmail)) {
               foundEmail = f.contactEmail.trim();
+            }
+            if (f.emailVerification || f.aiIntel?.emailVerification) {
+              foundEmailVerification = f.emailVerification || f.aiIntel.emailVerification;
             }
             if (f.aiIntel) {
               fetchedIntel = f.aiIntel;
@@ -2252,17 +2266,22 @@
         });
       }
 
-      // Never overwrite verified existing phone/email with empty or unverified values
-      const safeEmail = item.email || (kb?.emails?.[0] || "") || (!FAKE_EMAIL_CHECK.test(foundEmail) ? foundEmail : "");
+      // Dynamic priority: live AI/DNS-verified HR email wins first; generic black-hole addresses are always rejected
+      const cleanFoundEmail = isCleanHrEmail(foundEmail) ? foundEmail : "";
+      const cleanExistingVerified = existingIntel?.emailVerification?.deliverable && isCleanHrEmail(existingIntel?.bestEmail) ? existingIntel.bestEmail : "";
+      const cleanItemEmail = isCleanHrEmail(item.email) ? item.email : "";
+      const cleanKbEmail = (kb?.emails || []).find(isCleanHrEmail) || "";
+      const safeEmail = cleanFoundEmail || cleanExistingVerified || cleanItemEmail || cleanKbEmail || "";
       const safePhoneDisplay = item.phoneDisplay || kb?.phone || foundPhoneDisplay || "";
       const safePhone = item.phone || (safePhoneDisplay ? safePhoneDisplay.replace(/[^\d+]/g, "") : "");
 
       const finalIntel = {
         ...existingIntel,
-        poweredBy: fetchedIntel?.poweredBy || "Country-Locked LinkedIn + Executive KB",
+        poweredBy: fetchedIntel?.poweredBy || "Country-Locked LinkedIn + Live DNS Verifier",
         ctoAndEngLeads: mergedCto,
         hrAndRecruiters: mergedHr,
         bestEmail: safeEmail,
+        emailVerification: foundEmailVerification || existingIntel.emailVerification || null,
         phoneDisplay: safePhoneDisplay,
         officeAndMetro: kb?.officeAndMetro || existingIntel.officeAndMetro || fetchedIntel?.officeAndMetro || item.address,
         walkInVerdict: kb?.walkInVerdict || existingIntel.walkInVerdict || fetchedIntel?.walkInVerdict || item.summary
@@ -2278,7 +2297,7 @@
       }
 
       item.aiIntel = finalIntel;
-      if (!item.email && safeEmail) item.email = safeEmail;
+      if (safeEmail) item.email = safeEmail;
       if (!item.phoneDisplay && safePhoneDisplay) {
         item.phoneDisplay = safePhoneDisplay;
         item.phone = safePhone;
@@ -2289,17 +2308,22 @@
       } catch {}
 
       const crmTargetId = item.primaryCrmId || item.id;
-      const crmItem = STATE.applied.find(a => String(a.id) === String(crmTargetId));
-      if (crmItem) {
-        crmItem.aiIntel = finalIntel;
-        if (!crmItem.contactEmail && item.email) crmItem.contactEmail = item.email;
-        if (!crmItem.contactPhoneDisplay && item.phoneDisplay) {
-          crmItem.contactPhoneDisplay = item.phoneDisplay;
-          crmItem.contactPhone = item.phone;
+      const matchingCrmRows = STATE.applied.filter(
+        a => String(a.id) === String(crmTargetId) || normalizeCompanyKey(a.company || "") === compKey
+      );
+      for (const crmRow of matchingCrmRows) {
+        crmRow.aiIntel = finalIntel;
+        if (cleanFoundEmail || (!crmRow.contactEmail && item.email)) {
+          crmRow.contactEmail = cleanFoundEmail || item.email;
         }
-        if (!IS_LOCAL) {
-          d1Post("/api/apply", crmItem);
+        if (!crmRow.contactPhoneDisplay && item.phoneDisplay) {
+          crmRow.contactPhoneDisplay = item.phoneDisplay;
+          crmRow.contactPhone = item.phone;
         }
+      }
+      const primaryCrmRow = matchingCrmRows.find(a => String(a.id) === String(crmTargetId)) || matchingCrmRows[0];
+      if (primaryCrmRow && !IS_LOCAL) {
+        d1Post("/api/apply", primaryCrmRow);
       }
 
       if (btn) {
@@ -2308,6 +2332,99 @@
       }
       renderUnifiedPipeline();
       showToast(`👥 Loaded verified ${targetCountry} contacts for ${item.company}!`, true);
+    }
+
+    async function runAiVerifyEmail(idOrIdx, btn, openGmailAfter = false) {
+      const item = findPipelineItem(idOrIdx);
+      if (!item) return;
+      const itemId = item.id || idOrIdx;
+      const compKey = item.companyKey || normalizeCompanyKey(item.company);
+      const originalHtml = btn ? btn.innerHTML : "";
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = "⏳ DNS + Web Check...";
+      }
+
+      // Always call Cloudflare Worker first for live DoH DNS MX + Web Search + D1 persistence
+      const verifyUrl = "https://hessam-job-radar-ai.hessam-mamagani.workers.dev/api/verify-email";
+      try {
+        const res = await fetch(verifyUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: item.primaryCrmId || item.id,
+            company: item.company,
+            role: item.cleanRole || stripRoleBadgeClient(item.role),
+            country: item.countryGroup || "TR",
+            currentEmail: isCleanHrEmail(item.email) ? item.email : ""
+          })
+        });
+        const data = res.ok ? await res.json() : null;
+        if (!data || !data.ok) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml || "🛡️ Verify Mail";
+          }
+          showToast(`⚠️ Could not verify ${item.company} right now — check connection.`, false);
+          return;
+        }
+
+        const vEmail = isCleanHrEmail(data.verifiedEmail) ? data.verifiedEmail.trim() : "";
+        const nextIntel = {
+          ...(item.aiIntel || {}),
+          bestEmail: vEmail,
+          emailVerification: data.verification || null
+        };
+        if (data.recruiterName) {
+          const cleanComp = item.company.split("(")[0].trim();
+          const geoParam = item.countryGroup === "TR" ? "&geoUrn=%5B%22102105699%22%5D" : "";
+          const existingHr = Array.isArray(nextIntel.hrAndRecruiters) ? [...nextIntel.hrAndRecruiters] : [];
+          if (!existingHr.some(p => String(p?.name || "").toLowerCase() === String(data.recruiterName).toLowerCase())) {
+            existingHr.unshift({
+              name: data.recruiterName,
+              title: data.recruiterTitle || `Talent Acquisition / HR (${cleanComp})`,
+              linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(data.recruiterName + " " + cleanComp)}${geoParam}`
+            });
+            nextIntel.hrAndRecruiters = existingHr;
+          }
+        }
+
+        item.aiIntel = nextIntel;
+        item.email = vEmail;
+        try {
+          localStorage.setItem(`jr_intel_${itemId}`, JSON.stringify(nextIntel));
+        } catch {}
+
+        const crmTargetId = item.primaryCrmId || item.id;
+        const matchingRows = STATE.applied.filter(
+          a => String(a.id) === String(crmTargetId) || normalizeCompanyKey(a.company || "") === compKey
+        );
+        for (const row of matchingRows) {
+          row.contactEmail = vEmail;
+          row.aiIntel = nextIntel;
+        }
+
+        renderUnifiedPipeline();
+
+        if (vEmail) {
+          const gw = data.verification?.gateway || "Active MX";
+          showToast(`🛡️ Verified ${vEmail} (${gw}) — Saved to D1!`, true);
+          if (openGmailAfter) {
+            const freshItem = findPipelineItem(itemId) || item;
+            const mail = buildUnifiedEmail(freshItem);
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(vEmail)}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
+            window.open(gmailUrl, "_blank", "noopener");
+          }
+        } else {
+          showToast(`⚠️ ${data.verification?.reason || "No public HR mailbox published — use LinkedIn DM + Career Portal."}`, false);
+        }
+      } catch (err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml || "🛡️ Verify Mail";
+        }
+        showToast(`⚠️ Verification request failed for ${item.company}.`, false);
+      }
     }
 
     async function runAiRewriteTextOnly(idOrIdx, btn) {
@@ -2327,6 +2444,7 @@
         ? ["http://localhost:4545", "https://hessam-job-radar-ai.hessam-mamagani.workers.dev"]
         : ["https://hessam-job-radar-ai.hessam-mamagani.workers.dev"];
 
+      const cleanRole = item.cleanRole || stripRoleBadgeClient(item.role);
       let updated = false;
       for (const apiBase of apiBases) {
         try {
@@ -2336,8 +2454,8 @@
             body: JSON.stringify({
               type: "bundle",
               company: item.company,
-              role: item.role,
-              title: item.role,
+              role: cleanRole,
+              title: cleanRole,
               lang: chosenLang,
               leadName: firstLead,
               hrName: firstHr
@@ -4052,19 +4170,20 @@
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
+      const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
 
       // Only use AI-tailored email override when its generated language matches chosenLang
       if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody && item.aiIntel?.lang === chosenLang) {
         return {
-          subject: item.aiIntel.customEmailSubject,
-          body: item.aiIntel.customEmailBody
+          subject: stripRoleBadgeClient(item.aiIntel.customEmailSubject),
+          body: stripRoleBadgeClient(item.aiIntel.customEmailBody)
         };
       }
 
       if (chosenLang === "MULTI") {
         return {
-          subject: `Başvuru & CV: ${item.role} (TR & EN) — Hessam Barasm Mamagani`,
-          body: `Sayın ${cleanComp} İşe Alım Ekibi / Dear ${cleanComp} Hiring Team,\n\n[TR — Yerel İK ve İşe Alım Notu]\n${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim. Güncel Türkçe ve İngilizce özgeçmişim ile Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, C#, React, Azure ve kurumsal yapay zeka mimarisiyle 5 kurumsal platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık. İstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur.\n\n---\n\n[EN — Executive Summary for Engineering Leadership]\nI recently applied for the ${item.role} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Developer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud, and Enterprise AI. At Pilz Türkiye (German multinational Pilz GmbH), I architected and delivered 5 production enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and cutting operational turnaround time by 80%.\n\nSaygılarımla / Best regards,\n\nHessam Barasm Mamagani\nTel / Phone: +90 539 229 4251\nE-posta / Email: hessam.mamagani@gmail.com\nPortfolyo / Portfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Başvuru & Özgeçmiş / Application: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+          body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim; güncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nAlman otomasyon firması Pilz GmbH Türkiye bünyesinde .NET, C#, React/TypeScript, bulut mimarisi ve kurumsal yapay zeka ile 5 kurumsal yazılım platformunu sıfırdan uçtan uca hayata geçirdim; SAP ERP ve e-Fatura iş süreçlerini otomatikleştirerek operasyonel süreleri %80 kısalttık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için değerlendirilmekten veya ilgili teknik ekibe yönlendirilmekten büyük memnuniyet duyarım.\n\n---\n\nDear ${cleanComp} Hiring Team,\n\nI recently applied for the ${roleForText} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud Architecture, and Enterprise AI. At Pilz Türkiye (subsidiary of German multinational Pilz GmbH), I architected and delivered 5 production enterprise platforms end-to-end—automating SAP ERP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\nI am based in Istanbul with an active work permit and would welcome a brief introductory call with your technical team.\n\nSaygılarımla / Best regards,\n\nHessam Barasm Mamagani\nTel / Phone: +90 539 229 4251\nE-posta / Email: hessam.mamagani@gmail.com\nPortfolyo / Portfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
@@ -4073,14 +4192,14 @@
           ? `I would welcome the opportunity to connect with your engineering and talent team regarding how I can contribute hands-on.`
           : `I am based in Istanbul with an active work permit and would welcome a brief 10-minute introductory call with your technical team.`;
         return {
-          subject: `Application Follow-Up: ${item.role} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Dear ${cleanComp} Hiring Team,\n\nI recently applied for the ${item.role} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud Architecture, and Enterprise AI. At Pilz Türkiye (subsidiary of German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end—automating SAP ERP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\n${locationSentence}\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Application Follow-Up: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+          body: `Dear ${cleanComp} Hiring Team,\n\nI recently applied for the ${roleForText} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud Architecture, and Enterprise AI. At Pilz Türkiye (subsidiary of German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end—automating SAP ERP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\n${locationSentence}\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
       return {
-        subject: `Başvuru Takibi & CV: ${item.role} — Hessam Barasm Mamagani`,
-        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim; güncel Türkçe özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nUzun süredir .NET, C#, React/TypeScript, bulut mimarisi ve kurumsal yapay zeka odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Alman Pilz GmbH Türkiye bünyesinde 5 kurumsal yazılım platformunu bizzat uçtan uca tasarlayıp canlıya aldım; SAP & e-Fatura iş süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Başvuru Takibi & CV: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim; güncel Türkçe özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nUzun süredir .NET, C#, React/TypeScript, bulut mimarisi ve kurumsal yapay zeka odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Alman Pilz GmbH Türkiye bünyesinde 5 kurumsal yazılım platformunu bizzat uçtan uca tasarlayıp canlıya aldım; SAP & e-Fatura iş süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
@@ -4089,17 +4208,18 @@
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
+      const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
 
       if (item.aiIntel && item.aiIntel.lang === chosenLang) {
-        if (target === "hr" && item.aiIntel.customHrDm) return item.aiIntel.customHrDm;
-        if (target !== "hr" && item.aiIntel.customExecutiveDm) return item.aiIntel.customExecutiveDm;
+        if (target === "hr" && item.aiIntel.customHrDm) return stripRoleBadgeClient(item.aiIntel.customHrDm);
+        if (target !== "hr" && item.aiIntel.customExecutiveDm) return stripRoleBadgeClient(item.aiIntel.customExecutiveDm);
       }
 
       if (chosenLang === "MULTI") {
         if (target === "hr") {
-          return `Merhaba, ${cleanComp} bünyesindeki ${item.role} başvurum kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, React ve bulut mimarisiyle 5 kurumsal platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdım (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\n(English summary: Senior Full-Stack & Cloud Architect at Pilz GmbH Türkiye with signed GM recommendation letter — I'd appreciate sharing my profile with the hiring manager.)\n\nİyi çalışmalar / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+          return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} başvurum kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, React ve bulut mimarisiyle 5 kurumsal platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdım (İstanbul'da ikamet ediyorum, aktif çalışma iznim ve Genel Müdürümüzün imzalı referans mektubu mevcuttur).\n\n---\n\nHi, I also applied for ${roleForText} at ${cleanComp} — Senior Full-Stack & Cloud Architect at Pilz GmbH Türkiye (.NET, React, Cloud & Enterprise AI). I would really appreciate sharing my profile with the hiring team.\n\nİyi çalışmalar / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
         }
-        return `Merhaba / Hi, ${cleanComp} bünyesindeki ${item.role} pozisyonu için başvurumu ilettim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve kurumsal yapay zeka ile 5 canlı platformu uçtan uca geliştirdim (SAP & e-Fatura süreçlerinde %80 hızlanma).\n\nI'm based in Istanbul with an active work permit and a signed recommendation from our General Manager. Would love to connect with your engineering team!\n\nSaygılarımla / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonu için başvurumu ilettim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve kurumsal yapay zeka ile 5 canlı platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\n---\n\nHi, I recently applied for ${roleForText} at ${cleanComp} — Senior Full-Stack & Solutions Architect at Pilz GmbH Türkiye with a signed recommendation from our General Manager. Would welcome connecting with your engineering team!\n\nSaygılarımla / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
 
       if (chosenLang === "EN") {
@@ -4107,15 +4227,15 @@
           ? `backed by a signed recommendation letter from our General Manager Yavuz Çopur`
           : `based in Istanbul with an active work permit and a signed recommendation letter from our General Manager Yavuz Çopur`;
         if (target === "hr") {
-          return `Hi, I recently applied for ${item.role} at ${cleanComp} and wanted to follow up directly.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and delivered 5 production platforms end-to-end (.NET, React, Cloud & Enterprise AI), automating SAP & e-Invoice pipelines and cutting turnaround time by 80% (${locNote}).\n\nI would really appreciate your guidance on next steps or forwarding my profile to the hiring manager.\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+          return `Hi, I recently applied for ${roleForText} at ${cleanComp} and wanted to follow up directly.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and delivered 5 production platforms end-to-end (.NET, React, Cloud & Enterprise AI), automating SAP & e-Invoice pipelines and cutting turnaround time by 80% (${locNote}).\n\nI would really appreciate your guidance on next steps or forwarding my profile to the hiring manager.\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
         }
-        return `Hi, I recently applied for ${item.role} at ${cleanComp} and wanted to connect directly.\n\nI am a Senior Full-Stack Engineer & Cloud Solutions Architect (.NET, C#, React/TypeScript, Cloud & Agentic AI). At Pilz Türkiye (German multinational Pilz GmbH), I built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and accelerating operations by 80% (${locNote}).\n\nWould welcome a brief 10-minute chat or connecting with the hiring team!\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        return `Hi, I recently applied for ${roleForText} at ${cleanComp} and wanted to connect directly.\n\nI am a Senior Full-Stack Engineer & Cloud Solutions Architect (.NET, C#, React/TypeScript, Cloud & Agentic AI). At Pilz Türkiye (German multinational Pilz GmbH), I built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and accelerating operations by 80% (${locNote}).\n\nWould welcome a brief 10-minute chat or connecting with the hiring team!\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
 
       if (target === "hr") {
-        return `Merhaba, ${cleanComp} bünyesindeki ${item.role} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve bulut mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura iş süreçlerini %80 hızlandırdım.\n\nİstanbul'da ikamet ediyorum, aktif çalışma iznim ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu mevcuttur. Uygun göreceğiniz açık roller için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve bulut mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura iş süreçlerini %80 hızlandırdım.\n\nİstanbul'da ikamet ediyorum, aktif çalışma iznim ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu mevcuttur. Uygun göreceğiniz açık roller için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
       }
-      return `Merhaba, ${cleanComp} bünyesindeki ${item.role} pozisyonunuz için başvurumu iletmiştim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, C#, React ve kurumsal yapay zeka mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe iletmenizi çok isterim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, C#, React ve kurumsal yapay zeka mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe iletmenizi çok isterim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
     }
     function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
 
@@ -4164,8 +4284,8 @@
         "CV Downloaded ⭐": 90,
         "Viewed 👀": 85,
         "HR Messaged 💬": 80,
-        "Clicked Apply ⏳": 75,
-        "Applied": 70,
+        "Applied": 78,
+        "Clicked Apply ⏳": 72,
         "Rejected": 10
       };
 
@@ -4198,11 +4318,15 @@
 
         const cardId = vip?.id || String(primaryApp?.id || `CO-${companyKey}`);
 
-        let savedIntel = primaryApp?.aiIntel || null;
-        if (!savedIntel) {
-          try {
-            savedIntel = JSON.parse(localStorage.getItem(`jr_intel_${cardId}`) || (primaryApp ? localStorage.getItem(`jr_intel_${primaryApp.id}`) : "null") || "null");
-          } catch {}
+        let savedIntel = apps.map(a => a.aiIntel).find(i => i?.emailVerification) || primaryApp?.aiIntel || apps.map(a => a.aiIntel).find(Boolean) || null;
+        let localIntel = null;
+        try {
+          localIntel = JSON.parse(localStorage.getItem(`jr_intel_${cardId}`) || (primaryApp ? localStorage.getItem(`jr_intel_${primaryApp.id}`) : "null") || "null");
+        } catch {}
+        if (!savedIntel && localIntel) {
+          savedIntel = localIntel;
+        } else if (savedIntel && localIntel?.emailVerification && !savedIntel.emailVerification) {
+          savedIntel = { ...savedIntel, bestEmail: localIntel.bestEmail || savedIntel.bestEmail, emailVerification: localIntel.emailVerification };
         }
 
         const US_CELEB_GUARD = /\b(werner vogels|werner bey|prasad kalyanaraman|andy jassy|matt garman|satya nadella|sundar pichai)\b/i;
@@ -4239,15 +4363,38 @@
           };
         }
 
-        const FAKE_EMAIL_GUARD = /^(hr|jobs|careers|talent)@(amazon|aws|google|microsoft|apple|meta)\.com$|^aws-turkey@amazon\.com$|^google-turkey@google\.com$|^trinfo@microsoft\.com$/i;
-        const rawEmail = primaryApp?.contactEmail || (kb?.emails && kb.emails[0]) || known.email || vip?.email || savedIntel?.bestEmail || "";
-        const email = FAKE_EMAIL_GUARD.test(String(rawEmail).trim()) ? "" : String(rawEmail).trim();
+        // Dynamic Email Resolution: AI/DNS-verified & D1 CRM emails win first; generic black-hole addresses are filtered out
+        const verifiedIntelEmail = (mergedIntel?.emailVerification?.deliverable && isCleanHrEmail(mergedIntel?.bestEmail))
+          ? mergedIntel.bestEmail.trim()
+          : "";
+        const crmDirectEmail = liveApps.map(a => a.contactEmail).find(isCleanHrEmail)?.trim() ||
+          apps.map(a => a.contactEmail).find(isCleanHrEmail)?.trim() ||
+          "";
+        const savedBestEmail = isCleanHrEmail(mergedIntel?.bestEmail) ? mergedIntel.bestEmail.trim() : "";
+        const noPublicHrConfirmed = Boolean(mergedIntel?.emailVerification?.noPublicHrEmail || mergedIntel?.emailVerification?.isBlockedGiant);
+        const staticFallbackEmail = noPublicHrConfirmed
+          ? ""
+          : ((kb?.emails || []).find(isCleanHrEmail)?.trim() ||
+             (isCleanHrEmail(known.email) ? known.email.trim() : "") ||
+             (isCleanHrEmail(vip?.email) ? vip.email.trim() : "") || "");
+        const email = verifiedIntelEmail || crmDirectEmail || savedBestEmail || staticFallbackEmail;
 
         const rawPhoneDisp = (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
         const phoneDisplay = rawPhoneDisp;
         const phone = primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
         const address = kb?.officeAndMetro || vip?.address || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : "Remote");
         const mapQuery = vip?.mapQuery || `${displayCompany.split("(")[0].trim()} ${address}`;
+
+        const uniqueRoleTitles = [];
+        for (const a of liveApps) {
+          const t = stripRoleBadgeClient(a.title || "");
+          if (t && !uniqueRoleTitles.some(u => u.toLowerCase() === t.toLowerCase())) {
+            uniqueRoleTitles.push(t);
+          }
+        }
+        const cleanRole = uniqueRoleTitles.length
+          ? uniqueRoleTitles.slice(0, 2).join(" & ")
+          : stripRoleBadgeClient(vip?.role || "Senior Software Engineer & Solutions Architect");
 
         const roleDisplay = primaryApp
           ? (liveApps.length > 1 ? `${primaryApp.title} (+${liveApps.length - 1} more active role${liveApps.length > 2 ? 's' : ''})` : primaryApp.title)
@@ -4257,9 +4404,7 @@
         const latestDate = liveApps.map(a => a.appliedAt || "").sort().reverse()[0] || primaryApp?.appliedAt || "";
         const isAgency = AGENCY_RE.test(displayCompany);
 
-        const isEnDefault = countryGroup !== "TR" ||
-          known.lang === "EN" ||
-          /\b(amadeus|insider|aws|amazon|canonical|deel|google|ibm|oracle|mastercard|microsoft|ant|sezzle|sap|bosch|siemens|hitachi|accenture|dream games|peak|commencis|alignerr|wise|teleport)\b/i.test(displayCompany);
+        const defaultLangMode = countryGroup === "TR" ? "MULTI" : "EN";
 
         list.push({
           id: cardId,
@@ -4277,6 +4422,7 @@
           rejectedRoles,
           company: displayCompany,
           role: roleDisplay,
+          cleanRole,
           location: primaryApp?.location || vip?.address || "Istanbul",
           cluster: vip?.cluster || (/maslak|sarıyer|ayazağa/i.test(address) ? "CLUSTER_MASLAK" : /kartal|pendik|kurtköy|ataşehir|üsküdar|ümraniye|kozyatağı|küçükyalı|maltepe|tuzla|asya/i.test(address) ? "CLUSTER_ASIAN" : "CLUSTER_LEVENT"),
           clusterLabel: vip?.clusterLabel || `📍 ${primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : "Remote")}`,
@@ -4289,7 +4435,7 @@
           mapQuery,
           jobUrl: (primaryApp?.url && primaryApp.url !== "#") ? primaryApp.url : (vip?.jobUrl || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(displayCompany)}`),
           summary: primaryApp?.notes || kb?.walkInVerdict || vip?.summary || "Direct company application in pipeline.",
-          lang: isEnDefault ? "EN" : "TR",
+          lang: defaultLangMode,
           vipBadge: vip?.vipBadge || known.badge || null,
           aiIntel: mergedIntel
         });
@@ -4471,8 +4617,17 @@
           STATE.applied.unshift(crmItem);
         }
         if (actions.setContactEmail) {
-          crmItem.contactEmail = String(actions.setContactEmail).trim();
-          executed.push(`Saved Email: ${crmItem.contactEmail}`);
+          const cleanSaved = isCleanHrEmail(actions.setContactEmail) ? String(actions.setContactEmail).trim() : "";
+          if (cleanSaved) {
+            crmItem.contactEmail = cleanSaved;
+            item.email = cleanSaved;
+            const nextIntel = { ...(item.aiIntel || {}), bestEmail: cleanSaved };
+            if (actions.emailVerification) nextIntel.emailVerification = actions.emailVerification;
+            item.aiIntel = nextIntel;
+            crmItem.aiIntel = nextIntel;
+            try { localStorage.setItem(`jr_intel_${strId}`, JSON.stringify(nextIntel)); } catch {}
+            executed.push(`Verified & Saved Email: ${crmItem.contactEmail}`);
+          }
         }
         if (actions.setContactPhone) {
           crmItem.contactPhoneDisplay = String(actions.setContactPhone).trim();
@@ -4574,15 +4729,16 @@
       const chosenLang = getPreferredLang(item.id, getDefaultLangForItem(item));
 
       const jobContext = {
-        id: item.id,
+        id: item.primaryCrmId || item.id,
         company: item.company,
         giantRank: item.giantRank,
         countryGroup: item.countryGroup,
-        role: item.role,
+        role: item.cleanRole || stripRoleBadgeClient(item.role),
         address: item.address,
         status: item.status,
         chosenLang,
         email: item.email,
+        emailVerification: item.aiIntel?.emailVerification || null,
         phoneDisplay: item.phoneDisplay,
         channels: ch,
         activeRoles: (item.activeRoles || []).map(r => ({ id: r.id, title: r.title, status: r.status, appliedAt: r.appliedAt, notes: r.notes })),
@@ -4633,6 +4789,20 @@
       renderUnifiedPipeline();
     }
 
+    function renderEmailVerificationBadgeHtml(item) {
+      const ev = item?.aiIntel?.emailVerification;
+      if (ev?.deliverable && item?.email) {
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Live DNS MX Verified: ${escapeHtmlSafe(ev.gateway || 'Active SMTP')} · DMARC: ${escapeHtmlSafe(ev.dmarcPolicy || 'ok')} · ${escapeHtmlSafe(ev.sourceNote || '')}">🛡️ MX OK (${escapeHtmlSafe(ev.gateway || 'SMTP')})</span>`;
+      }
+      if (ev?.isBlockedGiant || ev?.noPublicHrEmail) {
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="${escapeHtmlSafe(ev.reason || 'Use LinkedIn DM + Career Portal')}">⚠️ Portal / LinkedIn DM Only</span>`;
+      }
+      if (item?.email) {
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700" title="Click 🛡️ AI Verify to check live web + DNS MX records">Unchecked MX</span>`;
+      }
+      return "";
+    }
+
     function renderPipelineDrawerHtml(item, checks, mail, dmText, gmailHref, mapsHref, myConnectionsHref) {
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
@@ -4651,7 +4821,7 @@
 
       const emailDisplay = item.email
         ? `<a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline text-xs">${item.email}</a>`
-        : `<span class="text-amber-300/90 text-xs font-medium">No public HR inbox — use LinkedIn DMs below or click ✏️ to save a recruiter email</span>`;
+        : `<span class="text-amber-300/90 text-xs font-medium">No verified HR inbox yet — click 🛡️ AI Verify or use LinkedIn DMs</span>`;
 
       return `
         <div class="p-4 bg-slate-950/90 border-t border-slate-800/90 space-y-4 text-xs">
@@ -4661,10 +4831,16 @@
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
             <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between gap-2">
               <div class="min-w-0">
-                <span class="text-slate-400 block text-[10px] font-bold tracking-wider mb-0.5">Direct Recruiter / HR Email</span>
+                <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
+                  <span class="text-slate-400 text-[10px] font-bold tracking-wider">Direct Recruiter / HR Email</span>
+                  ${renderEmailVerificationBadgeHtml(item)}
+                </div>
                 <div id="emailSlot-${item.id}" class="truncate font-mono">${emailDisplay}</div>
               </div>
-              <button type="button" onclick="promptContactInfo('${item.primaryCrmId || item.id}', '${safeCompAttr}', '${(item.role || "").replace(/'/g, "\\'")}', '${(item.address || "").replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] shrink-0 cursor-pointer" title="Manually add or edit recruiter email & phone">✏️</button>
+              <div class="flex items-center gap-1 shrink-0">
+                <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2 py-1 rounded bg-teal-600/35 hover:bg-teal-600/60 text-teal-200 border border-teal-500/40 text-[11px] font-bold cursor-pointer transition" title="AI Agent searches live web for ${safeCompAttr}'s published HR/Kariyer email, runs live DNS MX/DMARC verification, blocks info@ black holes, and saves to Cloudflare D1">🛡️ AI Verify</button>
+                <button type="button" onclick="promptContactInfo('${item.primaryCrmId || item.id}', '${safeCompAttr}', '${(item.cleanRole || item.role || "").replace(/'/g, "\\'")}', '${(item.address || "").replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] cursor-pointer" title="Manually add or edit recruiter email & phone">✏️</button>
+              </div>
             </div>
             <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
               <span class="text-slate-400 block text-[10px] font-bold tracking-wider mb-0.5">Verified Switchboard / Phone</span>
@@ -4754,10 +4930,18 @@
 
             <div class="p-3 rounded-lg bg-slate-950/95 border border-emerald-500/30 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <span class="text-[11px] font-bold text-emerald-300">📧 Direct Email — Subject: ${mail.subject}</span>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[11px] font-bold text-emerald-300">📧 Direct Email — Subject: ${mail.subject}</span>
+                  ${renderEmailVerificationBadgeHtml(item)}
+                </div>
                 <div class="flex flex-wrap items-center gap-1.5">
-                  <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow">
-                    ✉️ Open in Gmail Compose
+                  ${!item.aiIntel?.emailVerification?.deliverable ? `
+                    <button type="button" onclick="runAiVerifyEmail('${item.id}', this, true)" class="px-3 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow cursor-pointer" title="AI searches live web for ${safeCompAttr}'s HR/Kariyer email, runs live DNS MX check, saves to D1, and opens pre-filled Gmail">
+                      🛡️ AI Verify & Open Gmail
+                    </button>
+                  ` : ""}
+                  <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1 rounded-lg ${item.aiIntel?.emailVerification?.deliverable ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600 hover:bg-red-500'} text-white font-bold text-[11px] transition flex items-center gap-1 shadow">
+                    ${item.aiIntel?.emailVerification?.deliverable ? '🛡️✉️ Open Verified Gmail' : '✉️ Open in Gmail Compose'}
                   </a>
                   <button type="button" onclick="copyFromStore('${copyFullEmailKey}', this, '📧 Subject + Email copied!')" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 font-semibold text-[11px] transition cursor-pointer">
                     📋 Copy Subject + Body
@@ -4785,16 +4969,19 @@
 
             <!-- 1-Click Quick Prompts -->
             <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2.5 py-1 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 border border-teal-500/40 text-[11px] font-bold cursor-pointer" title="Searches web + Teknokent + career pages & runs live Cloudflare DoH DNS MX verification">
+                🛡️ Find & DNS-Verify Real HR Email
+              </button>
               <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Check my current 6-channel progress and contacts for ${safeCompAttr}. What is done, what is left, and what is the highest-impact next step right now?')" class="px-2.5 py-1 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/40 text-[11px] font-semibold cursor-pointer">
                 🎯 What's Left & Next Step
               </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a crisp, high-impact answer in ${chosenLang === 'TR' ? 'Turkish' : 'English'} for the application form question: Why do you want to join ${safeCompAttr} and why are you a strong fit for ${ (item.role || '').replace(/'/g, '') }?')" class="px-2.5 py-1 rounded-lg bg-blue-600/25 hover:bg-blue-600/40 text-blue-200 border border-blue-500/40 text-[11px] font-semibold cursor-pointer">
+              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a crisp, high-impact answer in ${chosenLang === 'TR' ? 'Turkish' : 'English'} for the application form question: Why do you want to join ${safeCompAttr} and why are you a strong fit for ${ (item.cleanRole || item.role || '').replace(/'/g, '') }?')" class="px-2.5 py-1 rounded-lg bg-blue-600/25 hover:bg-blue-600/40 text-blue-200 border border-blue-500/40 text-[11px] font-semibold cursor-pointer">
                 📝 "Why ${cleanComp}?" Portal Answer
               </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'What exact salary range and currency should I quote for ${safeCompAttr} (${ (item.role || '').replace(/'/g, '') }), and should I upload my EN or TR CV?')" class="px-2.5 py-1 rounded-lg bg-amber-600/25 hover:bg-amber-600/40 text-amber-200 border border-amber-500/40 text-[11px] font-semibold cursor-pointer">
+              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'What exact salary range and currency should I quote for ${safeCompAttr} (${ (item.cleanRole || item.role || '').replace(/'/g, '') }), and should I upload my EN or TR CV?')" class="px-2.5 py-1 rounded-lg bg-amber-600/25 hover:bg-amber-600/40 text-amber-200 border border-amber-500/40 text-[11px] font-semibold cursor-pointer">
                 💰 Salary & CV Advice
               </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a tailored 3-paragraph cover letter for ${safeCompAttr} (${ (item.role || '').replace(/'/g, '') }) in ${chosenLang === 'TR' ? 'Turkish' : 'English'} ready to paste into an application portal.')" class="px-2.5 py-1 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/40 text-[11px] font-semibold cursor-pointer">
+              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a tailored 3-paragraph cover letter for ${safeCompAttr} (${ (item.cleanRole || item.role || '').replace(/'/g, '') }) in ${chosenLang === 'TR' ? 'Turkish' : 'English'} ready to paste into an application portal.')" class="px-2.5 py-1 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/40 text-[11px] font-semibold cursor-pointer">
                 📄 Portal Cover Letter
               </button>
               <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Research ${safeCompAttr} engineering stack and give me the top 3 technical interview questions & strong answers based on my Pilz Türkiye platforms.')" class="px-2.5 py-1 rounded-lg bg-indigo-600/25 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/40 text-[11px] font-semibold cursor-pointer">
@@ -4890,7 +5077,7 @@
             <div class="flex items-center gap-0.5 bg-black/60 p-1 rounded-lg border border-slate-700/80 text-[10px] shrink-0" onclick="event.stopPropagation()">
               <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="English outreach">🇬🇧 EN</button>
               <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">🇹🇷 TR</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual (English + Turkish)">🌐 Both</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual (Turkish on top + English underneath)">🌐 Both</button>
             </div>
 
             <!-- 6-Channel Outreach Checkboxes -->
@@ -4899,9 +5086,22 @@
             <!-- Collapsed Quick Actions vs Expanded Close Button (Zero Duplication!) -->
             <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
               ${!isExpanded ? `
-                <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition" title="Quick-open pre-filled Gmail without expanding">
-                  ✉️ Gmail
-                </a>
+                ${item.aiIntel?.emailVerification?.deliverable && item.email ? `
+                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition" title="Live DNS MX Verified (${escapeHtmlSafe(item.aiIntel.emailVerification.gateway || 'SMTP')}): ${escapeHtmlSafe(item.email)}">
+                    🛡️✉️ Gmail
+                  </a>
+                ` : (item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) ? `
+                  <span class="px-2 py-1 rounded bg-slate-800/90 text-amber-300 border border-amber-500/30 text-[10px] font-semibold" title="${escapeHtmlSafe(item.aiIntel.emailVerification.reason || 'Use LinkedIn DM + Career Portal')}">
+                    ⚠️ DM Only
+                  </span>
+                ` : `
+                  <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2 py-1 rounded bg-teal-600/35 hover:bg-teal-600/60 text-teal-200 border border-teal-500/40 font-semibold text-[11px] transition cursor-pointer" title="AI Agent discovers ${escapeHtmlSafe(cleanComp)}'s published HR/Kariyer email & verifies live DNS MX records">
+                    🛡️ Verify Mail
+                  </button>
+                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition" title="${item.email ? 'Quick-open pre-filled Gmail to ' + escapeHtmlSafe(item.email) : 'Open Gmail draft'}">
+                    ✉️ Gmail
+                  </a>
+                `}
                 <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 Tech DM copied!')" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition cursor-pointer" title="Quick-copy Tech Lead LinkedIn DM without expanding">
                   💬 Copy DM
                 </button>
@@ -4951,7 +5151,7 @@
                 <div class="flex items-center gap-0.5 bg-black/60 p-0.5 rounded-lg border border-slate-700/80 text-[10px]">
                   <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
                   <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
-                  <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish Recruiter Note + English Engineering Summary">🌐 Both</button>
+                  <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish on top + English underneath">🌐 Both</button>
                 </div>
                 ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/6)</span>` : ""}
               </div>
@@ -4965,7 +5165,10 @@
             ${renderRolesSummaryHtml(item)}
             <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
               <div id="emailSlot-${item.id}">
-                <span class="text-slate-400 block text-[10px] font-bold tracking-wider">Direct Email</span>
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="text-slate-400 text-[10px] font-bold tracking-wider">Direct Email</span>
+                  ${renderEmailVerificationBadgeHtml(item)}
+                </div>
                 ${item.email ? `<a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline">${item.email}</a>` : `<span class="text-amber-300/90">Direct LinkedIn DM preferred</span>`}
               </div>
               <div id="phoneSlot-${item.id}">
@@ -4983,8 +5186,11 @@
               </a>
             </div>
 
-            <!-- Clear Two Action Buttons -->
+            <!-- Action Buttons -->
             <div class="flex flex-wrap gap-1.5 pt-0.5">
+              <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="py-1 px-2.5 rounded-lg bg-teal-600/35 hover:bg-teal-600/60 text-teal-200 border border-teal-500/40 text-xs font-bold transition cursor-pointer">
+                🛡️ Verify HR Mail
+              </button>
               <button type="button" onclick="runAiCompanyResearch('${item.id}', 'cto', this)" class="py-1 px-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition cursor-pointer">
                 🔎 Find Local People (${countryLabel})
               </button>
@@ -5006,8 +5212,8 @@
 
             <!-- Quick Action Buttons -->
             <div class="flex flex-wrap items-center gap-1.5 pt-1">
-              <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition flex items-center gap-1">
-                ✉️ Gmail
+              <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg ${item.aiIntel?.emailVerification?.deliverable ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600/80 hover:bg-red-500'} text-white font-semibold text-xs transition flex items-center gap-1">
+                ${item.aiIntel?.emailVerification?.deliverable ? '🛡️✉️ Gmail' : '✉️ Gmail'}
               </a>
               <button type="button" onclick="copyFromStore('${cardEmailKey}', this, '📧 Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer">
                 📋 Email
@@ -5020,7 +5226,7 @@
               </button>
               <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search 1st-degree connections">
                 👥 1st-Deg
-              </a>
+              </button>
               <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition ml-auto">
                 ↗ Job
               </a>
@@ -5077,6 +5283,7 @@
         const ch = resolveItemChannels(item, checks);
 
         if (filter === "TOP_GIANTS" && !item.giantRank) return false;
+        if (filter === "PENDING_EMAIL" && (ch.email || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail)) return false;
         if (filter === "HOT_SIGNALS" && !["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status)) return false;
         if (filter === "UNFINISHED_PORTAL" && !(item.hasUnfinishedPortal && !ch.applied)) return false;
         if (filter === "NEEDS_OUTREACH" && !(ch.applied && !ch.email && !ch.techDm && !ch.hrDm && !ch.connDm)) return false;
