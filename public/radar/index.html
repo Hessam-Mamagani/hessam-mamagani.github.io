@@ -89,7 +89,7 @@
       </div>
 
       <!-- Scan Controls -->
-      <div id="scanControls" class="flex items-center gap-2 w-full md:w-auto">
+      <div id="scanControls" class="flex flex-wrap items-center gap-2 w-full md:w-auto">
         <select id="tprSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs md:text-sm text-slate-200 focus:outline-none focus:border-blue-500">
           <option value="r3600">Last 1 Hour</option>
           <option value="r21600">Last 6 Hours</option>
@@ -99,6 +99,9 @@
         </select>
         <button onclick="runScan()" id="scanBtn" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition flex items-center justify-center gap-2">
           <span>🔍 Scan Fresh Jobs Now</span>
+        </button>
+        <button onclick="openPremiumScanModal()" id="premiumScanBtn" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg transition flex items-center justify-center gap-1.5" title="Open your logged-in LinkedIn Premium Top Applicant feed & sync unseen jobs into Cloudflare D1">
+          <span>👑 Scan My LinkedIn Premium</span>
         </button>
       </div>
     </div>
@@ -302,6 +305,97 @@
       <div class="flex justify-end gap-2 pt-2">
         <button onclick="closeAddModal()" class="px-4 py-2 rounded-lg text-xs bg-slate-800 text-slate-300">Cancel</button>
         <button onclick="saveManualApp()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 text-white">Save Application</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LinkedIn Premium User-Session Scanner Modal -->
+  <div id="premiumScanModal" class="fixed inset-0 bg-black/75 hidden items-center justify-center z-50 p-4">
+    <div class="glass rounded-2xl p-6 max-w-2xl w-full space-y-4 border border-amber-500/40 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between gap-2 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-extrabold">👑 LINKEDIN PREMIUM BRIDGE</span>
+          <h3 class="text-base md:text-lg font-bold text-white">Scan Your Personal LinkedIn Premium Feed</h3>
+        </div>
+        <button onclick="closePremiumScanModal()" class="text-slate-400 hover:text-white text-sm font-bold px-2 py-1">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Uses <strong>your own logged-in Chrome browser session</strong> (zero server cookie risk!) to open your personal LinkedIn Premium collections and filter out every job &amp; company you already applied to or dismissed in <strong>live Cloudflare D1</strong>.
+      </p>
+
+      <!-- Step 1: Launch Logged-In Premium Pages -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-2.5">
+        <div class="text-xs font-bold text-amber-300 uppercase tracking-wider">Step 1 — Click to Open Your Logged-In LinkedIn Premium Page</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/jobs/collections/top-applicant/')" class="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs flex items-center justify-between shadow transition">
+            <span>👑 1. "Top Applicant" Collection</span>
+            <span>↗</span>
+          </button>
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/jobs/collections/recommended/')" class="px-3.5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 font-bold text-xs flex items-center justify-between transition">
+            <span>✨ 2. "Recommended for You"</span>
+            <span>↗</span>
+          </button>
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/jobs/search/?f_TPR=r86400&geoId=102424322&keywords=Senior%20Software%20Engineer%20OR%20Full%20Stack%20OR%20Solution%20Architect&sortBy=R')" class="px-3.5 py-2.5 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/40 text-blue-200 font-bold text-xs flex items-center justify-between transition">
+            <span>🔥 3. Last 24h Top Matches (Istanbul)</span>
+            <span>↗</span>
+          </button>
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/analytics/profile-views/')" class="px-3.5 py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-200 font-bold text-xs flex items-center justify-between transition">
+            <span>👀 4. Unblurred Recruiter &amp; Profile Views</span>
+            <span>↗</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Option -->
+      <label class="flex items-center gap-2.5 bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 cursor-pointer select-none">
+        <input id="hideSameCompanyChk" type="checkbox" checked class="w-4 h-4 accent-amber-500 rounded" />
+        <span class="text-xs text-slate-200 font-medium">
+          <strong>Strict D1 Company Filter:</strong> Also hide new job posts from companies I already applied to in Cloudflare D1 (e.g., Accenture, OBSS, ICterra, Randstad)
+        </span>
+      </label>
+
+      <!-- Step 2: Send Premium Jobs to JobRadar -->
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="text-xs font-bold text-emerald-300 uppercase tracking-wider">Step 2 — Pull Jobs From Your Open Premium Tab Into Radar</div>
+          <span class="text-[11px] text-slate-400">Choose Option A (Bookmarklet) or Option B (Ctrl+A, Ctrl+C)</span>
+        </div>
+
+        <!-- Option A: 1-Click Bookmarklet -->
+        <div class="p-3 rounded-lg bg-black/40 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="space-y-1">
+            <div class="text-xs font-bold text-white">Option A: 1-Click Chrome Bookmarklet (Best)</div>
+            <p class="text-[11px] text-slate-400">
+              Drag the gold button on the right to your Chrome Bookmarks Bar once. Whenever you are on any LinkedIn Premium Jobs page, click it — it scrolls the list, extracts all jobs, and sends them straight here!
+            </p>
+          </div>
+          <a id="premiumBookmarkletLink" href="#" onclick="event.preventDefault(); alert('Drag this gold button to your Chrome Bookmarks Bar, then click it while viewing your LinkedIn Premium Jobs tab!');" class="shrink-0 px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs shadow-lg text-center cursor-grab">
+            👑 Send to JobRadar
+          </a>
+        </div>
+
+        <!-- Option B: Clipboard / Paste -->
+        <div class="p-3 rounded-lg bg-black/40 border border-emerald-500/30 space-y-2.5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="text-xs font-bold text-white">Option B: Copy Page (<code class="text-amber-300">Ctrl+A</code> then <code class="text-amber-300">Ctrl+C</code>) &amp; Click Scan</div>
+              <p class="text-[11px] text-slate-400">
+                On your open LinkedIn Premium tab, press <code class="text-slate-200">Ctrl+A</code> then <code class="text-slate-200">Ctrl+C</code>, come back here, and click the green button:
+              </p>
+            </div>
+            <button type="button" onclick="scanPremiumFromClipboard(this)" class="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition cursor-pointer">
+              📋 Read Clipboard &amp; Filter via D1
+            </button>
+          </div>
+          <textarea id="premiumPasteBox" rows="3" placeholder="Or paste (Ctrl+V) the copied LinkedIn Premium page text / HTML here and click 'Read Clipboard & Filter via D1'..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <div id="premiumIngestStatus" class="text-xs text-amber-300 font-semibold hidden"></div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button onclick="closePremiumScanModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300">Close</button>
       </div>
     </div>
   </div>
@@ -764,6 +858,7 @@
         setActiveCountry(ACTIVE_COUNTRY);
         renderVault();
         await loadCloudFeed();
+        await checkPremiumImportHash();
       }
     }
 
@@ -2843,6 +2938,7 @@
                 <a href="${job.url}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 text-center">
                   ↗ Open LinkedIn
                 </a>
+                ${job.hiringPosterUrl ? `<a href="${job.hiringPosterUrl}" target="_blank" class="px-3 py-1 rounded-lg text-[11px] font-bold bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-center">👩‍💼 ${job.hiringPoster || "Hiring Poster"} ↗</a>` : ""}
               </div>
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs">
@@ -5368,6 +5464,235 @@
       renderCrm();
       renderUnifiedPipeline();
     }
+
+    function initPremiumBookmarklet() {
+      const bmLink = document.getElementById("premiumBookmarkletLink");
+      if (!bmLink) return;
+      const radarUrl = IS_LOCAL ? location.origin + location.pathname : "https://hessam-mamagani.github.io/radar/";
+      const bmCode = `(function(){try{var sc=document.querySelector('.jobs-search-results-list,.scaffold-layout__list > div');if(sc)sc.scrollTo(0,sc.scrollHeight);setTimeout(function(){var cards=document.querySelectorAll('[data-job-id],[data-occludable-job-id]');var map={};var add=function(id,t,c,l,txt,hp,hpu){id=String(id||'').replace(/\\D/g,'');if(!id||map[id])return;t=String(t||'').replace(/\\s+with verification$/i,'').trim();if(t.length>14&&t.slice(0,t.length/2).trim()===t.slice(t.length/2).trim())t=t.slice(0,t.length/2).trim();map[id]={id:id,title:t||'Software Engineer',company:String(c||'Company').trim(),location:String(l||'Istanbul, Türkiye').trim(),easyApply:/Easy Apply|Kolay Ba/i.test(txt),activelyReviewing:/Actively reviewing|Aktif olarak/i.test(txt),alreadyApplied:/\\bApplied\\b|\\bBa\\u015fvuruldu\\b/i.test(txt),hiringPoster:hp||'',hiringPosterUrl:hpu||''};};cards.forEach(function(el){var id=el.getAttribute('data-job-id')||el.getAttribute('data-occludable-job-id');var a=el.querySelector('a[href*="/jobs/view/"]');if(!id&&a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(m)id=m[1];}var tEl=el.querySelector('.job-card-list__title--link strong,.artdeco-entity-lockup__title strong,.artdeco-entity-lockup__title a');var cEl=el.querySelector('.artdeco-entity-lockup__subtitle,.job-card-container__primary-description');var lEl=el.querySelector('.artdeco-entity-lockup__caption li,.job-card-container__metadata-item');add(id,tEl?tEl.innerText:(a?a.innerText:''),cEl?cEl.innerText:'',lEl?lEl.innerText:'',el.innerText||'','','');});if(!Object.keys(map).length){document.querySelectorAll('a[href*="/jobs/view/"]').forEach(function(a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(!m)return;var box=a.closest('li,div[data-job-id]')||a.parentElement;add(m[1],a.innerText,'','Istanbul, Türkiye',box?box.innerText:'','','');});}var list=Object.values(map);if(!list.length){alert('Open a LinkedIn Jobs / Top Applicant page first!');return;}var b64=btoa(unescape(encodeURIComponent(JSON.stringify(list))));window.open('${radarUrl}#premium_import='+encodeURIComponent(b64),'_blank');},600);}catch(e){alert('Premium Sync Error: '+e.message);}})();`;
+      bmLink.setAttribute("href", "javascript:" + bmCode);
+    }
+
+    function openPremiumScanModal() {
+      initPremiumBookmarklet();
+      const modal = document.getElementById("premiumScanModal");
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+      }
+    }
+
+    function closePremiumScanModal() {
+      const modal = document.getElementById("premiumScanModal");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    }
+
+    function launchPremiumTab(url) {
+      window.open(url, "_blank", "noopener");
+      showToast("👑 Opened your LinkedIn Premium page! Press Ctrl+A then Ctrl+C on that page (or click the '👑 Send to JobRadar' bookmarklet), then click 'Read Clipboard & Filter via D1' here.", true);
+    }
+
+    function parsePremiumHtmlOrText(htmlStr = "", textStr = "") {
+      const jobsMap = new Map();
+      const cleanTitle = (raw = "") => {
+        let s = String(raw || "").replace(/\s+/g, " ").replace(/\s*with verification\s*$/i, "").trim();
+        const half = Math.floor(s.length / 2);
+        if (s.length >= 12 && s.slice(0, half).trim() === s.slice(half).trim()) {
+          s = s.slice(0, half).trim();
+        }
+        return s;
+      };
+
+      // 1. Try JSON array first
+      const trimmed = (textStr || htmlStr || "").trim();
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        try {
+          const arr = JSON.parse(trimmed);
+          if (Array.isArray(arr)) return arr;
+        } catch {}
+      }
+
+      // 2. Parse Rich HTML from Clipboard (when user presses Ctrl+A, Ctrl+C in Chrome on LinkedIn!)
+      if (htmlStr && /\/jobs\/view\/\d+|data-job-id=/i.test(htmlStr)) {
+        try {
+          const doc = new DOMParser().parseFromString(htmlStr, "text/html");
+          const cards = doc.querySelectorAll("[data-job-id], [data-occludable-job-id], li");
+          cards.forEach(el => {
+            let id = el.getAttribute("data-job-id") || el.getAttribute("data-occludable-job-id") || "";
+            const link = el.querySelector('a[href*="/jobs/view/"]');
+            if (!id && link) {
+              const m = (link.getAttribute("href") || "").match(/\/jobs\/view\/(\d+)/);
+              if (m) id = m[1];
+            }
+            id = String(id || "").replace(/\D/g, "");
+            if (!id || jobsMap.has(id)) return;
+            const tEl = el.querySelector(".job-card-list__title--link strong, .artdeco-entity-lockup__title strong, .artdeco-entity-lockup__title a") || link;
+            const cEl = el.querySelector(".artdeco-entity-lockup__subtitle, .job-card-container__primary-description");
+            const lEl = el.querySelector(".artdeco-entity-lockup__caption li, .job-card-container__metadata-item");
+            const cardTxt = el.textContent || "";
+            const title = cleanTitle(tEl ? tEl.textContent : "");
+            const company = String(cEl ? cEl.textContent : "").replace(/\s+/g, " ").trim();
+            const location = String(lEl ? lEl.textContent : "Istanbul, Türkiye").replace(/\s+/g, " ").trim();
+            if (!title) return;
+            jobsMap.set(id, {
+              id,
+              title,
+              company: company || "Company",
+              location: location || "Istanbul, Türkiye",
+              easyApply: /Easy Apply|Kolay Başvuru/i.test(cardTxt),
+              activelyReviewing: /Actively reviewing|Aktif olarak/i.test(cardTxt),
+              alreadyApplied: /\bApplied\b|\bBaşvuruldu\b/i.test(cardTxt)
+            });
+          });
+
+          // Fallback: scan all /jobs/view/ links in HTML
+          if (!jobsMap.size) {
+            doc.querySelectorAll('a[href*="/jobs/view/"]').forEach(a => {
+              const m = (a.getAttribute("href") || "").match(/\/jobs\/view\/(\d+)/);
+              if (!m) return;
+              const id = m[1];
+              if (jobsMap.has(id)) return;
+              const box = a.closest("li, div") || a.parentElement;
+              const boxTxt = box ? box.textContent : "";
+              const title = cleanTitle(a.textContent || "");
+              if (!title) return;
+              jobsMap.set(id, {
+                id,
+                title,
+                company: "LinkedIn Premium Match",
+                location: "Istanbul, Türkiye",
+                easyApply: /Easy Apply|Kolay Başvuru/i.test(boxTxt),
+                activelyReviewing: /Actively reviewing|Aktif olarak/i.test(boxTxt),
+                alreadyApplied: /\bApplied\b|\bBaşvuruldu\b/i.test(boxTxt)
+              });
+            });
+          }
+        } catch {}
+      }
+
+      // 3. Fallback: regex scan for /jobs/view/(\d+) in raw string
+      if (!jobsMap.size) {
+        const combined = `${htmlStr}\n${textStr}`;
+        const re = /\/jobs\/view\/(\d+)/g;
+        let m;
+        while ((m = re.exec(combined)) !== null) {
+          const id = m[1];
+          if (!jobsMap.has(id)) {
+            jobsMap.set(id, {
+              id,
+              title: `LinkedIn Premium Job #${id}`,
+              company: "LinkedIn Top Applicant",
+              location: "Istanbul, Türkiye",
+              easyApply: false,
+              activelyReviewing: true,
+              alreadyApplied: false
+            });
+          }
+        }
+      }
+
+      return [...jobsMap.values()];
+    }
+
+    async function ingestPremiumJobsToD1(jobs, statusEl = null) {
+      if (!Array.isArray(jobs) || !jobs.length) {
+        showToast("⚠️ No LinkedIn job cards found yet. On your LinkedIn Premium tab, press Ctrl+A then Ctrl+C (or click the '👑 Send to JobRadar' bookmarklet) first!", false);
+        return;
+      }
+      const hideSameCompany = document.getElementById("hideSameCompanyChk") ? document.getElementById("hideSameCompanyChk").checked : true;
+      if (statusEl) {
+        statusEl.classList.remove("hidden");
+        statusEl.textContent = `⏳ Cross-checking ${jobs.length} LinkedIn Premium jobs against live Cloudflare D1 (214+ applied & 73+ dismissed)...`;
+      }
+
+      try {
+        const res = await fetch(`${CF_WORKER_URL}/api/premium-ingest`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobs, hideSameCompany })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        await loadState();
+        switchTab("radar");
+        const summaryMsg = `👑 LinkedIn Premium Sync Complete! Imported ${data.importedCount || 0} unseen Top Applicant jobs (filtered out ${data.skippedAlreadyInD1 || 0} already applied/dismissed in D1${data.skippedSameCompany ? ` + ${data.skippedSameCompany} at companies you already applied to` : ""}).`;
+        if (statusEl) {
+          statusEl.textContent = summaryMsg;
+        }
+        document.getElementById("scanStatusText").textContent = summaryMsg;
+        showToast(summaryMsg, true);
+        closePremiumScanModal();
+      } catch (e) {
+        if (statusEl) {
+          statusEl.textContent = `⚠️ Error syncing with Cloudflare D1: ${e.message}`;
+        }
+        showToast(`⚠️ Error syncing Premium jobs: ${e.message}`, false);
+      }
+    }
+
+    async function scanPremiumFromClipboard(btn) {
+      const statusEl = document.getElementById("premiumIngestStatus");
+      const pasteBox = document.getElementById("premiumPasteBox");
+      let htmlStr = "";
+      let textStr = pasteBox ? pasteBox.value.trim() : "";
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "⏳ Reading Clipboard & D1...";
+      }
+
+      try {
+        if (!textStr && navigator.clipboard) {
+          if (navigator.clipboard.read) {
+            try {
+              const items = await navigator.clipboard.read();
+              for (const item of items) {
+                if (item.types.includes("text/html")) {
+                  const blob = await item.getType("text/html");
+                  htmlStr += await blob.text();
+                }
+                if (item.types.includes("text/plain")) {
+                  const blob = await item.getType("text/plain");
+                  textStr += await blob.text();
+                }
+              }
+            } catch {}
+          }
+          if (!htmlStr && !textStr && navigator.clipboard.readText) {
+            try {
+              textStr = await navigator.clipboard.readText();
+            } catch {}
+          }
+        }
+        const extracted = parsePremiumHtmlOrText(htmlStr, textStr);
+        await ingestPremiumJobsToD1(extracted, statusEl);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "📋 Read Clipboard & Filter via D1";
+        }
+      }
+    }
+
+    async function checkPremiumImportHash() {
+      const hash = location.hash || "";
+      if (!hash.startsWith("#premium_import=")) return;
+      try {
+        const b64 = decodeURIComponent(hash.replace("#premium_import=", ""));
+        const jsonStr = decodeURIComponent(escape(atob(b64)));
+        const jobs = JSON.parse(jsonStr);
+        history.replaceState({}, document.title, location.pathname + location.search);
+        if (Array.isArray(jobs) && jobs.length) {
+          await ingestPremiumJobsToD1(jobs, null);
+        }
+      } catch (e) {
+        console.warn("Failed to parse #premium_import hash:", e);
+      }
+    }
+    window.addEventListener("hashchange", checkPremiumImportHash);
 
     initApp();
   </script>
