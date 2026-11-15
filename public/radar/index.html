@@ -43,28 +43,28 @@
   </div>
 
   <!-- Header -->
-  <header class="sticky top-0 z-30 glass border-b border-slate-800 px-4 md:px-6 py-3.5">
+  <header class="sticky top-0 z-30 glass border-b border-slate-800 px-4 md:px-6 py-3">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div>
         <div class="flex items-center gap-2.5 flex-wrap">
-          <span id="modeBadge" class="px-2.5 py-1 text-xs font-bold rounded-md bg-blue-600 text-white tracking-wider">LIVE RADAR</span>
-          <span class="px-2 py-0.5 text-[11px] font-bold rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300">🤖 v3.5 · Full-Context AI Copilot</span>
-          <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Hessam Mamagani — Daily Job Radar &amp; Career Copilot</h1>
+          <span id="modeBadge" class="px-2 py-0.5 text-[11px] font-bold rounded bg-blue-600 text-white tracking-wider">LIVE D1</span>
+          <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Hessam Mamagani — JobRadar &amp; AI Copilot</h1>
         </div>
-        <p class="text-xs text-slate-400 mt-1">
-          C# • .NET (8 / 10) • ASP.NET Core • React • Next.js • TypeScript • SQL / Redis • Azure • SAP RPA • Agentic AI / RAG &nbsp;|&nbsp; 2027 Floor: ≥140K TL Net (145K–215K Tiered) · €66K–€95K (IE / DE / NL)
+        <p class="text-xs text-slate-400 mt-0.5">
+          .NET (8/10) · C# · React · Next.js · TypeScript · SQL/Redis · Azure · SAP/e-Invoice · Agentic AI &nbsp;&middot;&nbsp; 2027 Floor: ≥140K TL Net · €66K–€95K EU
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
-        <div class="px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium" title="Work permit valid until 31.12.2026 + 10-day legal e-İzin transfer / short-term ikamet window (01.01–10.01.2027)">
-          ⏳ Permit: <strong id="daysLeft" class="text-amber-200">31.12.2026</strong> <span class="text-[10px] text-amber-300/80 ml-0.5">(+10d Jan e-İzin)</span>
+        <div class="px-3 py-1.5 rounded-lg bg-slate-900/90 border border-slate-800 text-slate-300 text-xs flex items-center gap-2.5" title="Work permit valid until 31.12.2026 + 10-day legal e-İzin transfer window">
+          <span>⏳ Permit: <strong id="daysLeft" class="text-amber-300">31.12.2026</strong></span>
+          <span class="text-slate-600">&middot;</span>
+          <span>✅ Applied: <strong id="totalAppliedCount" class="text-emerald-300">0</strong></span>
+          <span class="text-slate-600">&middot;</span>
+          <span>⭐ Signals: <strong id="activeSignalsCount" class="text-purple-300">0</strong></span>
         </div>
-        <div class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
-          ✅ Applied: <strong id="totalAppliedCount" class="text-white text-sm">0</strong>
-        </div>
-        <div class="px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-medium">
-          ⭐ Signals: <strong id="activeSignalsCount" class="text-white text-sm">0</strong>
-        </div>
+        <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v2 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
+          📄 My v2 CVs
+        </button>
         <button type="button" onclick="openCopilotDrawer(null)" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Open Full-Context Career, Legal, Salary & Interview Copilot (Synced via Cloudflare D1)">
           <span>🤖 Ask Copilot</span>
         </button>
@@ -73,47 +73,41 @@
   </header>
 
   <!-- Main Container -->
-  <main class="max-w-7xl mx-auto px-4 md:px-6 mt-5">
-    <!-- Navigation Tabs (5 Clean Tool Tabs) -->
-    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
+  <main class="max-w-7xl mx-auto px-4 md:px-6 mt-4">
+    <!-- Navigation Tabs (3 Clean, Focused Views) -->
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
       <div class="flex flex-wrap gap-2">
-        <button onclick="switchTab('radar')" id="tabBtn-radar" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white shadow-lg transition">
-          📡 1. Live Scanner
+        <button onclick="switchTab('radar')" id="tabBtn-radar" class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white shadow-lg transition cursor-pointer">
+          📡 1. Today &amp; Job Scanner
         </button>
-        <button onclick="switchTab('pipeline')" id="tabBtn-pipeline" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition">
-          🎯 2. Master Outreach &amp; Pipeline
+        <button onclick="switchTab('pipeline')" id="tabBtn-pipeline" class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
+          🎯 2. My Applications &amp; Outreach
         </button>
-        <button onclick="switchTab('crm')" id="tabBtn-crm" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          🗂️ 3. Applications CRM
-        </button>
-        <button onclick="switchTab('vault')" id="tabBtn-vault" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition">
-          📄 4. v2 CVs, Vault &amp; Kariyer.net
-        </button>
-        <button onclick="switchTab('coach')" id="tabBtn-coach" class="px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-600/30 transition">
-          🎤 5. Interview &amp; Demo Coach
+        <button onclick="switchTab('coach')" id="tabBtn-coach" class="px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
+          📄 3. CVs &amp; Interview Prep
         </button>
       </div>
 
       <!-- Scan Controls -->
       <div id="scanControls" class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <select id="tprSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs md:text-sm text-slate-200 focus:outline-none focus:border-blue-500">
+        <select id="tprSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
           <option value="r3600">Last 1 Hour</option>
           <option value="r21600">Last 6 Hours</option>
           <option value="r86400" selected>Last 24 Hours (Daily)</option>
           <option value="r259200">Last 3 Days</option>
           <option value="r604800">Last 7 Days</option>
         </select>
-        <button onclick="runScan()" id="scanBtn" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer">
-          <span>🔍 Scan Fresh Jobs Now</span>
+        <button onclick="runScan()" id="scanBtn" class="flex-1 md:flex-none px-3.5 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow transition flex items-center justify-center gap-1.5 cursor-pointer">
+          <span>🔍 Scan Fresh Jobs</span>
         </button>
-        <button onclick="openPremiumScanModal()" id="premiumScanBtn" class="flex-1 md:flex-none px-4 py-2 rounded-lg text-xs md:text-sm font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg transition flex items-center justify-center gap-1.5 cursor-pointer" title="Open your logged-in LinkedIn Premium Top Applicant feed & sync unseen jobs into Cloudflare D1">
-          <span>👑 Scan My LinkedIn Premium</span>
+        <button onclick="openPremiumScanModal()" id="premiumScanBtn" class="flex-1 md:flex-none px-3.5 py-2 rounded-lg text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition flex items-center justify-center gap-1.5 cursor-pointer" title="Open your logged-in LinkedIn Premium Top Applicant feed & sync unseen jobs into Cloudflare D1">
+          <span>👑 LinkedIn Premium</span>
         </button>
       </div>
     </div>
 
-    <!-- Shared 6-Country Fast-Track Pill Bar (Visible across Tab 1 Scanner, Tab 2 Pipeline & Tab 3 CRM) -->
-    <div id="globalCountryBar" class="mt-4 glass rounded-xl p-3 border border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
+    <!-- Clean Country Filter Bar (Visible in View 1 & View 2) -->
+    <div id="globalCountryBar" class="mt-3 glass rounded-xl px-3.5 py-2.5 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
       <div class="flex flex-wrap items-center gap-1.5" id="countryPillGroup">
         <button type="button" onclick="setActiveCountry('TR')" data-country-tab="TR" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow transition flex items-center gap-1.5 cursor-pointer">
           <span>🇹🇷 Türkiye</span>
@@ -135,11 +129,11 @@
           <span>🇬🇧 UK</span>
           <span id="cBadge-UK" class="px-1.5 py-0.5 rounded bg-black/35 text-[11px]">0</span>
         </button>
-        <button type="button" onclick="setActiveCountry('GLOBAL_REMOTE')" id="cBtn-GLOBAL_REMOTE" data-country-tab="GLOBAL_REMOTE" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition items-center gap-1.5 cursor-pointer" title="Hidden by default — focus on Visa-Sponsoring tracks (TR / IE / DE / NL / UK)">
+        <button type="button" onclick="setActiveCountry('GLOBAL_REMOTE')" id="cBtn-GLOBAL_REMOTE" data-country-tab="GLOBAL_REMOTE" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition items-center gap-1.5 cursor-pointer">
           <span>🌍 Global Remote</span>
           <span id="cBadge-GLOBAL_REMOTE" class="px-1.5 py-0.5 rounded bg-black/35 text-[11px]">0</span>
         </button>
-        <button type="button" onclick="setActiveCountry('OTHER_ABROAD')" id="cBtn-OTHER_ABROAD" data-country-tab="OTHER_ABROAD" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition items-center gap-1.5 cursor-pointer" title="Other International Roles (US / Canada / Nordics)">
+        <button type="button" onclick="setActiveCountry('OTHER_ABROAD')" id="cBtn-OTHER_ABROAD" data-country-tab="OTHER_ABROAD" class="hidden px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition items-center gap-1.5 cursor-pointer">
           <span>🌎 Other Abroad</span>
           <span id="cBadge-OTHER_ABROAD" class="px-1.5 py-0.5 rounded bg-black/35 text-[11px]">0</span>
         </button>
@@ -148,118 +142,74 @@
           <span id="cBadge-ALL" class="px-1.5 py-0.5 rounded bg-black/35 text-[11px]">0</span>
         </button>
       </div>
-      <div class="flex flex-wrap items-center gap-1.5 text-xs">
-        <button type="button" onclick="openCvModal()" class="px-2.5 py-1.5 rounded-lg bg-indigo-500/25 hover:bg-indigo-500/40 text-indigo-200 border border-indigo-400/50 font-bold transition cursor-pointer" title="View & download all 4 v2 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter) on Laptop & Mobile">
-          📄 My v2 CVs (TR &amp; EN)
-        </button>
-        <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='FAST_HIRE_DEC31'; setActiveCountry('TR');" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-500/40 font-bold transition cursor-pointer" title="Filter strong Teknopark, Ar-Ge & Gebze sponsors capable of fast 2-3 week offers before Dec 31">
-          ⚡ Fast Sponsors (Dec 31)
-        </button>
-        <button type="button" onclick="jumpToCompanyCard('aws')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 font-bold transition cursor-pointer">
-          ☁️ #2 AWS (Active TAM)
-        </button>
-        <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='UNFINISHED_PORTAL'; setActiveCountry('ALL');" class="px-2.5 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 border border-blue-500/40 font-bold transition cursor-pointer">
-          ⏳ Unfinished Portals
-        </button>
+      <div class="text-[11px] text-slate-400">
+        Visa-sponsoring tracks only &middot; <button type="button" onclick="openAddModal()" class="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer">+ Log Manual Application</button>
       </div>
     </div>
 
-    <!-- TAB 1: LIVE RADAR -->
-    <section id="tab-radar" class="mt-4 grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <div class="lg:col-span-7 space-y-3">
-        <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1">
-          <span id="scanStatusText">Ready to scan unseen visa-sponsoring jobs across Türkiye (Istanbul + Gebze/Teknoparks), Ireland, Germany, Netherlands &amp; UK.</span>
-          <span id="scanCountBadge" class="font-semibold text-emerald-400"></span>
-        </div>
-        <div id="radarList" class="space-y-3"></div>
-      </div>
+    <!-- VIEW 1: TODAY'S PRIORITY QUEUE + LIVE JOB SCANNER -->
+    <section id="tab-radar" class="mt-4 space-y-4">
+      <!-- Today's Priority Action Queue -->
+      <div id="todayActionStrip" class="glass rounded-xl p-4 border border-slate-800"></div>
 
-      <div class="lg:col-span-5">
-        <div id="inspectorPanel" class="glass rounded-xl p-5 sticky top-24 max-h-[82vh] overflow-y-auto">
-          <p class="text-sm text-slate-400 text-center py-12">
-            👈 Tap <strong>"Inspect &amp; Score"</strong> on any job card (works 24/7 on Laptop &amp; Phone via Cloudflare Edge!) to view its full description, Company Tier, 2027 Smart Salary Band, recommended CV (TR vs EN), legal sponsor note, and AI Copilot.
-          </p>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 space-y-3">
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1">
+            <span id="scanStatusText">Ready to scan unseen visa-sponsoring jobs across Türkiye, Ireland, Germany, Netherlands &amp; UK.</span>
+            <span id="scanCountBadge" class="font-semibold text-emerald-400"></span>
+          </div>
+          <div id="radarList" class="space-y-2.5"></div>
         </div>
-      </div>
-    </section>
 
-    <!-- TAB 3: APPLICATIONS CRM -->
-    <section id="tab-crm" class="mt-4 hidden space-y-4">
-      <div class="glass rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-2.5 flex-1">
-          <input id="crmSearch" oninput="renderCrm()" type="text" placeholder="Search company, role, location, or notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white w-full md:w-80 focus:outline-none focus:border-blue-500" />
-          <select id="crmStatusFilter" onchange="renderCrm()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200">
-            <option value="ALL">All Statuses</option>
-            <option value="Interview 🎯">Interview / Invite 🎯</option>
-            <option value="CV Downloaded ⭐">CV Downloaded ⭐</option>
-            <option value="Viewed 👀">Viewed 👀</option>
-            <option value="HR Messaged 💬">HR Messaged 💬</option>
-            <option value="Clicked Apply ⏳">Clicked Apply (Finish Portal) ⏳</option>
-            <option value="Applied">Applied</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-        <button onclick="openAddModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
-          + Log Manual Application
-        </button>
-      </div>
-
-      <div class="glass rounded-xl overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-slate-800 text-xs text-slate-400 bg-slate-900/60">
-                <th class="py-3 px-4">Company &amp; Role</th>
-                <th class="py-3 px-4">Location / Platform</th>
-                <th class="py-3 px-4">Date</th>
-                <th class="py-3 px-4">Status</th>
-                <th class="py-3 px-4">CV / Salary Band</th>
-                <th class="py-3 px-4">Notes &amp; Copilot</th>
-              </tr>
-            </thead>
-            <tbody id="crmTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
-          </table>
+        <div class="lg:col-span-5">
+          <div id="inspectorPanel" class="glass rounded-xl p-5 sticky top-20 max-h-[82vh] overflow-y-auto">
+            <p class="text-sm text-slate-400 text-center py-12">
+              👈 Select <strong>"Inspect"</strong> on any job card to view its full description, 2027 salary band, recommended v2 CV, and AI Copilot.
+            </p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: MASTER OUTREACH & PIPELINE -->
+    <!-- VIEW 2: MY APPLICATIONS & OUTREACH (Unified Outreach List + Quick Status Table) -->
     <section id="tab-pipeline" class="mt-4 hidden space-y-4">
-      <div class="glass rounded-xl p-5 border border-emerald-500/40">
+      <div class="glass rounded-xl p-4 border border-slate-800">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <h2 class="text-base font-bold text-white">🎯 Strong-Sponsor Pipeline &amp; 6-Channel Outreach Tracker</h2>
-              <span id="pipelineProgressBadge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Loading Pipeline...</span>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h2 class="text-base font-bold text-white">🎯 My Applications &amp; Sponsor Outreach</h2>
+              <span id="pipelineProgressBadge" class="text-xs text-slate-400">Loading...</span>
             </div>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              Sorted <strong>Top Giants &amp; Verified Visa Sponsors First</strong> per country (<strong>🇹🇷 TR · 🇮🇪 IE · 🇩🇪 DE · 🇳🇱 NL · 🇬🇧 UK</strong>) with 2027 Smart Salary Tiers, Hiring-Speed Badges, 1-Click <strong>ÇSGB Muafiyeti / EU Visa HR Notes</strong>, and D1-synced AI Copilot.
+            <p class="text-xs text-slate-400 mt-0.5">
+              Track every application, send direct HR/CTO outreach, or switch to the Quick Status Table to update statuses in bulk.
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
               <button onclick="setPipelineViewMode('compact')" id="pipelineViewBtn-compact" class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition cursor-pointer">
-                📋 Compact List
+                📋 Outreach List
+              </button>
+              <button onclick="setPipelineViewMode('table')" id="pipelineViewBtn-table" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
+                🗂️ Quick Status Table
               </button>
               <button onclick="setPipelineViewMode('cards')" id="pipelineViewBtn-cards" class="px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
-                🗂️ Cards
+                🃏 Cards
               </button>
             </div>
-            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search sponsor, role, stack, recruiter..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-52 focus:outline-none focus:border-emerald-500" />
+            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, location..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
             <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
-              <option value="ALL">🏆 All (Top Giants &amp; Sponsors First)</option>
-              <option value="FAST_HIRE_DEC31">⚡ Fast 2–3 Wk Sponsors (Beat Dec 31)</option>
-              <option value="TOP_GIANTS">🏢 Top Ranked Giants &amp; Visa Sponsors</option>
-              <option value="PENDING_EMAIL">📧 Email Queue — Not Emailed Yet</option>
+              <option value="ALL">All Companies (Top Sponsors First)</option>
               <option value="HOT_SIGNALS">🔥 Hot Signals (Invite / CV Downloaded / Viewed)</option>
-              <option value="UNFINISHED_PORTAL">⏳ Clicked Apply (Finish External Portal)</option>
-              <option value="NEEDS_OUTREACH">📬 Applied — Needs Email / LinkedIn DM</option>
+              <option value="UNFINISHED_PORTAL">⏳ Unfinished External Portals</option>
+              <option value="FAST_HIRE_DEC31">⚡ Fast 2–3 Wk Sponsors (Beat Dec 31)</option>
+              <option value="NEEDS_OUTREACH">📬 Applied — Needs Email / DM</option>
+              <option value="PENDING_EMAIL">📧 Email Queue — Not Emailed Yet</option>
+              <option value="TOP_GIANTS">🏢 Top Ranked Giants</option>
               <option value="EMAILED">📧 Emailed</option>
-              <option value="DM_SENT">💬 Tech or HR DM Sent</option>
-              <option value="CONNECTIONS">👥 Has 1st-Deg Connections / Referrals</option>
-              <option value="CLUSTER_ASIAN">📍 Asian Side (Kartal / Pendik / Ataşehir / Üsküdar)</option>
-              <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla (Marmaray)</option>
-              <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli (M2 Metro)</option>
+              <option value="DM_SENT">💬 LinkedIn DM Sent</option>
+              <option value="CLUSTER_ASIAN">📍 Asian Side (Kartal / Ataşehir / Üsküdar)</option>
+              <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla</option>
+              <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
               <option value="CLUSTER_MASLAK">📍 Maslak &amp; İTÜ Teknokent</option>
             </select>
           </div>
@@ -267,85 +217,130 @@
       </div>
 
       <div id="pipelineContainer" class="space-y-2"></div>
-    </section>
 
-    <!-- TAB 4: v2 CVs, QUICK COPY VAULT & KARIYER.NET -->
-    <section id="tab-vault" class="mt-5 hidden space-y-6">
-      <div id="v2CvKitPanel" class="glass rounded-xl p-5 border border-emerald-500/40"></div>
+      <!-- Embedded Quick Status Table (Shown when 'Quick Status Table' mode is selected) -->
+      <div id="tab-crm" class="hidden space-y-3">
+        <div class="glass rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 border border-slate-800">
+          <div class="flex flex-wrap items-center gap-2.5 flex-1">
+            <input id="crmSearch" oninput="renderCrm()" type="text" placeholder="Filter table by company, role, location, or notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white w-full md:w-72 focus:outline-none focus:border-blue-500" />
+            <select id="crmStatusFilter" onchange="renderCrm()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
+              <option value="ALL">All Statuses</option>
+              <option value="Interview 🎯">Interview / Invite 🎯</option>
+              <option value="CV Downloaded ⭐">CV Downloaded ⭐</option>
+              <option value="Viewed 👀">Viewed 👀</option>
+              <option value="HR Messaged 💬">HR Messaged 💬</option>
+              <option value="Clicked Apply ⏳">Clicked Apply (Finish Portal) ⏳</option>
+              <option value="Applied">Applied</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <button onclick="openAddModal()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
+            + Log Manual Application
+          </button>
+        </div>
 
-      <div class="glass rounded-xl p-5">
-        <h2 class="text-base font-bold text-white mb-1">🚀 Kariyer.net — 1-Click "Last 24 Hours" Searches (Istanbul + Gebze / Teknoparks)</h2>
-        <p class="text-xs text-slate-400 mb-4">Opens directly in your browser without triggering verification — remember to attach your Turkish CV + Pilz GM Reference PDF on Turkish portals.</p>
-        <div class="flex flex-wrap gap-2.5">
-          <a href="https://www.kariyer.net/is-ilanlari?kw=.net+core&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 .NET Core (Last 24h)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=full+stack+developer&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Full Stack Developer (Last 24h)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+mimari&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Yazılım Mimarı / Architect (Last 24h)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+muduru&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 Yazılım Müdürü / Team Lead (Last 24h)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=is+uygulamalari&date=3days" target="_blank" class="px-3.5 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600/30 text-emerald-200 text-xs font-semibold">🔗 İş Uygulamaları / ERP (3d)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=dijital+donusum+yazilim&date=3days" target="_blank" class="px-3.5 py-2 rounded-lg bg-emerald-600/20 border border-emerald-500/40 hover:bg-emerald-600/30 text-emerald-200 text-xs font-semibold">🔗 Dijital Dönüşüm / Otomasyon (3d)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=teknopark+.net&date=3days" target="_blank" class="px-3.5 py-2 rounded-lg bg-amber-600/20 border border-amber-500/40 hover:bg-amber-600/30 text-amber-200 text-xs font-semibold">🔗 Teknopark &amp; Ar-Ge (.NET)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=gebze+yazilim+.net&date=7days" target="_blank" class="px-3.5 py-2 rounded-lg bg-amber-600/20 border border-amber-500/40 hover:bg-amber-600/30 text-amber-200 text-xs font-semibold">🔗 Gebze / Bilişim Vadisi (.NET)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=yapay+zeka+ai&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 AI / Yapay Zeka (Last 24h)</a>
-          <a href="https://www.kariyer.net/is-ilanlari?kw=react+typescript&date=1day" target="_blank" class="px-3.5 py-2 rounded-lg bg-purple-600/20 border border-purple-500/40 hover:bg-purple-600/30 text-purple-200 text-xs font-semibold">🔗 React / TypeScript (Last 24h)</a>
+        <div class="glass rounded-xl overflow-hidden border border-slate-800">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-800 text-xs text-slate-400 bg-slate-900/60">
+                  <th class="py-3 px-4">Company &amp; Role</th>
+                  <th class="py-3 px-4">Location / Platform</th>
+                  <th class="py-3 px-4">Date</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4">CV &amp; Quote</th>
+                  <th class="py-3 px-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="crmTableBody" class="divide-y divide-slate-800/70 text-sm"></tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="vaultCards"></div>
     </section>
 
-    <!-- TAB 5: INTERVIEW & LIVE DEMO COACH -->
-    <section id="tab-coach" class="mt-5 hidden space-y-6">
-      <!-- 5-Minute Live Screen-Share Demo Playbook -->
-      <div class="glass rounded-2xl p-5 border border-indigo-500/40 space-y-4">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-2.5 py-0.5 rounded-md bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-extrabold">🖥️ SECRET WEAPON PLAYBOOK</span>
-              <h2 class="text-base md:text-lg font-bold text-white">5-Minute Live Screen-Share Demo (Steer Away From Trivia → Show Live Production Architecture)</h2>
-            </div>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              You built 5 live enterprise platforms solo end-to-end (<code class="text-emerald-300">1,190+</code> APIs, <code class="text-emerald-300">275+</code> tables). In the first 3 minutes of any technical interview, share your screen and walk through your live architecture — then answer C#/.NET theory questions effortlessly using the plain-language flashcards below.
-            </p>
+    <!-- VIEW 3: CVs, TEMPLATES & INTERVIEW PREP (Unified Resource Hub) -->
+    <section id="tab-coach" class="mt-4 hidden space-y-5">
+      <!-- Sub-View Switcher inside View 3 -->
+      <div class="glass rounded-xl p-3.5 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="setResourceHubSection('cvs')" id="hubBtn-cvs" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition cursor-pointer">
+            📄 My v2 CVs, Kariyer.net &amp; Copy Templates
+          </button>
+          <button type="button" onclick="setResourceHubSection('interview')" id="hubBtn-interview" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
+            🎤 5-Min Live Demo &amp; 36 Interview Q&amp;As
+          </button>
+        </div>
+        <button type="button" onclick="openCopilotDrawer(null); setTimeout(()=>sendCopilotPrompt('Run an interactive 4-question .NET 10 + Architecture + AI mock interview with me right now. Ask me Question 1 first, wait for my answer, grade it honestly, and show how to tie it to PilzPortal and EvenTracer.'), 120);" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow transition cursor-pointer">
+          🤖 Start Live Mock Interview With Copilot
+        </button>
+      </div>
+
+      <!-- Sub-Section A: v2 CVs, Kariyer.net & Copy Templates -->
+      <div id="tab-vault" class="space-y-5">
+        <div id="v2CvKitPanel" class="glass rounded-xl p-5 border border-slate-800"></div>
+
+        <div class="glass rounded-xl p-5 border border-slate-800">
+          <h2 class="text-sm font-bold text-white mb-1">🚀 Kariyer.net — 1-Click "Last 24 Hours" Searches (Istanbul + Gebze / Teknoparks)</h2>
+          <p class="text-xs text-slate-400 mb-3">Opens directly in your browser — attach your Turkish v2 CV + Pilz GM Reference PDF (`Hessam_Mamagani_CV_TR_ve_Referans.pdf`) on Turkish portals.</p>
+          <div class="flex flex-wrap gap-2">
+            <a href="https://www.kariyer.net/is-ilanlari?kw=.net+core&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 .NET Core (24h)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=full+stack+developer&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Full Stack (24h)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+mimari&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Yazılım Mimarı (24h)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=yazilim+muduru&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Team Lead / Müdür (24h)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=teknopark+.net&date=3days" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Teknopark &amp; Ar-Ge (.NET)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=gebze+yazilim+.net&date=7days" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Gebze / Bilişim Vadisi</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=yapay+zeka+ai&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 AI / Yapay Zeka (24h)</a>
+            <a href="https://www.kariyer.net/is-ilanlari?kw=react+typescript&date=1day" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 React / TypeScript (24h)</a>
           </div>
-          <div class="flex flex-wrap items-center gap-2 shrink-0">
-            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-xs">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="vaultCards"></div>
+      </div>
+
+      <!-- Sub-Section B: 5-Minute Live Screen-Share Demo & 36 Interview Flashcards -->
+      <div id="coachInterviewSection" class="hidden space-y-5">
+        <div class="glass rounded-2xl p-5 border border-slate-800 space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base font-bold text-white">🖥️ 5-Minute Live Screen-Share Demo Playbook</h2>
+              <p class="text-xs text-slate-400 mt-0.5">
+                You built 5 live enterprise platforms solo (<code class="text-emerald-300">1,190+</code> APIs, <code class="text-emerald-300">275+</code> tables). Share your screen in the first 3 minutes, then use the flashcards below for theory questions.
+              </p>
+            </div>
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5 text-xs shrink-0">
               <button type="button" onclick="setCoachLang('EN')" id="coachLangBtn-EN" class="px-2.5 py-1 rounded font-bold bg-indigo-600 text-white transition cursor-pointer">🇬🇧 English</button>
               <button type="button" onclick="setCoachLang('TR')" id="coachLangBtn-TR" class="px-2.5 py-1 rounded font-bold text-slate-300 hover:text-white transition cursor-pointer">🇹🇷 Türkçe</button>
               <button type="button" onclick="setCoachLang('BOTH')" id="coachLangBtn-BOTH" class="px-2.5 py-1 rounded font-bold text-slate-300 hover:text-white transition cursor-pointer">🌐 Both</button>
             </div>
-            <button type="button" onclick="openCopilotDrawer(null); setTimeout(()=>sendCopilotPrompt('Run an interactive 4-question .NET 10 + Architecture + AI mock interview with me right now. Ask me Question 1 first, wait for my answer, grade it honestly, and show how to tie it to PilzPortal and EvenTracer.'), 120);" class="px-3.5 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold shadow transition cursor-pointer">
-              🤖 Live Mock Interview With Copilot
-            </button>
           </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="https://pilztr.online/portal" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-300 text-xs font-semibold transition">↗ 1. PilzPortal (450+ APIs · SAP &amp; e-Invoice)</a>
+            <a href="https://eventracer.com/en" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 text-xs font-semibold transition">↗ 2. EvenTracer (380+ APIs · Clean CQRS)</a>
+            <a href="https://insightfulai.online" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-purple-300 text-xs font-semibold transition">↗ 3. InsightfulAI (Multi-LLM RAG + NL2SQL)</a>
+            <a href="https://hessam-mamagani.github.io/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition">↗ Portfolio &amp; Signed GM Letter</a>
+          </div>
+
+          <div id="demoPlaybookContent" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
         </div>
 
-        <!-- Live Demo Links Strip -->
-        <div class="flex flex-wrap items-center gap-2 pt-1">
-          <a href="https://pilztr.online/portal" target="_blank" class="px-3 py-1.5 rounded-lg bg-blue-600/25 hover:bg-blue-600/40 border border-blue-500/40 text-blue-200 text-xs font-bold transition">↗ 1. Open PilzPortal (450+ APIs · SAP &amp; Sovos e-Invoice)</a>
-          <a href="https://eventracer.com/en" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-200 text-xs font-bold transition">↗ 2. Open EvenTracer (380+ APIs · Clean CQRS + Redis)</a>
-          <a href="https://insightfulai.online" target="_blank" class="px-3 py-1.5 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-xs font-bold transition">↗ 3. Open InsightfulAI (Multi-LLM Agentic RAG + NL2SQL)</a>
-          <a href="https://hessam-mamagani.github.io/" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition">↗ Portfolio &amp; Signed GM Letter</a>
+        <!-- Flashcard Filter & Search Bar -->
+        <div class="glass rounded-xl p-4 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-1.5" id="coachCategoryTabs">
+            <button type="button" onclick="setCoachCategory('ALL')" data-coach-cat="ALL" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition cursor-pointer">All (36)</button>
+            <button type="button" onclick="setCoachCategory('DOTNET')" data-coach-cat="DOTNET" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">.NET &amp; C#</button>
+            <button type="button" onclick="setCoachCategory('ARCH')" data-coach-cat="ARCH" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">Architecture</button>
+            <button type="button" onclick="setCoachCategory('DATA')" data-coach-cat="DATA" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">SQL &amp; Redis</button>
+            <button type="button" onclick="setCoachCategory('REACT')" data-coach-cat="REACT" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">React &amp; TS</button>
+            <button type="button" onclick="setCoachCategory('AI')" data-coach-cat="AI" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">AI &amp; RAG</button>
+            <button type="button" onclick="setCoachCategory('HR_LEGAL')" data-coach-cat="HR_LEGAL" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">Permit &amp; Salary</button>
+          </div>
+          <input id="coachSearchInput" oninput="renderCoachTab()" type="text" placeholder="Search topic (e.g. Scoped, IQueryable, CQRS, permit)..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-xs text-white w-full md:w-64 focus:outline-none focus:border-indigo-500" />
         </div>
 
-        <div id="demoPlaybookContent" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+        <div id="coachCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
       </div>
-
-      <!-- Flashcard Filter & Search Bar -->
-      <div class="glass rounded-xl p-4 border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="flex flex-wrap items-center gap-1.5" id="coachCategoryTabs">
-          <button type="button" onclick="setCoachCategory('ALL')" data-coach-cat="ALL" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition cursor-pointer">📚 All Cards (36)</button>
-          <button type="button" onclick="setCoachCategory('DOTNET')" data-coach-cat="DOTNET" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">🟣 .NET &amp; C# Core</button>
-          <button type="button" onclick="setCoachCategory('ARCH')" data-coach-cat="ARCH" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">🏗️ Architecture &amp; APIs</button>
-          <button type="button" onclick="setCoachCategory('DATA')" data-coach-cat="DATA" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">🗄️ SQL · EF Core · Redis</button>
-          <button type="button" onclick="setCoachCategory('REACT')" data-coach-cat="REACT" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">⚛️ React 19 · Next.js · TS</button>
-          <button type="button" onclick="setCoachCategory('AI')" data-coach-cat="AI" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">🤖 AI · RAG · Agents</button>
-          <button type="button" onclick="setCoachCategory('HR_LEGAL')" data-coach-cat="HR_LEGAL" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">⚖️ Permit · Salary · HR Defense</button>
-        </div>
-        <input id="coachSearchInput" oninput="renderCoachTab()" type="text" placeholder="Search topic (e.g. interface, Scoped, IQueryable, CQRS, permit)..." class="bg-slate-900 border border-slate-700 rounded-lg px-3.5 py-2 text-xs md:text-sm text-white w-full md:w-72 focus:outline-none focus:border-indigo-500" />
-      </div>
-
-      <!-- Flashcards Grid -->
-      <div id="coachCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </section>
   </main>
 
@@ -1027,6 +1022,7 @@
 
     function jumpToCompanyCard(compKey) {
       switchTab("pipeline");
+      setPipelineViewMode("compact");
       const filterEl = document.getElementById("pipelineFilter");
       if (filterEl) filterEl.value = "ALL";
       const searchEl = document.getElementById("pipelineSearch");
@@ -3396,40 +3392,175 @@
       document.getElementById("activeSignalsCount").textContent = signals;
     }
 
+    function setResourceHubSection(sec) {
+      const cvsEl = document.getElementById("tab-vault");
+      const intEl = document.getElementById("coachInterviewSection");
+      const btnCvs = document.getElementById("hubBtn-cvs");
+      const btnInt = document.getElementById("hubBtn-interview");
+      const showCvs = sec !== "interview";
+      if (cvsEl) cvsEl.classList.toggle("hidden", !showCvs);
+      if (intEl) intEl.classList.toggle("hidden", showCvs);
+      if (btnCvs) {
+        btnCvs.className = showCvs
+          ? "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition cursor-pointer"
+          : "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer";
+      }
+      if (btnInt) {
+        btnInt.className = !showCvs
+          ? "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition cursor-pointer"
+          : "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer";
+      }
+    }
+
     function switchTab(tab) {
-      ACTIVE_TAB = tab;
-      ["radar", "pipeline", "crm", "vault", "coach"].forEach(t => {
+      let targetView = tab;
+      if (tab === "crm") {
+        targetView = "pipeline";
+        setTimeout(() => setPipelineViewMode("table"), 10);
+      } else if (tab === "vault") {
+        targetView = "coach";
+        setTimeout(() => setResourceHubSection("cvs"), 10);
+      }
+      ACTIVE_TAB = targetView;
+
+      ["radar", "pipeline", "coach"].forEach(t => {
         const el = document.getElementById(`tab-${t}`);
-        if (el) el.classList.toggle("hidden", t !== tab);
+        if (el) el.classList.toggle("hidden", t !== targetView);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (btn) {
-          if (t === tab) {
-            btn.className = t === "pipeline"
-              ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600 text-white shadow-lg transition"
-              : t === "coach"
-              ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-violet-600 text-white shadow-lg transition"
-              : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white shadow-lg transition";
-          } else {
-            btn.className = t === "pipeline"
-              ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-emerald-600/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-600/30 transition"
-              : t === "coach"
-              ? "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-violet-600/20 border border-violet-500/40 text-violet-200 hover:bg-violet-600/30 transition"
-              : "px-3.5 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition";
-          }
+          btn.className = t === targetView
+            ? "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-blue-600 text-white shadow-lg transition cursor-pointer"
+            : "px-4 py-2 rounded-lg text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer";
         }
       });
+
       const scanControlsEl = document.getElementById("scanControls");
-      if (scanControlsEl) scanControlsEl.classList.toggle("hidden", tab !== "radar");
+      if (scanControlsEl) scanControlsEl.classList.toggle("hidden", targetView !== "radar");
       const countryBarEl = document.getElementById("globalCountryBar");
-      if (countryBarEl) countryBarEl.classList.toggle("hidden", !["radar", "pipeline", "crm"].includes(tab));
+      if (countryBarEl) countryBarEl.classList.toggle("hidden", !["radar", "pipeline"].includes(targetView));
 
       updateGlobalCountryCounts();
       refreshScanButtonLabel();
-      if (tab === "radar") renderRadarList();
-      if (tab === "pipeline") renderUnifiedPipeline();
-      if (tab === "crm") renderCrm();
-      if (tab === "vault") renderVault();
-      if (tab === "coach" && typeof renderCoachTab === "function") renderCoachTab();
+      if (targetView === "radar") {
+        renderTodayActionStrip();
+        renderRadarList();
+      }
+      if (targetView === "pipeline") {
+        renderUnifiedPipeline();
+        renderCrm();
+      }
+      if (targetView === "coach") {
+        renderVault();
+        if (typeof renderCoachTab === "function") renderCoachTab();
+      }
+    }
+
+    function renderTodayActionStrip() {
+      const strip = document.getElementById("todayActionStrip");
+      if (!strip) return;
+      if (!UNIFIED_PIPELINE_ITEMS.length) {
+        try { UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList(); } catch {}
+      }
+      const checks = getPipelineCheckState();
+      const actions = [];
+
+      // 1. Hot Signals (Interview / CV Downloaded / Viewed) needing follow-up
+      for (const item of UNIFIED_PIPELINE_ITEMS) {
+        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        const ch = resolveItemChannels(item, checks);
+        if (["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status) && (!ch.email || !ch.techDm)) {
+          actions.push({
+            tag: item.status,
+            company: item.company,
+            role: item.cleanRole || item.role,
+            reason: !ch.email ? "Hot signal — send direct follow-up email + CTO LinkedIn DM" : "Hot signal — message Engineering Lead / Recruiter on LinkedIn",
+            btnLabel: "📂 Open Outreach",
+            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}')`,
+            itemId: item.id
+          });
+        }
+        if (actions.length >= 2) break;
+      }
+
+      // 2. Unfinished External Portals ('Clicked Apply ⏳')
+      for (const item of UNIFIED_PIPELINE_ITEMS) {
+        if (actions.length >= 3) break;
+        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        const ch = resolveItemChannels(item, checks);
+        if (item.hasUnfinishedPortal && !ch.applied) {
+          actions.push({
+            tag: "⏳ Finish Portal",
+            company: item.company,
+            role: item.cleanRole || item.role,
+            reason: "External portal opened — complete submission & attach v2 CV",
+            btnLabel: "↗ Finish Portal",
+            href: item.jobUrl,
+            itemId: item.id
+          });
+        }
+      }
+
+      // 3. Fast-Track Sponsors needing direct Email or Tech DM
+      for (const item of UNIFIED_PIPELINE_ITEMS) {
+        if (actions.length >= 4) break;
+        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        if (actions.some(a => a.itemId === item.id)) continue;
+        const ch = resolveItemChannels(item, checks);
+        if ((item.smartMeta?.isFastSponsor || item.giantRank) && (!ch.email || !ch.techDm)) {
+          actions.push({
+            tag: item.giantRank ? `🏆 #${item.giantRank} Sponsor` : "⚡ Fast Sponsor",
+            company: item.company,
+            role: item.cleanRole || item.role,
+            reason: ch.applied ? "Applied — send direct HR email & Tech Lead DM today" : "High-fit sponsor — apply & send direct outreach",
+            btnLabel: "📂 Open Outreach",
+            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}')`,
+            itemId: item.id
+          });
+        }
+      }
+
+      if (!actions.length) {
+        strip.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+            <span class="text-slate-300"><strong>☀️ Today's Focus:</strong> Scan unseen jobs below or review your active applications in View 2.</span>
+            <button type="button" onclick="openCopilotDrawer(null); setTimeout(()=>sendCopilotPrompt('Give me my top 4 highest-impact actions for today based on my live D1 CRM and Dec 31 deadline.'), 100);" class="text-emerald-400 hover:underline font-semibold cursor-pointer">🤖 Ask Copilot for Today's Plan →</button>
+          </div>
+        `;
+        return;
+      }
+
+      strip.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <div>
+            <h2 class="text-sm font-bold text-white">☀️ Today's Priority Actions (Next ${actions.length} Concrete Steps)</h2>
+            <p class="text-xs text-slate-400">Auto-prioritized from your live D1 applications, hot signals, and fast work-permit sponsors.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='UNFINISHED_PORTAL'; renderUnifiedPipeline();" class="text-slate-300 hover:text-white cursor-pointer">⏳ Unfinished Portals</button>
+            <span class="text-slate-700">&middot;</span>
+            <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='FAST_HIRE_DEC31'; renderUnifiedPipeline();" class="text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">⚡ All Fast Sponsors →</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          ${actions.map(act => `
+            <div class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 hover:border-slate-700 flex flex-col justify-between gap-2">
+              <div>
+                <div class="flex items-center justify-between gap-1.5 text-[11px] text-slate-400 mb-0.5">
+                  <span class="font-semibold text-amber-300">${escapeHtmlSafe(act.tag)}</span>
+                  <button type="button" onclick="openCopilotForPipelineItem('${act.itemId}')" class="text-slate-400 hover:text-emerald-300 font-semibold cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(act.company)}">🤖 Copilot</button>
+                </div>
+                <div class="text-xs font-bold text-white truncate">${escapeHtmlSafe(act.company)}</div>
+                <div class="text-[11px] text-slate-300 truncate">${escapeHtmlSafe(act.role)}</div>
+                <p class="text-[11px] text-slate-400 mt-1 leading-snug">${escapeHtmlSafe(act.reason)}</p>
+              </div>
+              ${act.href
+                ? `<a href="${act.href}" target="_blank" class="w-full py-1.5 px-2.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-center text-xs font-semibold transition">${act.btnLabel}</a>`
+                : `<button type="button" onclick="${act.onClick}" class="w-full py-1.5 px-2.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-100 text-xs font-semibold transition cursor-pointer">${act.btnLabel}</button>`
+              }
+            </div>
+          `).join("")}
+        </div>
+      `;
     }
 
     function mergeFreshScanJobs(freshJobs, fallbackCountry) {
@@ -3558,6 +3689,7 @@
     }
 
     function renderRadarList() {
+      renderTodayActionStrip();
       const container = document.getElementById("radarList");
       if (!container) return;
       const pool = (ALL_SCAN_JOBS && ALL_SCAN_JOBS.length) ? ALL_SCAN_JOBS : LAST_SCAN_JOBS;
@@ -3593,65 +3725,56 @@
         const smartMeta = computeClientSmartSalaryAndTier(job.company, job.title, job.location, job.description || "");
         const salaryDisplay = job.recommendedSalary || smartMeta.salaryBand;
         const cvCode = job.recommendedCvCode || smartMeta.cvCode;
-        const legalSnippet = buildLegalSponsorSnippet(cg, cvCode === "TR" ? "TR" : "EN");
-        const legalCopyKey = registerCopyPayload("radar-legal-" + job.id, legalSnippet);
 
-        const badgeColor = job.score >= 80 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40" :
-                           job.score >= 65 ? "bg-blue-500/20 text-blue-300 border-blue-500/40" :
-                                             "bg-slate-700 text-slate-300 border-slate-600";
-        const tierBadgeClass = smartMeta.tier === "TIER1"
-          ? "bg-amber-500/20 text-amber-200 border-amber-500/40"
-          : smartMeta.tier === "TIER2"
-          ? "bg-cyan-500/15 text-cyan-200 border-cyan-500/30"
-          : "bg-slate-800 text-slate-300 border-slate-700";
+        const scoreColor = job.score >= 80 ? "text-emerald-300 bg-emerald-500/15 border-emerald-500/30" :
+                           job.score >= 65 ? "text-blue-300 bg-blue-500/15 border-blue-500/30" :
+                                             "text-slate-300 bg-slate-800 border-slate-700";
 
         return `
-          <div id="jobcard-${job.id}" class="glass rounded-xl p-4 hover:border-blue-500/40 transition">
+          <div id="jobcard-${job.id}" class="glass rounded-xl p-4 border border-slate-800 hover:border-slate-700 transition">
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-slate-900 text-slate-200 border border-slate-700">${cMeta.flag} ${cMeta.short}</span>
-                  <span class="px-2 py-0.5 text-xs font-bold rounded border ${badgeColor}">Match ${job.score}%</span>
-                  <span class="px-2 py-0.5 text-[11px] font-semibold rounded border ${tierBadgeClass}">${escapeHtmlSafe(smartMeta.tierLabel)}</span>
-                  <span class="text-xs text-emerald-400 font-medium">${escapeHtmlSafe(job.postedAgo || "Recent")}</span>
-                  ${smartMeta.isDemoWin ? `<span class="px-2 py-0.5 text-[11px] font-bold rounded bg-violet-500/20 text-violet-200 border border-violet-500/40">🖥️ Demo-Win Role</span>` : ""}
-                  ${(job.tags || []).map(t => `<span class="px-2 py-0.5 text-[11px] rounded bg-slate-800 text-slate-300">${escapeHtmlSafe(t)}</span>`).join("")}
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="px-2 py-0.5 text-xs font-bold rounded border ${scoreColor}">${job.score}% Match</span>
+                  <h3 class="text-sm md:text-base font-bold text-white cursor-pointer hover:text-blue-300 transition" onclick="inspectJob('${job.id}')">${escapeHtmlSafe(job.title)}</h3>
                 </div>
-                <h3 class="text-base font-bold text-white mt-1.5">${escapeHtmlSafe(job.title)}</h3>
-                <p class="text-sm text-slate-300 font-medium">${escapeHtmlSafe(job.company)} &middot; <span class="text-slate-400">${escapeHtmlSafe(job.location)}</span></p>
-                <div class="flex items-center gap-2 flex-wrap mt-1.5 text-[11px]">
-                  <span class="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-300 font-semibold">💰 ${escapeHtmlSafe(salaryDisplay)}</span>
-                  <span class="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-semibold">📄 CV: ${escapeHtmlSafe(cvCode)}</span>
-                  <span class="text-slate-400">${escapeHtmlSafe(smartMeta.hiringSpeed)}</span>
-                </div>
-                ${job.aiVerdict ? `<p class="text-xs text-blue-300/90 mt-1">🤖 ${escapeHtmlSafe(job.aiVerdict)}</p>` : ""}
+                <p class="text-xs md:text-sm text-slate-200 font-medium mt-1">
+                  ${cMeta.flag} ${escapeHtmlSafe(job.company)}
+                  <span class="text-slate-500">&middot;</span>
+                  <span class="text-slate-400 font-normal">${escapeHtmlSafe(job.location)}</span>
+                  <span class="text-slate-500">&middot;</span>
+                  <span class="text-emerald-400/90 text-xs font-normal">${escapeHtmlSafe(job.postedAgo || "Recent")}</span>
+                </p>
+                <p class="text-xs text-slate-400 mt-1">
+                  Quote: <span class="text-amber-300 font-medium">${escapeHtmlSafe(salaryDisplay)}</span>
+                  <span class="text-slate-600 mx-1">&middot;</span>
+                  CV: <span class="text-slate-200 font-medium">${escapeHtmlSafe(cvCode)}</span>
+                  <span class="text-slate-600 mx-1">&middot;</span>
+                  <span>${escapeHtmlSafe(smartMeta.hiringSpeed)}</span>
+                </p>
               </div>
-              <div class="flex flex-col gap-1.5 shrink-0">
+              <div class="flex items-center gap-1.5 shrink-0">
                 <button onclick="inspectJob('${job.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
-                  🔎 Inspect & Score
+                  🔎 Inspect
                 </button>
-                <button onclick="openCopilotForScannerJob('${job.id}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white cursor-pointer">
-                  🤖 Ask Copilot
-                </button>
-                <a href="${job.url}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 text-center">
-                  ↗ Open LinkedIn
+                <a href="${job.url}" target="_blank" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200">
+                  ↗ Apply
                 </a>
-                ${job.hiringPosterUrl ? `<a href="${job.hiringPosterUrl}" target="_blank" class="px-3 py-1 rounded-lg text-[11px] font-bold bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-center">👩‍💼 ${escapeHtmlSafe(job.hiringPoster || "Hiring Poster")} ↗</a>` : ""}
               </div>
             </div>
             <div class="mt-3 pt-2.5 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap text-xs">
-              <div class="flex items-center gap-2">
-                <span class="text-slate-500">ID: ${job.id}</span>
-                <button type="button" onclick="copyFromStore('${legalCopyKey}', this, '⚖️ Visa/Muafiyet HR note copied!')" class="px-2 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-200 text-[11px] font-semibold cursor-pointer">
-                  ⚖️ Copy Visa/Muafiyet Note
-                </button>
+              <div class="flex items-center gap-2 text-slate-400">
+                ${(job.tags || []).slice(0, 4).length ? `<span>${(job.tags || []).slice(0, 4).map(escapeHtmlSafe).join(" · ")}</span>` : `<span>#${job.id}</span>`}
               </div>
-              <div class="flex gap-2">
-                <button onclick="quickMarkApplied('${job.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-medium cursor-pointer">
+              <div class="flex items-center gap-1.5">
+                <button onclick="openCopilotForScannerJob('${job.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold cursor-pointer">
+                  🤖 Copilot
+                </button>
+                <button onclick="quickMarkApplied('${job.id}')" class="px-2.5 py-1 rounded bg-emerald-600/20 hover:bg-emerald-600/35 text-emerald-300 font-semibold cursor-pointer">
                   ✅ Mark Applied
                 </button>
-                <button onclick="quickSkip('${job.id}')" class="px-2.5 py-1 rounded bg-rose-600/15 hover:bg-rose-600/25 text-rose-300 font-medium cursor-pointer">
-                  ✕ Skip / Hide
+                <button onclick="quickSkip('${job.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 cursor-pointer">
+                  ✕ Skip
                 </button>
               </div>
             </div>
@@ -4245,12 +4368,22 @@
       localStorage.setItem("jr_pipeline_view_mode", m);
       localStorage.setItem("jr_vip_view_mode", m);
       const bCompact = document.getElementById("pipelineViewBtn-compact") || document.getElementById("vipViewBtn-compact");
+      const bTable = document.getElementById("pipelineViewBtn-table");
       const bCards = document.getElementById("pipelineViewBtn-cards") || document.getElementById("vipViewBtn-cards");
-      if (bCompact && bCards) {
-        bCompact.className = m === "compact" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
-        bCards.className = m === "cards" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition";
+      if (bCompact) bCompact.className = m === "compact" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition cursor-pointer" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer";
+      if (bTable) bTable.className = m === "table" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition cursor-pointer" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer";
+      if (bCards) bCards.className = m === "cards" ? "px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition cursor-pointer" : "px-2.5 py-1 rounded text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer";
+
+      const pipeCont = document.getElementById("pipelineContainer");
+      const crmCont = document.getElementById("tab-crm");
+      if (pipeCont) pipeCont.classList.toggle("hidden", m === "table");
+      if (crmCont) crmCont.classList.toggle("hidden", m !== "table");
+
+      if (m === "table") {
+        renderCrm();
+      } else {
+        renderUnifiedPipeline();
       }
-      renderUnifiedPipeline();
     }
     function setVipViewMode(m) { setPipelineViewMode(m); }
 
@@ -6142,23 +6275,24 @@
         <div class="p-4 bg-slate-950/90 border-t border-slate-800/90 space-y-4 text-xs">
           ${renderRolesSummaryHtml(item)}
 
-          <!-- 2027 Smart Salary, Tier, Visa/Muafiyet & Pop-Out Copilot Strip -->
-          <div class="p-3 rounded-xl bg-gradient-to-r from-emerald-950/40 via-slate-900/90 to-indigo-950/40 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex flex-wrap items-center gap-1.5">
-              <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-200 text-[11px] font-bold">${cMeta.flag} ${cMeta.label}</span>
-              <span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-[11px] font-bold">💰 Quote: ${escapeHtmlSafe(smart.salaryBand)}</span>
-              <span class="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-200 text-[11px] font-semibold">${escapeHtmlSafe(smart.tierLabel)}</span>
-              <span class="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-200 text-[11px] font-semibold">${escapeHtmlSafe(smart.hiringSpeed)}</span>
-              <span class="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-200 text-[11px] font-semibold">📄 CV: ${escapeHtmlSafe(smart.cvFile || smart.recommendedCv || "Hessam_Mamagani_CV_EN.pdf")}</span>
-              <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-indigo-600/40 hover:bg-indigo-600/65 border border-indigo-400/50 text-indigo-100 text-[11px] font-bold transition">📥 Download v2 (${smart.cvCode === 'TR' ? 'TR+Ref 3p' : 'EN 2p'})</a>
-              <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr' : 'en_ref', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold transition">📥 ${smart.cvCode === 'TR' ? 'TR 2p' : 'EN+Ref 3p'}</a>
+          <!-- 2027 Smart Salary, Tier, Visa/Muafiyet & Pop-Out Copilot Strip (Clean Plain Text + Action Buttons) -->
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs text-slate-300 leading-relaxed">
+              <strong class="text-white">${cMeta.flag} ${cMeta.label}</strong>
+              <span class="text-slate-600 mx-1.5">&middot;</span>
+              <span>Quote: <strong class="text-amber-300">${escapeHtmlSafe(smart.salaryBand)}</strong></span>
+              <span class="text-slate-600 mx-1.5">&middot;</span>
+              <span>${escapeHtmlSafe(smart.tierLabel)}</span>
+              <span class="text-slate-600 mx-1.5">&middot;</span>
+              <span class="text-slate-400">${escapeHtmlSafe(smart.hiringSpeed)}</span>
             </div>
             <div class="flex flex-wrap items-center gap-1.5">
-              <button type="button" onclick="copyFromStore('${copyLegalKey}', this, '⚖️ Visa / Muafiyet note copied!')" class="px-2.5 py-1 rounded-lg bg-amber-600/25 hover:bg-amber-600/45 text-amber-200 border border-amber-500/40 text-[11px] font-bold cursor-pointer transition" title="Copy ready-to-paste ÇSGB Muafiyeti / Visa sponsorship note for HR">
-                ⚖️ Copy Visa / Muafiyet HR Note
+              <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold transition">📥 Download CV (${smart.cvCode === 'TR' ? 'TR+Ref 3p' : 'EN 2p'})</a>
+              <button type="button" onclick="copyFromStore('${copyLegalKey}', this, '⚖️ Visa / Muafiyet note copied!')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 text-[11px] font-semibold cursor-pointer transition" title="Copy ready-to-paste ÇSGB Muafiyeti / Visa sponsorship note for HR">
+                ⚖️ Copy Visa Note
               </button>
               <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow cursor-pointer transition">
-                🤖 Slide-Over Copilot
+                🤖 Open Copilot
               </button>
             </div>
           </div>
@@ -6375,88 +6509,74 @@
       const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(cleanComp)}${geoParam}`;
       const rowDmKey = registerCopyPayload(`row_dm_${item.id}`, dmText);
 
-      const rankLabel = item.giantRank ? `#${item.giantRank}` : (ch.applied ? "CRM" : "PRO");
       const statusBadgeHtml = item.status === "Interview 🎯"
-        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/25 text-purple-200 border border-purple-400/50 animate-pulse">🎯 Interview Invite</span>`
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/25 text-purple-200 border border-purple-400/50">🎯 Interview</span>`
         : item.status === "CV Downloaded ⭐"
-        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 text-amber-200 border border-amber-400/50">⭐ CV Downloaded</span>`
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-200 border border-amber-400/40">⭐ CV Downloaded</span>`
         : item.status === "Viewed 👀"
-        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/25 text-cyan-200 border border-cyan-400/50">👀 Viewed</span>`
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">👀 Viewed</span>`
         : item.hasUnfinishedPortal && !ch.applied
         ? `<a href="${item.jobUrl}" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/50">⏳ Finish Portal ↗</a>`
         : ch.applied
-        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Applied (${doneCount}/6)</span>`
-        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Target (${doneCount}/6)</span>`;
+        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">Applied (${doneCount}/6)</span>`
+        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Target (${doneCount}/6)</span>`;
 
       const rowBorder = item.status === "Interview 🎯"
         ? "border-purple-500/60 bg-purple-950/15"
         : doneCount >= 3
-        ? "border-emerald-500/50 bg-emerald-950/15"
-        : item.giantRank
-        ? "border-blue-500/40 hover:border-emerald-500/40"
+        ? "border-emerald-500/40 bg-emerald-950/10"
         : "border-slate-800 hover:border-slate-700";
+
+      const locationShort = item.clusterLabel.split("(")[0].replace(/^📍\s*/, "").trim();
 
       return `
         <div id="pipeRow-${item.id}" class="glass rounded-xl border ${rowBorder} transition overflow-hidden">
-          <!-- Compact Single-Row Bar -->
-          <div class="p-3 flex flex-wrap items-center justify-between gap-2.5 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
-            <div class="flex items-center gap-2.5 flex-1 min-w-[260px]">
-              <span class="px-2 py-1 rounded-lg text-xs font-extrabold shrink-0 ${item.giantRank ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40' : 'bg-slate-800 text-slate-300 border border-slate-700'}">
-                ${rankLabel}
-              </span>
+          <!-- Clean Single-Row Summary Bar -->
+          <div class="p-3.5 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
+            <div class="flex items-start gap-2.5 flex-1 min-w-[260px]">
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap">
-                  <span class="text-[11px]" title="${cMeta.label}">${cMeta.flag}</span>
-                  <span class="text-sm font-bold text-white hover:text-blue-300 transition">${item.company}</span>
-                  <span class="text-[11px] px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${item.clusterLabel.split("(")[0].trim()}</span>
-                  <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">💰 ${escapeHtmlSafe(smart.salaryBand)}</span>
-                  ${smart.isFastSponsor && !item.isAgency ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-bold bg-cyan-500/15 text-cyan-200 border border-cyan-500/30">${escapeHtmlSafe(smart.hiringSpeed)}</span>` : ""}
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-sm font-bold text-white hover:text-blue-300 transition">${cMeta.flag} ${item.company}</span>
                   ${statusBadgeHtml}
-                  ${item.rejectedRoles?.length && item.activeRoles?.length ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-600/25 text-emerald-200 border border-emerald-500/30" title="${item.rejectedRoles.length} older role closed, ${item.activeRoles.length} role STILL ACTIVE">${item.activeRoles.length} Active · ${item.rejectedRoles.length} Closed</span>` : ""}
-                  ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">${item.vipBadge}</span>` : ""}
+                  ${item.giantRank ? `<span class="text-[11px] text-amber-300/90 font-semibold">#${item.giantRank} Sponsor</span>` : ""}
                 </div>
-                <p class="text-xs text-slate-400 font-medium truncate max-w-lg mt-0.5">${item.role}</p>
+                <p class="text-xs text-slate-300 font-medium truncate max-w-xl mt-0.5">${item.role}</p>
+                <p class="text-[11px] text-slate-400 mt-0.5">
+                  <span>📍 ${escapeHtmlSafe(locationShort)}</span>
+                  <span class="text-slate-600 mx-1">&middot;</span>
+                  <span>Quote: <strong class="text-amber-300/90 font-medium">${escapeHtmlSafe(smart.salaryBand)}</strong></span>
+                  ${smart.isFastSponsor && !item.isAgency ? `<span class="text-slate-600 mx-1">&middot;</span><span class="text-cyan-300/90">${escapeHtmlSafe(smart.hiringSpeed)}</span>` : ""}
+                </p>
               </div>
             </div>
 
-            <!-- Single Language Switcher Pill (Controls entire card) -->
-            <div class="flex items-center gap-0.5 bg-black/60 p-1 rounded-lg border border-slate-700/80 text-[10px] shrink-0" onclick="event.stopPropagation()">
-              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="English outreach">🇬🇧 EN</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">🇹🇷 TR</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual (Turkish on top + English underneath)">🌐 Both</button>
+            <!-- Language Switcher (EN / TR / Both) -->
+            <div class="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px] shrink-0" onclick="event.stopPropagation()">
+              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}" title="English outreach">EN</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">TR</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}" title="Bilingual TR+EN">Both</button>
             </div>
 
             <!-- 6-Channel Outreach Checkboxes -->
             ${renderSixChannelCheckboxes(item, ch, true)}
 
-            <!-- Collapsed Quick Actions vs Expanded Close Button (Zero Duplication!) -->
+            <!-- Clean Action Buttons -->
             <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
               ${!isExpanded ? `
-                ${item.aiIntel?.emailVerification?.deliverable && item.email ? `
-                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition" title="Live DNS MX Verified (${escapeHtmlSafe(item.aiIntel.emailVerification.gateway || 'SMTP')}): ${escapeHtmlSafe(item.email)}">
-                    🛡️✉️ Gmail
+                ${!(item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) ? `
+                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="${item.email ? 'Open Gmail to ' + escapeHtmlSafe(item.email) : 'Open Gmail draft'}">
+                    ✉️ Email
                   </a>
-                ` : (item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) ? `
-                  <span class="px-2 py-1 rounded bg-slate-800/90 text-amber-300 border border-amber-500/30 text-[10px] font-semibold" title="${escapeHtmlSafe(item.aiIntel.emailVerification.reason || 'Use LinkedIn DM + Career Portal')}">
-                    ⚠️ DM Only
-                  </span>
-                ` : `
-                  <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2 py-1 rounded bg-teal-600/35 hover:bg-teal-600/60 text-teal-200 border border-teal-500/40 font-semibold text-[11px] transition cursor-pointer" title="AI Agent discovers ${escapeHtmlSafe(cleanComp)}'s published HR/Kariyer email & verifies live DNS MX records">
-                    🛡️ Verify Mail
-                  </button>
-                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-red-600/80 hover:bg-red-500 text-white font-semibold text-xs transition" title="${item.email ? 'Quick-open pre-filled Gmail to ' + escapeHtmlSafe(item.email) : 'Open Gmail draft'}">
-                    ✉️ Gmail
-                  </a>
-                `}
-                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 Tech DM copied!')" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition cursor-pointer" title="Quick-copy Tech Lead LinkedIn DM without expanding">
+                ` : ""}
+                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 Tech DM copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy Tech Lead LinkedIn DM">
                   💬 Copy DM
                 </button>
-                <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 font-bold text-xs transition cursor-pointer" title="Open slide-over AI Copilot synced to Cloudflare D1">
+                <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-semibold text-xs transition cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(cleanComp)}">
                   🤖 Copilot
                 </button>
               ` : ""}
-              <button type="button" onclick="togglePipelineExpand('${item.id}')" class="px-3 py-1 rounded ${isExpanded ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow'} text-xs font-bold transition cursor-pointer">
-                ${isExpanded ? '▲ Close Workspace' : '📂 Workspace'}
+              <button type="button" onclick="togglePipelineExpand('${item.id}')" class="px-3 py-1 rounded ${isExpanded ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} text-xs font-semibold transition cursor-pointer">
+                ${isExpanded ? '▲ Close' : '📂 Details'}
               </button>
             </div>
           </div>
