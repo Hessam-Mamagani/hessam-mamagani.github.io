@@ -1320,19 +1320,34 @@
       await loadState();
     }
 
+    function filterChatByClearedTs(key, arr = []) {
+      if (!Array.isArray(arr) || !arr.length) return [];
+      try {
+        const clearedAt = Number(localStorage.getItem(`jr_chat_cleared_${key}`) || "0");
+        if (!clearedAt) return arr;
+        return arr.filter(m => {
+          const t = m?.ts ? Date.parse(m.ts) : 0;
+          return t && t > clearedAt;
+        });
+      } catch {
+        return arr;
+      }
+    }
+
     function loadLocalChatsMap() {
       const out = {};
       try {
         const mapRaw = JSON.parse(localStorage.getItem("jr_job_chats_map_v1") || "{}") || {};
         for (const [k, v] of Object.entries(mapRaw)) {
-          if (Array.isArray(v) && v.length) out[k] = v;
+          const clean = filterChatByClearedTs(k, v);
+          if (clean.length) out[k] = clean;
         }
         for (let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
-          if (k && k.startsWith("jr_chat_")) {
+          if (k && k.startsWith("jr_chat_") && !k.startsWith("jr_chat_cleared_")) {
             const itemId = k.slice("jr_chat_".length);
-            const arr = JSON.parse(localStorage.getItem(k) || "[]");
-            if (Array.isArray(arr) && arr.length && (!out[itemId] || arr.length > out[itemId].length)) {
+            const arr = filterChatByClearedTs(itemId, JSON.parse(localStorage.getItem(k) || "[]"));
+            if (arr.length && (!out[itemId] || arr.length > out[itemId].length)) {
               out[itemId] = arr;
             }
           }
@@ -1345,8 +1360,14 @@
       const merged = { ...(localChats || {}) };
       for (const [k, rArr] of Object.entries(remoteChats || {})) {
         if (!Array.isArray(rArr)) continue;
-        const lArr = Array.isArray(merged[k]) ? merged[k] : [];
-        merged[k] = rArr.length >= lArr.length ? rArr : lArr;
+        const cleanRemote = filterChatByClearedTs(k, rArr);
+        const lArr = filterChatByClearedTs(k, Array.isArray(merged[k]) ? merged[k] : []);
+        const chosen = cleanRemote.length >= lArr.length ? cleanRemote : lArr;
+        if (chosen.length) {
+          merged[k] = chosen;
+        } else {
+          delete merged[k];
+        }
       }
       return merged;
     }
@@ -5746,11 +5767,11 @@
 
     function getJobChatHistory(itemId) {
       const key = String(itemId);
-      const fromState = Array.isArray(STATE.jobChats?.[key]) ? STATE.jobChats[key] : [];
+      const fromState = filterChatByClearedTs(key, Array.isArray(STATE.jobChats?.[key]) ? STATE.jobChats[key] : []);
       let fromLocal = [];
       try {
         const parsed = JSON.parse(localStorage.getItem(`jr_chat_${key}`) || "[]");
-        if (Array.isArray(parsed)) fromLocal = parsed;
+        if (Array.isArray(parsed)) fromLocal = filterChatByClearedTs(key, parsed);
       } catch {}
       return fromLocal.length >= fromState.length ? fromLocal : fromState;
     }
@@ -5759,9 +5780,25 @@
       const key = String(itemId);
       const trimmed = (list || []).slice(-24);
       if (!STATE.jobChats) STATE.jobChats = {};
-      STATE.jobChats[key] = trimmed;
+      if (trimmed.length === 0) {
+        delete STATE.jobChats[key];
+      } else {
+        STATE.jobChats[key] = trimmed;
+      }
       try {
-        localStorage.setItem(`jr_chat_${key}`, JSON.stringify(trimmed));
+        if (trimmed.length === 0) {
+          localStorage.setItem(`jr_chat_cleared_${key}`, String(Date.now()));
+          localStorage.removeItem(`jr_chat_${key}`);
+        } else {
+          localStorage.setItem(`jr_chat_${key}`, JSON.stringify(trimmed));
+        }
+        const mapRaw = JSON.parse(localStorage.getItem("jr_job_chats_map_v1") || "{}") || {};
+        if (trimmed.length === 0) {
+          delete mapRaw[key];
+        } else {
+          mapRaw[key] = trimmed;
+        }
+        localStorage.setItem("jr_job_chats_map_v1", JSON.stringify(mapRaw));
       } catch {}
       if (syncCloud) {
         if (IS_LOCAL) {
@@ -5777,18 +5814,7 @@
 
     function clearJobChat(itemId) {
       const key = String(itemId);
-      if (STATE.jobChats) STATE.jobChats[key] = [];
-      try {
-        localStorage.removeItem(`jr_chat_${key}`);
-      } catch {}
-      if (IS_LOCAL) {
-        fetch("/api/job-chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ itemId: key, history: [] })
-        }).catch(() => {});
-      }
-      d1Post("/api/job-chat", { itemId: key, history: [] });
+      saveJobChatHistory(key, [], true);
       renderUnifiedPipeline();
       if (typeof renderCopilotDrawer === "function") renderCopilotDrawer();
       showToast("🗑️ Cleared chat thread across local & Cloudflare D1.", true);
@@ -7606,7 +7632,7 @@
         ];
         chipsEl.innerHTML = quickList.map((chip, idx) => {
           const pKey = registerCopyPayload(`cp_chip_${chatKey}_${idx}`, chip.prompt);
-          return `<button type="button" onclick="sendCopilotPrompt(COPY_STORE['${pKey}'])" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
+          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
         }).join("");
       } else {
         if (badgeEl) badgeEl.textContent = "🌐 Global Career, Legal, Salary & Interview Copilot";
@@ -7622,7 +7648,7 @@
         ];
         chipsEl.innerHTML = globalChips.map((chip, idx) => {
           const pKey = registerCopyPayload(`cp_gchip_${idx}`, chip.prompt);
-          return `<button type="button" onclick="sendCopilotPrompt(COPY_STORE['${pKey}'])" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
+          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
         }).join("");
       }
 
