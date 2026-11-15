@@ -3800,7 +3800,9 @@
       if (!msg || !outEl) return;
       inputEl.value = "";
       outEl.classList.remove("hidden");
-      outEl.textContent = `🤖 Thinking about ${d.company || "this role"}...`;
+      const chatKey = `SCAN_${id}`;
+      const priorHistory = getJobChatHistory(chatKey);
+      outEl.textContent = `🧠 Orchestrator routing (${priorHistory.length} prior turns in memory) → 📂 CV Vault · 🗄️ D1 CRM · 🌐 Web Subagent...`;
       if (btnEl) { btnEl.disabled = true; btnEl.textContent = "⏳"; }
       const cg = classifyCountryGroup(d.company, d.location, d.countryGroup);
       const smartMeta = computeClientSmartSalaryAndTier(d.company, d.title, d.location, d.description || "");
@@ -3810,8 +3812,9 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            chatKey: `scan_${id}`,
+            chatKey,
             message: msg,
+            history: priorHistory,
             jobContext: {
               id: String(id),
               company: d.company || "Target Company",
@@ -3827,9 +3830,25 @@
           })
         });
         const data = await res.json();
-        const textToCopy = data.copySnippet || data.reply || "";
+        const snippet = data.copySnippet || data.copyableAnswer || "";
+        const textToCopy = snippet || data.reply || "";
         const copyKey = registerCopyPayload(`scanner_agent_${id}`, textToCopy);
-        outEl.innerHTML = `<div class="flex items-center justify-between gap-2 mb-1"><span class="text-[10px] font-bold text-emerald-300">🤖 Copilot (${escapeHtmlSafe(data.provider || "Cloud AI")})</span><div class="flex gap-1.5"><button type="button" onclick="openCopilotForScannerJob('${id}')" class="px-2 py-0.5 rounded bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-bold cursor-pointer">↗ Expand Thread</button><button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Copied!')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy</button></div></div><pre class="whitespace-pre-wrap font-sans text-xs text-slate-100">${escapeHtmlSafe(data.reply || "No reply returned.")}</pre>`;
+        const nextHistory = [
+          ...priorHistory,
+          { role: "user", content: msg, ts: new Date().toISOString() },
+          {
+            role: "assistant",
+            content: data.reply || "",
+            copySnippet: snippet,
+            copyableAnswer: snippet,
+            agentTrace: data.agentTrace || [],
+            provider: data.provider || "",
+            ts: new Date().toISOString()
+          }
+        ];
+        saveJobChatHistory(chatKey, nextHistory, true);
+        const tracePills = (data.agentTrace || []).map(t => `<span class="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-[9px] text-cyan-300" title="${escapeHtmlSafe(t.summary || '')}">${escapeHtmlSafe(t.agent)}</span>`).join("");
+        outEl.innerHTML = `<div class="flex items-center justify-between gap-2 mb-1 flex-wrap"><span class="text-[10px] font-bold text-emerald-300">🧠 Orchestrator (${escapeHtmlSafe(data.provider || "Cloud AI")} · ${nextHistory.length} turns)</span><div class="flex gap-1.5"><button type="button" onclick="openCopilotForScannerJob('${id}')" class="px-2 py-0.5 rounded bg-violet-600 hover:bg-violet-500 text-white text-[10px] font-bold cursor-pointer">↗ Expand Full Thread (${nextHistory.length})</button><button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Copied!')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy</button></div></div>${tracePills ? `<div class="flex flex-wrap gap-1 mb-1.5">${tracePills}</div>` : ""}<pre class="whitespace-pre-wrap font-sans text-xs text-slate-100">${escapeHtmlSafe(data.reply || "No reply returned.")}</pre>${snippet ? `<div class="mt-2 p-2 rounded bg-emerald-950/50 border border-emerald-500/40"><div class="text-[10px] font-bold text-emerald-300 mb-1">📋 Ready-to-Paste Snippet:</div><pre class="whitespace-pre-wrap font-sans text-[11px] text-emerald-100">${escapeHtmlSafe(snippet)}</pre></div>` : ""}`;
       } catch (e) {
         outEl.textContent = "Error reaching AI Copilot: " + e.message;
       } finally {
@@ -5782,12 +5801,16 @@
       }
       return history.map((msg, idx) => {
         const isUser = msg.role === "user";
-        const snippetKey = msg.copySnippet ? registerCopyPayload(`agent_snip_${itemId}_${idx}`, msg.copySnippet) : "";
+        const snippetText = msg.copySnippet || msg.copyableAnswer || "";
+        const snippetKey = snippetText ? registerCopyPayload(`agent_snip_${itemId}_${idx}`, snippetText) : "";
         const fullKey = !isUser ? registerCopyPayload(`agent_full_${itemId}_${idx}`, msg.content || "") : "";
+        const traceHtml = !isUser && Array.isArray(msg.agentTrace) && msg.agentTrace.length
+          ? `<div class="flex flex-wrap gap-1 pt-0.5">${msg.agentTrace.map(t => `<span class="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700/80 text-[9px] text-cyan-300 font-semibold" title="${escapeHtmlSafe(t.summary || '')}">${escapeHtmlSafe(t.agent)}${t.summary ? ` · <span class="text-slate-400 font-normal">${escapeHtmlSafe(t.summary.slice(0, 52))}</span>` : ''}</span>`).join("")}</div>`
+          : "";
         return `
           <div class="p-2.5 rounded-lg border ${isUser ? 'bg-blue-950/35 border-blue-500/30 ml-6' : 'bg-slate-900/95 border-emerald-500/30 mr-2'} space-y-1.5">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[10px] font-bold ${isUser ? 'text-blue-300' : 'text-emerald-300'}">${isUser ? '👤 You' : `🤖 Copilot${msg.provider ? ` (${escapeHtmlSafe(msg.provider)})` : ''}`}</span>
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-[10px] font-bold ${isUser ? 'text-blue-300' : 'text-emerald-300'}">${isUser ? '👤 You' : `🧠 Orchestrator${msg.provider ? ` (${escapeHtmlSafe(msg.provider)})` : ''}`}</span>
               ${!isUser ? `
                 <div class="flex items-center gap-1.5">
                   ${snippetKey ? `<button type="button" onclick="copyFromStore('${snippetKey}', this, '📋 Paste-ready text copied!')" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy Ready Answer</button>` : ""}
@@ -5795,8 +5818,15 @@
                 </div>
               ` : ""}
             </div>
+            ${traceHtml}
             <pre class="text-[11px] text-slate-100 whitespace-pre-wrap font-sans leading-relaxed">${escapeHtmlSafe(msg.content)}</pre>
-            ${msg.appliedActions?.length ? `<div class="text-[10px] font-semibold text-amber-300 pt-1 border-t border-slate-800">⚡ Auto-Executed on Card: ${escapeHtmlSafe(msg.appliedActions.join(" · "))}</div>` : ""}
+            ${!isUser && snippetText && !(msg.content || "").includes(snippetText.slice(0, 45)) ? `
+              <div class="p-2 rounded bg-emerald-950/40 border border-emerald-500/35 space-y-1">
+                <div class="text-[10px] font-bold text-emerald-300">📋 Drafted Copy-Ready Text:</div>
+                <pre class="text-[11px] text-emerald-100 whitespace-pre-wrap font-sans leading-relaxed">${escapeHtmlSafe(snippetText)}</pre>
+              </div>
+            ` : ""}
+            ${(msg.appliedActions?.length || msg.appliedNote) ? `<div class="text-[10px] font-semibold text-amber-300 pt-1 border-t border-slate-800">⚡ Auto-Executed on Card: ${escapeHtmlSafe(msg.appliedNote || msg.appliedActions.join(" · "))}</div>` : ""}
           </div>
         `;
       }).join("");
@@ -5946,18 +5976,18 @@
       if (!msg) return;
       if (inputEl && !presetText) inputEl.value = "";
 
-      const history = getJobChatHistory(item.id);
-      history.push({ role: "user", content: msg });
+      const priorHistory = getJobChatHistory(item.id).slice(-24);
+      const history = [...priorHistory, { role: "user", content: msg, ts: new Date().toISOString() }];
       saveJobChatHistory(item.id, history, false);
 
       const logEl = document.getElementById(`jobAgentLog-${item.id}`);
       if (logEl) {
-        logEl.innerHTML = renderJobAgentMessagesHtml(item.id) + `<div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-700 text-emerald-300 text-[11px] animate-pulse">🤖 Thinking & checking live context for ${escapeHtmlSafe(item.company)}...</div>`;
+        logEl.innerHTML = renderJobAgentMessagesHtml(item.id) + `<div class="p-2.5 rounded-lg bg-slate-900/90 border border-cyan-500/40 text-cyan-200 text-[11px] animate-pulse space-y-1"><div>🧠 <strong>Main Orchestrator</strong> active (${priorHistory.length} prior turns in memory)...</div><div class="text-[10px] text-slate-300">↳ Dispatching <strong>📂 CV &amp; Codebase Vault</strong> · <strong>🗄️ D1 CRM &amp; DNS Tool</strong> · <strong>🌐 Web &amp; LinkedIn Subagent</strong> for ${escapeHtmlSafe(item.company)}</div></div>`;
         logEl.scrollTop = logEl.scrollHeight;
       }
       if (sendBtn) {
         sendBtn.disabled = true;
-        sendBtn.innerHTML = "⏳ Thinking...";
+        sendBtn.innerHTML = "⏳ Orchestrating...";
       }
 
       const checks = getPipelineCheckState();
@@ -5997,6 +6027,7 @@
       let copySnippet = "";
       let actions = {};
       let provider = "";
+      let agentTrace = [];
 
       for (const apiBase of apiBases) {
         try {
@@ -6007,16 +6038,17 @@
               chatKey: String(item.id),
               message: msg,
               jobContext,
-              history: history.slice(-8)
+              history: priorHistory
             })
           });
           if (res.ok) {
             const data = await res.json();
             if (data.ok && data.reply) {
               replyText = data.reply;
-              copySnippet = data.copySnippet || "";
+              copySnippet = data.copySnippet || data.copyableAnswer || "";
               actions = data.actions || {};
               provider = data.provider || "";
+              agentTrace = data.agentTrace || [];
               break;
             }
           }
@@ -6024,7 +6056,17 @@
       }
 
       const appliedActions = await applyJobAgentActions(item, actions);
-      history.push({ role: "assistant", content: replyText, copySnippet, provider, appliedActions });
+      history.push({
+        role: "assistant",
+        content: replyText,
+        copySnippet,
+        copyableAnswer: copySnippet,
+        agentTrace,
+        provider,
+        appliedActions,
+        appliedNote: appliedActions.length ? appliedActions.join(" · ") : "",
+        ts: new Date().toISOString()
+      });
       saveJobChatHistory(item.id, history, true);
 
       updateHeaderCounts();
@@ -7585,15 +7627,27 @@
       }
 
       const history = getJobChatHistory(chatKey);
+      if (subEl) {
+        const baseSub = ctx
+          ? (ctx.subtitle || "")
+          : "Knows your v1 vs v2 CVs, 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas & live D1 CRM.";
+        subEl.textContent = `${baseSub} · 🧠 Thread Memory: ${history.length} turn(s) synced`;
+      }
       if (!history.length) {
         msgEl.innerHTML = `
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2 leading-relaxed">
-            <div class="font-bold text-emerald-300 text-sm">👋 Ready whenever you are, Hessam.</div>
-            <p>Click any quick-prompt chip above, or type/paste anything below:</p>
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <div class="font-bold text-emerald-300 text-sm">👋 Multi-Agent Orchestrator Ready, Hessam.</div>
+            <div class="flex flex-wrap gap-1.5 text-[10px]">
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-cyan-500/40 text-cyan-300 font-semibold">🧠 Main Orchestrator (Full Thread Memory)</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-emerald-500/40 text-emerald-300 font-semibold">📂 v2 CV &amp; Codebase Vault Agent</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-amber-500/40 text-amber-300 font-semibold">🗄️ D1 CRM &amp; Live DNS Tool Agent</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-indigo-500/40 text-indigo-300 font-semibold">🌐 Live Web &amp; LinkedIn Research Subagent</span>
+            </div>
+            <p>Click any quick-prompt chip above, or type/paste anything below — I keep <strong>100% of our conversation context</strong> across every turn:</p>
             <ul class="list-disc pl-5 space-y-1 text-slate-400">
               <li>Paste a job description or tough application portal question for a ready-to-copy answer</li>
-              <li>Ask what exact 2027 salary band &amp; CV language (<code class="text-slate-200">EN</code> vs <code class="text-slate-200">TR</code>) to quote</li>
-              <li>Ask Turkish work-permit (<code class="text-slate-200">e-İzin</code> / <code class="text-slate-200">ÇSGB Bilişim Muafiyeti</code>) or Ireland/Germany/NL visa questions</li>
+              <li>Ask follow-up edits (<code class="text-slate-200">"make it shorter"</code>, <code class="text-slate-200">"translate that to Turkish"</code>, <code class="text-slate-200">"check their CTO on the net"</code>)</li>
+              <li>Ask which exact <code class="text-slate-200">v2</code> CV file &amp; 2027 salary band to use for any country</li>
               <li>Practice any C#/.NET, SQL, React, or System Design interview topic interactively</li>
             </ul>
           </div>
@@ -7603,14 +7657,31 @@
 
       msgEl.innerHTML = history.map((m, idx) => {
         const isUser = m.role === "user";
-        const copyKey = m.copyableAnswer ? registerCopyPayload(`cp_ans_${chatKey}_${idx}`, m.copyableAnswer) : "";
+        const snippetText = m.copySnippet || m.copyableAnswer || "";
+        const copyKey = snippetText ? registerCopyPayload(`cp_ans_${chatKey}_${idx}`, snippetText) : "";
+        const fullCopyKey = !isUser ? registerCopyPayload(`cp_full_${chatKey}_${idx}`, m.content || "") : "";
+        const traceHtml = !isUser && Array.isArray(m.agentTrace) && m.agentTrace.length
+          ? `<div class="flex flex-wrap gap-1 pt-0.5">${m.agentTrace.map(t => `<span class="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700/80 text-[10px] text-cyan-300 font-semibold" title="${escapeHtmlSafe(t.summary || '')}">${escapeHtmlSafe(t.agent)}${t.summary ? ` · <span class="text-slate-400 font-normal">${escapeHtmlSafe(t.summary.slice(0, 56))}</span>` : ''}</span>`).join("")}</div>`
+          : "";
         return `
           <div class="p-3 rounded-xl ${isUser ? "bg-blue-950/50 border border-blue-500/35 ml-8" : "bg-slate-900/95 border border-emerald-500/30 mr-3"} space-y-2">
-            <div class="flex items-center justify-between gap-2">
-              <span class="text-[10px] font-bold tracking-wider ${isUser ? "text-blue-300" : "text-emerald-300"}">${isUser ? "👤 YOU" : "🤖 CAREER, LEGAL & INTERVIEW COPILOT"}</span>
-              ${copyKey ? `<button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Ready answer copied!')" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy Ready Answer</button>` : ""}
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-[10px] font-bold tracking-wider ${isUser ? "text-blue-300" : "text-emerald-300"}">${isUser ? `👤 YOU (Turn ${idx + 1})` : `🧠 ORCHESTRATOR${m.provider ? ` · ${escapeHtmlSafe(m.provider)}` : ""}`}</span>
+              ${!isUser ? `
+                <div class="flex items-center gap-1.5">
+                  ${copyKey ? `<button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Ready answer copied!')" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy Ready Answer</button>` : ""}
+                  <button type="button" onclick="copyFromStore('${fullCopyKey}', this, '📋 Reply copied!')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold cursor-pointer">📋 Copy</button>
+                </div>
+              ` : ""}
             </div>
+            ${traceHtml}
             <div class="text-xs text-slate-100 whitespace-pre-wrap leading-relaxed">${escapeHtmlSafe(m.content || "")}</div>
+            ${!isUser && snippetText && !(m.content || "").includes(snippetText.slice(0, 45)) ? `
+              <div class="p-2.5 rounded-lg bg-emerald-950/45 border border-emerald-500/40 space-y-1">
+                <div class="text-[10px] font-bold text-emerald-300">📋 Drafted Copy-Ready Text:</div>
+                <pre class="text-xs text-emerald-100 whitespace-pre-wrap font-sans leading-relaxed">${escapeHtmlSafe(snippetText)}</pre>
+              </div>
+            ` : ""}
             ${m.appliedNote ? `<div class="text-[10px] text-amber-300 font-semibold pt-1 border-t border-slate-800">⚡ ${escapeHtmlSafe(m.appliedNote)}</div>` : ""}
           </div>
         `;
@@ -7627,14 +7698,30 @@
 
       const ctx = CURRENT_COPILOT_CONTEXT;
       const chatKey = getActiveCopilotChatKey();
-      const history = getJobChatHistory(chatKey);
-      history.push({ role: "user", content: rawMsg, ts: new Date().toISOString() });
+      const priorHistory = getJobChatHistory(chatKey).slice(-24);
+      const history = [...priorHistory, { role: "user", content: rawMsg, ts: new Date().toISOString() }];
       saveJobChatHistory(chatKey, history, true);
       renderCopilotDrawer();
 
+      const msgEl = document.getElementById("copilotMessages");
+      if (msgEl) {
+        msgEl.insertAdjacentHTML(
+          "beforeend",
+          `<div id="copilotOrchestratorPending" class="p-3 rounded-xl bg-slate-900/95 border border-cyan-500/40 mr-3 space-y-1.5 animate-pulse">
+            <div class="text-[11px] font-bold text-cyan-300">🧠 Main Orchestrator active (${priorHistory.length} prior turns in memory)...</div>
+            <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">📂 Checking v2 CV &amp; Codebase Vault</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🗄️ Querying D1 CRM &amp; DNS</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🌐 Running Web &amp; LinkedIn Research Subagent</span>
+            </div>
+          </div>`
+        );
+        msgEl.scrollTop = msgEl.scrollHeight;
+      }
+
       if (btnEl) {
         btnEl.disabled = true;
-        btnEl.innerHTML = "⏳ Thinking...";
+        btnEl.innerHTML = "⏳ Orchestrating...";
       }
 
       const endpoint = IS_LOCAL ? "/api/ai-chat" : `${CF_WORKER_URL}/api/ai-chat`;
@@ -7660,10 +7747,9 @@
             chatKey,
             message: rawMsg,
             jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
-            history: history.slice(0, -1).map(h => ({ role: h.role, content: h.content }))
+            history: priorHistory
           })
         });
-        // Automatic fallback to Cloudflare Worker if local server has no Gemini key or fails
         if (!res.ok && IS_LOCAL) {
           res = await fetch(`${CF_WORKER_URL}/api/ai-chat`, {
             method: "POST",
@@ -7672,7 +7758,7 @@
               chatKey,
               message: rawMsg,
               jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
-              history: history.slice(0, -1).map(h => ({ role: h.role, content: h.content }))
+              history: priorHistory
             })
           });
         }
@@ -7686,11 +7772,15 @@
               appliedChanges = await applyJobAgentActions(pipeItem, data.actions);
             }
           }
+          const snippet = data.copySnippet || data.copyableAnswer || "";
           const updated = getJobChatHistory(chatKey);
           updated.push({
             role: "assistant",
             content: data.reply,
-            copyableAnswer: data.copyableAnswer || "",
+            copySnippet: snippet,
+            copyableAnswer: snippet,
+            agentTrace: data.agentTrace || [],
+            provider: data.provider || "",
             appliedNote: appliedChanges.length ? `Updated on card & D1: ${appliedChanges.join(" · ")}` : "",
             ts: new Date().toISOString()
           });
