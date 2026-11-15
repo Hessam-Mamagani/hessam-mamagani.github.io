@@ -2705,9 +2705,9 @@
     }
 
     function getDefaultLangForItem(item) {
-      if (!item) return "MULTI";
+      if (!item) return "TR";
       if (item.countryGroup && item.countryGroup !== "TR") return "EN";
-      return "MULTI";
+      return "TR";
     }
 
     function getGeoParamForCountry(cg = "TR") {
@@ -5502,18 +5502,18 @@
     function getPreferredLang(id, fallback = "TR") {
       try {
         const saved = localStorage.getItem(`jr_lang_${id}`);
-        if (saved && (saved === "EN" || saved === "TR" || saved === "MULTI")) return saved;
+        if (saved === "EN" || saved === "TR") return saved;
       } catch {}
-      return fallback;
+      return fallback === "EN" ? "EN" : "TR";
     }
 
     function setPreferredLang(id, lang) {
+      const cleanLang = lang === "EN" ? "EN" : "TR";
       try {
-        localStorage.setItem(`jr_lang_${id}`, lang);
+        localStorage.setItem(`jr_lang_${id}`, cleanLang);
       } catch {}
       renderUnifiedPipeline();
-      const label = lang === "MULTI" ? "Bilingual (TR + EN)" : lang === "TR" ? "Türkçe" : "English";
-      showToast(`🌐 Outreach language switched to ${label}!`, true);
+      showToast(`🌐 Outreach language switched to ${cleanLang === "TR" ? "🇹🇷 Türkçe" : "🇬🇧 English"}!`, true);
     }
 
     function buildUnifiedEmail(item) {
@@ -5522,7 +5522,6 @@
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
       const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
 
-      // Only use AI-tailored email override when its generated language matches chosenLang
       if (item.aiIntel?.customEmailSubject && item.aiIntel?.customEmailBody && item.aiIntel?.lang === chosenLang) {
         return {
           subject: stripRoleBadgeClient(item.aiIntel.customEmailSubject),
@@ -5530,26 +5529,26 @@
         };
       }
 
-      if (chosenLang === "MULTI") {
-        return {
-          subject: `Başvuru & Özgeçmiş / Application: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim; güncel özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nAlman otomasyon firması Pilz GmbH Türkiye bünyesinde .NET, C#, React/TypeScript, bulut mimarisi ve kurumsal yapay zeka ile 5 kurumsal yazılım platformunu sıfırdan uçtan uca hayata geçirdim; SAP ERP ve e-Fatura iş süreçlerini otomatikleştirerek operasyonel süreleri %80 kısalttık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için değerlendirilmekten veya ilgili teknik ekibe yönlendirilmekten büyük memnuniyet duyarım.\n\n---\n\nDear ${cleanComp} Hiring Team,\n\nI recently applied for the ${roleForText} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud Architecture, and Enterprise AI. At Pilz Türkiye (subsidiary of German multinational Pilz GmbH), I architected and delivered 5 production enterprise platforms end-to-end—automating SAP ERP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\nI am based in Istanbul with an active work permit and would welcome a brief introductory call with your technical team.\n\nSaygılarımla / Best regards,\n\nHessam Barasm Mamagani\nTel / Phone: +90 539 229 4251\nE-posta / Email: hessam.mamagani@gmail.com\nPortfolyo / Portfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
-        };
-      }
-
       if (chosenLang === "EN") {
-        const locationSentence = item.countryGroup !== "TR"
-          ? `${buildLegalSponsorSnippet(item.countryGroup, "EN")} I would welcome a brief 10-minute introductory call or live system demo with your engineering team.`
-          : `I am based in Istanbul with an active work permit and would welcome a brief 10-minute introductory call with your technical team.`;
+        const visaLine = item.countryGroup === "IE"
+          ? "I hold an M.Eng. & B.Sc. in Engineering and qualify directly under Ireland's fast-track Critical Skills Employment Permit (Standard ICT SOC 2136)."
+          : item.countryGroup === "DE"
+          ? "My engineering degrees are verified as H+ in Germany's ANABIN database, qualifying directly for the EU Blue Card (§ 18g / § 81a fast-track)."
+          : item.countryGroup === "NL"
+          ? "With an M.Eng. degree and senior enterprise architecture track record at Pilz GmbH, I qualify directly for the Netherlands IND Highly Skilled Migrant fast-track."
+          : item.countryGroup === "UK"
+          ? "I qualify directly for UK Skilled Worker Visa sponsorship and am ready for immediate relocation or remote onboarding."
+          : "I am based in Istanbul with an active work permit (eligible for ÇSGB Bilişim Uzmanı Muafiyeti fast-track transfer).";
+
         return {
-          subject: `Application Follow-Up: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Dear ${cleanComp} Hiring Team,\n\nI recently applied for the ${roleForText} position at ${cleanComp} and wanted to follow up directly with my CV and a signed recommendation letter from Pilz Türkiye General Manager Yavuz Çopur (attached).\n\nI am a Senior Full-Stack Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Cloud Architecture, and Enterprise AI. At Pilz Türkiye (subsidiary of German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end—automating SAP ERP & e-Invoice pipelines and reducing operational turnaround time by 80%.\n\n${locationSentence}\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `Application & CV: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+          body: `Dear ${cleanComp} Hiring Team,\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, React/TypeScript, Azure, modern Cloud, and Enterprise AI.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and cutting turnaround time by 80%.\n\nI would love to contribute hands-on to the engineering team at ${cleanComp} (${roleForText}). My CV and signed recommendation letter from Pilz General Manager Yavuz Çopur are attached. ${visaLine}\n\nI would welcome the opportunity for you to review my background or connect me with the engineering hiring team.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
       return {
-        subject: `Başvuru Takibi & CV: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim; güncel Türkçe özgeçmişimi ve Pilz Türkiye Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu doğrudan bilgilerinize sunmak istedim.\n\nUzun süredir .NET, C#, React/TypeScript, bulut mimarisi ve kurumsal yapay zeka odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim. Alman Pilz GmbH Türkiye bünyesinde 5 kurumsal yazılım platformunu bizzat uçtan uca tasarlayıp canlıya aldım; SAP & e-Fatura iş süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `Yazılım / Mühendislik Başvurusu & Özgeçmiş — ${cleanComp} — Hessam Barasm Mamagani`,
+        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\nUzun süredir Microsoft ekosistemi (.NET, C#, React/TypeScript, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET ve bulut mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nTüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ${cleanComp} bünyesindeki yazılım / mühendislik rollerinde (${roleForText}) yer almayı çok istiyorum.\n\nGüncel özgeçmişimi ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe / İK'ya yönlendirmenizi rica ederim.\n\nVaktiniz için çok teşekkürler,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
@@ -5558,34 +5557,27 @@
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
-      const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
 
       if (item.aiIntel && item.aiIntel.lang === chosenLang) {
         if (target === "hr" && item.aiIntel.customHrDm) return stripRoleBadgeClient(item.aiIntel.customHrDm);
         if (target !== "hr" && item.aiIntel.customExecutiveDm) return stripRoleBadgeClient(item.aiIntel.customExecutiveDm);
       }
 
-      if (chosenLang === "MULTI") {
-        if (target === "hr") {
-          return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} başvurum kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, React ve bulut mimarisiyle 5 kurumsal platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdım (İstanbul'da ikamet ediyorum, aktif çalışma iznim ve Genel Müdürümüzün imzalı referans mektubu mevcuttur).\n\n---\n\nHi, I also applied for ${roleForText} at ${cleanComp} — Senior Full-Stack & Cloud Architect at Pilz GmbH Türkiye (.NET, React, Cloud & Enterprise AI). I would really appreciate sharing my profile with the hiring team.\n\nİyi çalışmalar / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
-        }
-        return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonu için başvurumu ilettim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve kurumsal yapay zeka ile 5 canlı platformu uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\n---\n\nHi, I recently applied for ${roleForText} at ${cleanComp} — Senior Full-Stack & Solutions Architect at Pilz GmbH Türkiye with a signed recommendation from our General Manager. Would welcome connecting with your engineering team!\n\nSaygılarımla / Best regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
-      }
-
       if (chosenLang === "EN") {
-        const locNote = item.countryGroup !== "TR"
-          ? `backed by a signed recommendation letter from Pilz General Manager Yavuz Çopur — ${buildLegalSponsorSnippet(item.countryGroup, "EN")}`
-          : `based in Istanbul with an active work permit and a signed recommendation letter from our General Manager Yavuz Çopur`;
-        if (target === "hr") {
-          return `Hi, I recently applied for ${roleForText} at ${cleanComp} and wanted to follow up directly.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and delivered 5 production platforms end-to-end (.NET, React, Cloud & Enterprise AI), automating SAP & e-Invoice pipelines and cutting turnaround time by 80% (${locNote}).\n\nI would really appreciate your guidance on next steps or forwarding my profile to the hiring manager.\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
-        }
-        return `Hi, I recently applied for ${roleForText} at ${cleanComp} and wanted to connect directly.\n\nI am a Senior Full-Stack Engineer & Cloud Solutions Architect (.NET, C#, React/TypeScript, Cloud & Agentic AI). At Pilz Türkiye (German multinational Pilz GmbH), I built 5 enterprise platforms end-to-end, solving SAP & e-Invoice bottlenecks and accelerating operations by 80% (${locNote}).\n\nWould welcome a brief 10-minute chat or sharing a live demo with the hiring team!\n\nBest regards,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+        const permitPhrase = item.countryGroup === "IE"
+          ? "(backed by a signed recommendation letter from our General Manager, and qualifying directly for Ireland's Critical Skills Permit)"
+          : item.countryGroup === "DE"
+          ? "(backed by a signed recommendation letter from our General Manager, with ANABIN H+ verified M.Eng. degree for the EU Blue Card)"
+          : item.countryGroup === "NL"
+          ? "(backed by a signed recommendation letter from our General Manager, qualifying for the IND Highly Skilled Migrant fast-track)"
+          : item.countryGroup === "UK"
+          ? "(backed by a signed recommendation letter from our General Manager)"
+          : "(based in Istanbul with active work permit and a signed recommendation letter from our General Manager)";
+
+        return `Hi,\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, React/TypeScript, Azure, modern Cloud, and Enterprise AI.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and cutting turnaround time by 80%.\n\nI would love to contribute hands-on to the engineering team at ${cleanComp}. My CV is attached ${permitPhrase}.\n\nI would welcome the opportunity for you to review my background or connect me with the engineering hiring team.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
       }
 
-      if (target === "hr") {
-        return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonuna yaptığım başvuru kapsamında doğrudan iletişime geçmek istedim.\n\nAlman Pilz GmbH Türkiye'de .NET, C#, React ve bulut mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura iş süreçlerini %80 hızlandırdım.\n\nİstanbul'da ikamet ediyorum, aktif çalışma iznim ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu mevcuttur. Uygun göreceğiniz açık roller için profilimi değerlendirmenizi veya ilgili teknik yöneticiye iletmenizi rica ederim.\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
-      }
-      return `Merhaba, ${cleanComp} bünyesindeki ${roleForText} pozisyonunuz için başvurumu iletmiştim ve doğrudan da tanışmak istedim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, C#, React ve kurumsal yapay zeka mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırdık.\n\nİstanbul'da ikamet ediyorum ve aktif çalışma iznim mevcuttur. Açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe iletmenizi çok isterim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani (+90 539 229 4251 | https://hessam-mamagani.github.io/)`;
+      return `Merhaba,\n\nUzun süredir Microsoft ekosistemi (.NET, C#, React/TypeScript, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.\n\nPilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nTüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ${cleanComp} ekibi bünyesindeki yazılım / mühendislik rollerinde yer almayı çok istiyorum.\n\nGüncel özgeçmişimi bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe / İK'ya yönlendirmenizi rica ederim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
     }
     function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
 
@@ -6250,7 +6242,7 @@
     function renderPipelineDrawerHtml(item, checks, mail, dmText, gmailHref, mapsHref, myConnectionsHref) {
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
-      const hrDmText = buildUnifiedDm(item, "hr");
+      const ch = resolveItemChannels(item, checks);
       const cleanComp = item.company.split("(")[0].trim();
       const safeCompAttr = cleanComp.replace(/'/g, "\\'");
       const cMeta = COUNTRY_DISPLAY_META[item.countryGroup] || COUNTRY_DISPLAY_META.TR;
@@ -6259,233 +6251,162 @@
       const smart = item.smartMeta || computeClientSmartSalaryAndTier(item.company, item.cleanRole || item.role, item.address, item.countryGroup);
       const legalNote = buildLegalSponsorSnippet(item.countryGroup, chosenLang === "TR" ? "TR" : "EN", cleanComp);
       const copyLegalKey = registerCopyPayload(`drawer_legal_${item.id}`, legalNote);
-      const localTechSearchHref = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " CTO OR Engineering Manager OR Solutions Architect")}${geoParam}`;
+
+      const linkedinJobsSearchUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanComp + " Software Engineer")}&location=${encodeURIComponent(countryLabel)}`;
+      const localTechSearchHref = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " CTO OR Engineering Manager OR Software Director")}${geoParam}`;
       const localHrSearchHref = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " Technical Recruiter OR Talent Acquisition")}${geoParam}`;
 
       const copyFullEmailKey = registerCopyPayload(`drawer_full_email_${item.id}`, `${item.email ? `To: ${item.email}\n` : ""}Subject: ${mail.subject}\n\n${mail.body}`);
-      const copyBodyEmailKey = registerCopyPayload(`drawer_body_email_${item.id}`, mail.body);
       const copyCtoDmKey = registerCopyPayload(`drawer_cto_dm_${item.id}`, dmText);
-      const copyHrDmKey = registerCopyPayload(`drawer_hr_dm_${item.id}`, hrDmText);
 
-      const emailDisplay = item.email
-        ? `<a href="${gmailHref}" target="_blank" class="text-emerald-300 font-semibold hover:underline text-xs">${item.email}</a>`
-        : `<span class="text-amber-300/90 text-xs font-medium">No verified HR inbox yet — click 🛡️ AI Verify or use LinkedIn DMs</span>`;
+      const nextStepBanner = !ch.applied
+        ? {
+            badge: "STEP 1 OF 3 · APPLY FIRST",
+            color: "border-blue-500/40 bg-blue-950/30 text-blue-200",
+            text: `You haven't applied to an open role at ${cleanComp} yet. Click "🔍 Find Open Jobs on LinkedIn (${countryLabel})" below, apply with your recommended v2 CV, and check "🌐 Apply" above.`
+          }
+        : (!ch.techDm && !ch.hrDm)
+        ? {
+            badge: "STEP 2 OF 3 · SEND PEER-TO-PEER LINKEDIN DM",
+            color: "border-indigo-500/40 bg-indigo-950/30 text-indigo-200",
+            text: `Application logged! Next priority: click "🔎 Find Local People (${countryLabel})" in Step 2, copy your Peer-to-Peer LinkedIn DM (${chosenLang}), and message 1 Tech Lead & 1 Recruiter.`
+          }
+        : !ch.email
+        ? {
+            badge: "STEP 3 OF 3 · SEND DIRECT FOLLOW-UP EMAIL",
+            color: "border-emerald-500/40 bg-emerald-950/30 text-emerald-200",
+            text: `LinkedIn DM sent! Final outreach step: verify or open ${cleanComp}'s HR email in Step 3 and send your CV + Pilz GM Reference PDF.`
+          }
+        : {
+            badge: "✅ OUTREACH COMPLETE · PREP FOR INTERVIEW",
+            color: "border-emerald-500/40 bg-emerald-950/30 text-emerald-200",
+            text: `You completed portal apply, LinkedIn DMs, and email for ${cleanComp}. Open AI Copilot to practice interview questions for this role.`
+          };
 
       return `
-        <div class="p-4 bg-slate-950/90 border-t border-slate-800/90 space-y-4 text-xs">
+        <div class="p-4 bg-slate-950/90 border-t border-slate-800/90 space-y-3.5 text-xs">
+          <!-- Priority Next-Step Guide Banner -->
+          <div class="p-3 rounded-xl border ${nextStepBanner.color} flex flex-wrap items-center justify-between gap-2">
+            <div class="space-y-0.5">
+              <div class="text-[10px] font-extrabold tracking-wider uppercase">${nextStepBanner.badge}</div>
+              <div class="text-xs text-slate-100">${escapeHtmlSafe(nextStepBanner.text)}</div>
+            </div>
+            <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow cursor-pointer transition shrink-0">
+              🤖 Ask Copilot About ${escapeHtmlSafe(cleanComp)}
+            </button>
+          </div>
+
           ${renderRolesSummaryHtml(item)}
 
-          <!-- 2027 Smart Salary, Tier, Visa/Muafiyet & Pop-Out Copilot Strip (Clean Plain Text + Action Buttons) -->
-          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-wrap items-center justify-between gap-2">
-            <div class="text-xs text-slate-300 leading-relaxed">
-              <strong class="text-white">${cMeta.flag} ${cMeta.label}</strong>
-              <span class="text-slate-600 mx-1.5">&middot;</span>
-              <span>Quote: <strong class="text-amber-300">${escapeHtmlSafe(smart.salaryBand)}</strong></span>
-              <span class="text-slate-600 mx-1.5">&middot;</span>
-              <span>${escapeHtmlSafe(smart.tierLabel)}</span>
-              <span class="text-slate-600 mx-1.5">&middot;</span>
-              <span class="text-slate-400">${escapeHtmlSafe(smart.hiringSpeed)}</span>
-            </div>
-            <div class="flex flex-wrap items-center gap-1.5">
-              <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold transition">📥 Download CV (${smart.cvCode === 'TR' ? 'TR+Ref 3p' : 'EN 2p'})</a>
-              <button type="button" onclick="copyFromStore('${copyLegalKey}', this, '⚖️ Visa / Muafiyet note copied!')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 text-[11px] font-semibold cursor-pointer transition" title="Copy ready-to-paste ÇSGB Muafiyeti / Visa sponsorship note for HR">
-                ⚖️ Copy Visa Note
-              </button>
-              <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow cursor-pointer transition">
-                🤖 Open Copilot
-              </button>
-            </div>
-          </div>
-
-          <!-- Top Verified Contact & Location Strip -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between gap-2">
-              <div class="min-w-0">
-                <div class="flex items-center gap-1.5 flex-wrap mb-0.5">
-                  <span class="text-slate-400 text-[10px] font-bold tracking-wider">Direct Recruiter / HR Email</span>
-                  ${renderEmailVerificationBadgeHtml(item)}
-                </div>
-                <div id="emailSlot-${item.id}" class="truncate font-mono">${emailDisplay}</div>
-              </div>
-              <div class="flex items-center gap-1 shrink-0">
-                <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2 py-1 rounded bg-teal-600/35 hover:bg-teal-600/60 text-teal-200 border border-teal-500/40 text-[11px] font-bold cursor-pointer transition" title="AI Agent searches live web for ${safeCompAttr}'s published HR/Kariyer email, runs live DNS MX/DMARC verification, blocks info@ black holes, and saves to Cloudflare D1">🛡️ AI Verify</button>
-                <button type="button" onclick="promptContactInfo('${item.primaryCrmId || item.id}', '${safeCompAttr}', '${(item.cleanRole || item.role || "").replace(/'/g, "\\'")}', '${(item.address || "").replace(/'/g, "\\'")}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] cursor-pointer" title="Manually add or edit recruiter email & phone">✏️</button>
-              </div>
-            </div>
-            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
-              <span class="text-slate-400 block text-[10px] font-bold tracking-wider mb-0.5">Verified Switchboard / Phone</span>
-              <div id="phoneSlot-${item.id}">
-                ${item.phone && item.phone !== "Global Remote"
-                  ? `<a href="tel:${item.phone}" class="text-emerald-300 font-bold hover:underline text-xs">📞 ${item.phoneDisplay}</a>`
-                  : `<span class="text-slate-400 text-xs">${item.phoneDisplay || "No local switchboard listed"}</span>`
-                }
-              </div>
-            </div>
-            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between gap-2">
-              <div>
-                <span class="text-slate-400 block text-[10px] font-bold tracking-wider mb-0.5">Office & Career Portal</span>
-                <a href="${item.jobUrl}" target="_blank" class="text-blue-400 hover:underline font-semibold text-xs">↗ Open Active Job / Portal</a>
-              </div>
-              <a href="${mapsHref}" target="_blank" class="px-2.5 py-1 rounded bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600/30 transition">
-                🗺️ Maps
-              </a>
-            </div>
-          </div>
-
-          <div class="bg-slate-900/50 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 leading-relaxed">
-            <strong class="text-slate-400">📍 Address & Notes:</strong> ${item.address} &middot; <span class="text-amber-200/90">${item.summary}</span>
-          </div>
-
-          <!-- SECTION 1: PEOPLE FINDER (AI BUTTON #1 = DISCOVER REAL LOCAL PEOPLE) -->
-          <div class="bg-indigo-950/35 p-3.5 rounded-xl border border-indigo-500/35 space-y-2.5">
+          <!-- STEP 1: FIND OPEN JOB, APPLY & DOWNLOAD RECOMMENDED v2 CV -->
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <span class="text-xs font-bold text-indigo-200 block">1️⃣ Decision-Makers & Recruiters in ${countryLabel}</span>
-                <span class="text-[11px] text-slate-400">Purpose: Find real local people at ${cleanComp}. Click <strong>📋 Copy DM</strong> next to a person to copy a message addressed to their first name, then open their <strong>↗ LinkedIn</strong>.</span>
+                <span class="text-xs font-bold text-white block">1️⃣ Step 1 — Find Open Role &amp; Apply (${cMeta.flag} ${countryLabel})</span>
+                <span class="text-[11px] text-slate-400">
+                  Recommended CV: <strong class="text-emerald-300">${smart.cvCode === 'TR' ? 'Turkish v2 + Pilz GM Letter (3p)' : 'English v2 ATS CV (2p)'}</strong>
+                  &middot; Quote: <strong class="text-amber-300">${escapeHtmlSafe(smart.salaryBand)}</strong>
+                </span>
               </div>
               <div class="flex flex-wrap items-center gap-1.5">
-                <button type="button" onclick="runAiCompanyResearch('${item.id}', 'cto', this)" class="py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow transition cursor-pointer" title="AI Button #1: Searches live LinkedIn & web strictly in ${countryLabel} to find CTOs, Engineering Managers, and HR Recruiters">
-                  🔎 AI Find Local People (${countryLabel})
+                <a href="${linkedinJobsSearchUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow transition">
+                  🔍 Find Open Jobs on LinkedIn (${countryLabel})
+                </a>
+                <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition">
+                  ${ch.applied ? '↗ View Applied Job' : '🌐 Career Portal'}
+                </a>
+                <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-200 text-xs font-bold transition">
+                  📥 Download CV (${smart.cvCode === 'TR' ? 'TR+Ref 3p' : 'EN 2p'})
+                </a>
+                <button type="button" onclick="copyFromStore('${copyLegalKey}', this, '⚖️ Visa / Muafiyet note copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 text-xs font-semibold cursor-pointer transition" title="Copy ready-to-paste ÇSGB Muafiyeti / EU Visa sponsorship answer for portal forms">
+                  ⚖️ Copy Visa Note
                 </button>
-                <a href="${localTechSearchHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-blue-300 border border-slate-700 text-[11px] font-semibold transition" title="Open LinkedIn search filtered to ${countryLabel} tech leaders">
+              </div>
+            </div>
+            <div class="text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 flex flex-wrap items-center justify-between gap-2">
+              <span>📍 ${item.address} &middot; <span class="text-slate-300">${item.summary}</span></span>
+              <a href="${mapsHref}" target="_blank" class="text-blue-400 hover:underline font-medium shrink-0">🗺️ Google Maps ↗</a>
+            </div>
+          </div>
+
+          <!-- STEP 2: FIND LOCAL PEOPLE & SEND LEARNED PEER-TO-PEER LINKEDIN DM -->
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <span class="text-xs font-bold text-white block">2️⃣ Step 2 — Message 1 Tech Lead &amp; 1 Recruiter on LinkedIn (${chosenLang === 'TR' ? '🇹🇷 Türkçe' : '🇬🇧 English'})</span>
+                <span class="text-[11px] text-slate-400">Uses your learned Peer-to-Peer Developer Pitch. Click <strong>🔎 Find Local People</strong> to get named contacts, or copy the DM below.</span>
+              </div>
+              <div class="flex flex-wrap items-center gap-1.5">
+                <button type="button" onclick="runAiCompanyResearch('${item.id}', 'cto', this)" class="py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow transition cursor-pointer">
+                  🔎 Find Local People (${countryLabel})
+                </button>
+                <a href="${localTechSearchHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-semibold transition">
                   👨‍💻 LinkedIn Tech Leads
                 </a>
-                <a href="${localHrSearchHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 text-[11px] font-semibold transition" title="Open LinkedIn search filtered to ${countryLabel} recruiters">
+                <a href="${localHrSearchHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-[11px] font-semibold transition">
                   👩‍💼 LinkedIn Recruiters
                 </a>
-                <a href="${myConnectionsHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-200 border border-purple-500/30 text-[11px] font-semibold transition" title="Check if any of your existing 1st-degree LinkedIn connections work at ${cleanComp}">
-                  👥 My 1st-Deg Connections
+                <a href="${myConnectionsHref}" target="_blank" class="py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 text-[11px] font-semibold transition">
+                  👥 1st-Deg Connections
                 </a>
               </div>
             </div>
 
-            <div id="aiIntelPanel-${item.id}" class="${item.aiIntel ? '' : 'hidden'} pt-2 border-t border-indigo-500/20 space-y-2.5 text-xs">
+            <div id="aiIntelPanel-${item.id}" class="${item.aiIntel ? '' : 'hidden'} pt-2 border-t border-slate-800 space-y-2.5 text-xs">
               ${item.aiIntel ? renderAiIntelHtml(item.aiIntel, item, item.id) : ''}
             </div>
-          </div>
 
-          <!-- SECTION 2: OUTREACH MESSAGES (AI BUTTON #2 = REWRITE MESSAGE TEXT ONLY) -->
-          <div class="bg-slate-900/90 p-3.5 rounded-xl border border-blue-500/30 space-y-3">
-            <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span class="text-xs font-bold text-blue-200 block">2️⃣ Ready-to-Send LinkedIn DMs & Direct Email (${chosenLang === 'TR' ? '🇹🇷 Türkçe' : chosenLang === 'MULTI' ? '🌐 Bilingual TR+EN' : '🇬🇧 English'})</span>
-                <span class="text-[11px] text-slate-400">Switch <strong>🇬🇧 EN / 🇹🇷 TR / 🌐 Both</strong> in the top bar of this card anytime. Remember to attach your PDF CV in Gmail.</span>
-              </div>
-              <button type="button" onclick="runAiRewriteTextOnly('${item.id}', this)" class="py-1.5 px-3 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow transition cursor-pointer" title="AI Button #2: Custom-rewrites ONLY the Tech DM, HR DM, and Email text below for ${item.role} in ${chosenLang} (never overwrites your contacts or phone)">
-                ✍️ AI Tailor Message Text (${chosenLang})
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800 space-y-2">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-[11px] font-bold text-blue-300">👨‍💻 Tech Manager / CTO LinkedIn DM</span>
-                  <button type="button" onclick="copyFromStore('${copyCtoDmKey}', this, '💬 Tech Lead DM copied!')" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition cursor-pointer">
-                    📋 Copy Tech DM
-                  </button>
-                </div>
-                <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">${dmText}</pre>
-              </div>
-
-              <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800 space-y-2">
-                <div class="flex items-center justify-between gap-2">
-                  <span class="text-[11px] font-bold text-purple-300">👩‍💼 HR / Technical Recruiter LinkedIn DM</span>
-                  <button type="button" onclick="copyFromStore('${copyHrDmKey}', this, '👩‍💼 HR Recruiter DM copied!')" class="px-2.5 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white text-[11px] font-bold transition cursor-pointer">
-                    📋 Copy HR DM
-                  </button>
-                </div>
-                <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">${hrDmText}</pre>
-              </div>
-            </div>
-
-            <div class="p-3 rounded-lg bg-slate-950/95 border border-emerald-500/30 space-y-2">
+            <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800 space-y-2">
               <div class="flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-[11px] font-bold text-emerald-300">📧 Direct Email — Subject: ${mail.subject}</span>
-                  ${renderEmailVerificationBadgeHtml(item)}
+                <div class="flex items-center gap-2">
+                  <span class="text-[11px] font-bold text-blue-300">💬 Peer-to-Peer LinkedIn DM (${chosenLang === 'TR' ? '🇹🇷 Türkçe' : '🇬🇧 English'})</span>
+                  <div class="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded border border-slate-700 text-[10px]">
+                    <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
+                    <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
+                  </div>
                 </div>
-                <div class="flex flex-wrap items-center gap-1.5">
-                  ${!item.aiIntel?.emailVerification?.deliverable ? `
-                    <button type="button" onclick="runAiVerifyEmail('${item.id}', this, true)" class="px-3 py-1 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-[11px] transition flex items-center gap-1 shadow cursor-pointer" title="AI searches live web for ${safeCompAttr}'s HR/Kariyer email, runs live DNS MX check, saves to D1, and opens pre-filled Gmail">
-                      🛡️ AI Verify & Open Gmail
-                    </button>
-                  ` : ""}
-                  <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1 rounded-lg ${item.aiIntel?.emailVerification?.deliverable ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600 hover:bg-red-500'} text-white font-bold text-[11px] transition flex items-center gap-1 shadow">
-                    ${item.aiIntel?.emailVerification?.deliverable ? '🛡️✉️ Open Verified Gmail' : '✉️ Open in Gmail Compose'}
-                  </a>
-                  <button type="button" onclick="copyFromStore('${copyFullEmailKey}', this, '📧 Subject + Email copied!')" class="px-2.5 py-1 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 font-semibold text-[11px] transition cursor-pointer">
-                    📋 Copy Subject + Body
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="runAiRewriteTextOnly('${item.id}', this)" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-purple-300 text-[11px] font-semibold transition cursor-pointer">
+                    ✍️ AI Tailor (${chosenLang})
                   </button>
-                  <button type="button" onclick="copyFromStore('${copyBodyEmailKey}', this, '📧 Email body copied!')" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-[11px] transition cursor-pointer">
-                    📋 Copy Body Only
+                  <button type="button" onclick="copyFromStore('${copyCtoDmKey}', this, '💬 LinkedIn DM copied!')" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition cursor-pointer">
+                    📋 Copy LinkedIn DM
                   </button>
                 </div>
               </div>
-              <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed max-h-44 overflow-y-auto">${mail.body}</pre>
+              <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">${dmText}</pre>
             </div>
           </div>
 
-          <!-- SECTION 3: INTERACTIVE PER-JOB AI AGENT (CHAT + LIVE CARD ACTIONS) -->
-          <div class="bg-emerald-950/25 p-3.5 rounded-xl border border-emerald-500/40 space-y-2.5">
+          <!-- STEP 3: DIRECT HR EMAIL (WITH 1-CLICK VERIFY OR GMAIL COMPOSE) -->
+          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <span class="text-xs font-bold text-emerald-300 block">3️⃣ 🤖 Interactive Per-Job AI Agent (${cleanComp} Copilot — Synced via Cloudflare D1)</span>
-                <span class="text-[11px] text-slate-300">Knows your full Pilz/.NET/Azure/SAP profile, Dec 31 permit & 2027 salary floor + ${cleanComp}'s contacts & 6-channel progress.</span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-white">3️⃣ Step 3 — Direct Email (${item.email ? `<span class="text-emerald-300 font-mono">${escapeHtmlSafe(item.email)}</span>` : `<span class="text-slate-400 font-normal">No HR email saved yet</span>`})</span>
+                ${renderEmailVerificationBadgeHtml(item)}
+                ${item.phone && item.phone !== "Global Remote" ? `<span class="text-slate-500">&middot;</span><a href="tel:${item.phone}" class="text-slate-300 hover:text-white text-[11px]">📞 ${item.phoneDisplay}</a>` : ""}
               </div>
-              <div class="flex items-center gap-1.5">
-                <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 border border-emerald-500/40 text-[11px] font-bold cursor-pointer">
-                  ↗ Pop Out Drawer
+              <div class="flex flex-wrap items-center gap-1.5">
+                ${item.email ? `
+                  <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow">
+                    ✉️ Open in Gmail Compose
+                  </a>
+                ` : `
+                  <button type="button" onclick="runAiVerifyEmail('${item.id}', this, true)" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition shadow cursor-pointer" title="AI searches live web for ${safeCompAttr}'s HR email, verifies DNS MX, and opens Gmail">
+                    🛡️ Find HR Email &amp; Open Gmail
+                  </button>
+                `}
+                <button type="button" onclick="copyFromStore('${copyFullEmailKey}', this, '📧 Subject + Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs transition cursor-pointer">
+                  📋 Copy Email
                 </button>
-                <button type="button" onclick="clearJobChat('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] cursor-pointer">
-                  🗑️ Clear Chat
+                <button type="button" onclick="promptContactInfo('${item.primaryCrmId || item.id}', '${safeCompAttr}', '${(item.cleanRole || item.role || "").replace(/'/g, "\\'")}', '${(item.address || "").replace(/'/g, "\\'")}')" class="px-2 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs cursor-pointer" title="Manually add or edit recruiter email & phone">
+                  ✏️ Edit Contact
                 </button>
               </div>
             </div>
-
-            <!-- 1-Click Quick Prompts -->
-            <div class="flex flex-wrap gap-1.5">
-              <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2.5 py-1 rounded-lg bg-teal-600/30 hover:bg-teal-600/50 text-teal-200 border border-teal-500/40 text-[11px] font-bold cursor-pointer" title="Searches web + Teknokent + career pages & runs live Cloudflare DoH DNS MX verification">
-                🛡️ Find & DNS-Verify Real HR Email
-              </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Check my current 6-channel progress and contacts for ${safeCompAttr}. What is done, what is left, and what is the highest-impact next step right now?')" class="px-2.5 py-1 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 text-emerald-200 border border-emerald-500/40 text-[11px] font-semibold cursor-pointer">
-                🎯 What's Left & Next Step
-              </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a crisp, high-impact answer in ${chosenLang === 'TR' ? 'Turkish' : 'English'} for the application form question: Why do you want to join ${safeCompAttr} and why are you a strong fit for ${ (item.cleanRole || item.role || '').replace(/'/g, '') }?')" class="px-2.5 py-1 rounded-lg bg-blue-600/25 hover:bg-blue-600/40 text-blue-200 border border-blue-500/40 text-[11px] font-semibold cursor-pointer">
-                📝 "Why ${cleanComp}?" Portal Answer
-              </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'What exact 2027 salary range, currency, and work-permit / visa sponsorship framing should I use for ${safeCompAttr} (${ (item.cleanRole || item.role || '').replace(/'/g, '') }), and should I upload my EN or TR CV?')" class="px-2.5 py-1 rounded-lg bg-amber-600/25 hover:bg-amber-600/40 text-amber-200 border border-amber-500/40 text-[11px] font-semibold cursor-pointer">
-                💰 2027 Salary & Visa Strategy
-              </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Write a tailored 3-paragraph cover letter for ${safeCompAttr} (${ (item.cleanRole || item.role || '').replace(/'/g, '') }) in ${chosenLang === 'TR' ? 'Turkish' : 'English'} ready to paste into an application portal.')" class="px-2.5 py-1 rounded-lg bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/40 text-[11px] font-semibold cursor-pointer">
-                📄 Portal Cover Letter
-              </button>
-              <button type="button" onclick="sendJobAgentPrompt('${item.id}', 'Research ${safeCompAttr} engineering stack and give me the top 3 technical interview questions & strong plain-language answers tied to my Pilz Türkiye platforms.')" class="px-2.5 py-1 rounded-lg bg-indigo-600/25 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/40 text-[11px] font-semibold cursor-pointer">
-                🎤 Stack & Interview Prep
-              </button>
-            </div>
-
-            <!-- Chat History Container -->
-            <div id="jobAgentLog-${item.id}" class="max-h-72 overflow-y-auto space-y-2 p-2.5 rounded-lg bg-slate-950/90 border border-slate-800">
-              ${renderJobAgentMessagesHtml(item.id)}
-            </div>
-
-            <!-- Chat Input Row -->
-            <div class="flex items-center gap-2">
-              <input
-                id="jobAgentInput-${item.id}"
-                type="text"
-                onkeydown="if(event.key==='Enter'){event.preventDefault();sendJobAgentPrompt('${item.id}');}"
-                placeholder="Ask your agent about ${cleanComp} (e.g. 'Answer this portal question: ...' or 'Make HR DM shorter in Turkish' or 'Save email ik@...')"
-                class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
-              />
-              <button
-                id="jobAgentBtn-${item.id}"
-                type="button"
-                onclick="sendJobAgentPrompt('${item.id}')"
-                class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition cursor-pointer shrink-0"
-              >
-                🤖 Send
-              </button>
+            <div class="p-3 rounded-lg bg-slate-950/90 border border-slate-800">
+              <div class="text-[11px] font-semibold text-slate-400 mb-1">Subject: <span class="text-slate-200">${escapeHtmlSafe(mail.subject)}</span></div>
+              <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed max-h-40 overflow-y-auto">${mail.body}</pre>
             </div>
           </div>
         </div>
@@ -6519,7 +6440,7 @@
         ? `<a href="${item.jobUrl}" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/50">⏳ Finish Portal ↗</a>`
         : ch.applied
         ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">Applied (${doneCount}/6)</span>`
-        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Target (${doneCount}/6)</span>`;
+        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Step 1: Apply (${doneCount}/6)</span>`;
 
       const rowBorder = item.status === "Interview 🎯"
         ? "border-purple-500/60 bg-purple-950/15"
@@ -6550,11 +6471,10 @@
               </div>
             </div>
 
-            <!-- Language Switcher (EN / TR / Both) -->
+            <!-- Language Switcher (Strictly TR or EN — Never Glued Together) -->
             <div class="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px] shrink-0" onclick="event.stopPropagation()">
-              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}" title="English outreach">EN</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">TR</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}" title="Bilingual TR+EN">Both</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">🇹🇷 TR</button>
+              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}" title="English outreach">🇬🇧 EN</button>
             </div>
 
             <!-- 6-Channel Outreach Checkboxes -->
@@ -6563,12 +6483,12 @@
             <!-- Clean Action Buttons -->
             <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
               ${!isExpanded ? `
-                ${!(item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) ? `
-                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="${item.email ? 'Open Gmail to ' + escapeHtmlSafe(item.email) : 'Open Gmail draft'}">
+                ${item.email ? `
+                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="Open Gmail to ${escapeHtmlSafe(item.email)}">
                     ✉️ Email
                   </a>
                 ` : ""}
-                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 Tech DM copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy Tech Lead LinkedIn DM">
+                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy Peer-to-Peer LinkedIn DM">
                   💬 Copy DM
                 </button>
                 <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-semibold text-xs transition cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(cleanComp)}">
@@ -6576,7 +6496,7 @@
                 </button>
               ` : ""}
               <button type="button" onclick="togglePipelineExpand('${item.id}')" class="px-3 py-1 rounded ${isExpanded ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} text-xs font-semibold transition cursor-pointer">
-                ${isExpanded ? '▲ Close' : '📂 Details'}
+                ${isExpanded ? '▲ Close' : '📂 Step-by-Step'}
               </button>
             </div>
           </div>
@@ -6621,9 +6541,8 @@
               </div>
               <div class="flex items-center gap-1.5 flex-wrap">
                 <div class="flex items-center gap-0.5 bg-black/60 p-0.5 rounded-lg border border-slate-700/80 text-[10px]">
-                  <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
                   <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
-                  <button type="button" onclick="setPreferredLang('${item.id}', 'MULTI')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'MULTI' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}" title="Bilingual: Turkish on top + English underneath">🌐 Both</button>
+                  <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
                 </div>
                 ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/6)</span>` : ""}
               </div>
@@ -6687,24 +6606,19 @@
 
             <!-- Quick Action Buttons -->
             <div class="flex flex-wrap items-center gap-1.5 pt-1">
-              <a href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg ${item.aiIntel?.emailVerification?.deliverable ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-red-600/80 hover:bg-red-500'} text-white font-semibold text-xs transition flex items-center gap-1">
-                ${item.aiIntel?.emailVerification?.deliverable ? '🛡️✉️ Gmail' : '✉️ Gmail'}
+              <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanComp + ' Software Engineer')}&location=${encodeURIComponent(countryLabel)}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1">
+                🔍 LinkedIn Jobs
               </a>
+              <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
+                🌐 Portal
+              </a>
+              <button type="button" onclick="copyFromStore('${cardDmKey}', this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-indigo-600/40 hover:bg-indigo-600/60 text-indigo-100 border border-indigo-500/40 font-semibold text-xs transition cursor-pointer">
+                💬 Copy DM (${chosenLang})
+              </button>
               <button type="button" onclick="copyFromStore('${cardEmailKey}', this, '📧 Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer">
                 📋 Email
               </button>
-              <button type="button" onclick="copyFromStore('${cardDmKey}', this, '💬 Tech DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-medium text-xs transition cursor-pointer">
-                👨‍💻 Tech DM
-              </button>
-              <button type="button" onclick="copyFromStore('${cardHrDmKey}', this, '👩‍💼 HR DM copied!')" class="px-2.5 py-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 font-medium text-xs transition cursor-pointer">
-                👩‍💼 HR DM
-              </button>
-              <a href="${myConnectionsHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 text-xs font-medium transition" title="Search 1st-degree connections">
-                👥 1st-Deg
-              </button>
-              <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition ml-auto">
-                ↗ Job
-              </a>
+              ${item.email ? `<a href="${gmailHref}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition ml-auto">✉️ Gmail</a>` : ''}
             </div>
           </div>
         </div>
