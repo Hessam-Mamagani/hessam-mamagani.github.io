@@ -207,6 +207,7 @@
               <option value="TOP_GIANTS">🏢 Top Ranked Giants</option>
               <option value="EMAILED">📧 Emailed</option>
               <option value="DM_SENT">💬 LinkedIn DM Sent</option>
+              <option value="REJECTED">❌ Rejected / Closed</option>
               <option value="CLUSTER_ASIAN">📍 Asian Side (Kartal / Ataşehir / Üsküdar)</option>
               <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla</option>
               <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
@@ -4352,6 +4353,7 @@
       updateGlobalCountryCounts();
       renderCrm();
       renderUnifiedPipeline();
+      showToast(`📌 Updated status to "${newStatus}"!`, true);
     }
 
     function renderCrm() {
@@ -5639,15 +5641,23 @@
           ? "I qualify directly for UK Skilled Worker Visa sponsorship and am ready for immediate relocation or remote onboarding."
           : "I am based in Istanbul with an active work permit (eligible for ÇSGB Bilişim Uzmanı Muafiyeti fast-track transfer).";
 
+        const openerEn = item.hasAppliedInCrm
+          ? `I recently submitted my application for the ${roleForText} role at ${cleanComp} and wanted to follow up directly with my CV and live production demos.`
+          : `I am a Senior Full-Stack Software Engineer & Solutions Architect specializing in .NET, C#, React/TypeScript, Azure, and Enterprise AI, writing regarding the ${roleForText} opportunity at ${cleanComp}.`;
+
         return {
-          subject: `Application & CV: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Dear ${cleanComp} Hiring Team,\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, React/TypeScript, Azure, modern Cloud, and Enterprise AI.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and cutting turnaround time by 80%.\n\nI would love to contribute hands-on to the engineering team at ${cleanComp} (${roleForText}). My CV and signed recommendation letter from Pilz General Manager Yavuz Çopur are attached. ${visaLine}\n\nI would welcome the opportunity for you to review my background or connect me with the engineering hiring team.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+          subject: `${item.hasAppliedInCrm ? "Follow-Up & CV" : "Application & CV"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+          body: `Dear ${cleanComp} Hiring Team,\n\n${openerEn}\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 production enterprise platforms end-to-end (.NET, React, Next.js, Azure, OpenAI/Claude RAG), eliminating manual SAP & e-Invoice bottlenecks and cutting processing time by 80%.\n\nMy CV and signed recommendation letter from Pilz General Manager Yavuz Çopur are attached. ${visaLine}\n\nI would welcome a brief 10-minute call or live screen-share of these production systems at your convenience.\n\nBest regards,\n\nHessam Barasm Mamagani\nPhone: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
         };
       }
 
+      const openerTr = item.hasAppliedInCrm
+        ? `${cleanComp} bünyesindeki ${roleForText} pozisyonu için ilettiğim başvurunun ardından doğrudan bilgi vermek ve canlı sistem demolarımı paylaşmak istedim.`
+        : `Uzun süredir Microsoft ekosistemi (.NET, C#, React/TypeScript, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Mühendisi ve Çözüm Mimarı olarak ${cleanComp} bünyesindeki ${roleForText} rolü için yazıyorum.`;
+
       return {
-        subject: `Yazılım / Mühendislik Başvurusu & Özgeçmiş — ${cleanComp} — Hessam Barasm Mamagani`,
-        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\nUzun süredir Microsoft ekosistemi (.NET, C#, React/TypeScript, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.\n\nAlman Pilz GmbH Türkiye bünyesinde .NET ve bulut mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nTüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ${cleanComp} bünyesindeki yazılım / mühendislik rollerinde (${roleForText}) yer almayı çok istiyorum.\n\nGüncel özgeçmişimi ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe / İK'ya yönlendirmenizi rica ederim.\n\nVaktiniz için çok teşekkürler,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
+        subject: `${item.hasAppliedInCrm ? "Başvuru Takibi & Özgeçmiş" : "Yazılım Başvurusu & Özgeçmiş"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\n${openerTr}\n\nAlman Pilz GmbH Türkiye bünyesinde .NET, React/Next.js ve Azure mimarisiyle 5 kurumsal yazılım platformunu uçtan uca geliştirdim; SAP & GİB e-Fatura süreçlerini %80 hızlandırıp çoklu yapay zeka (RAG / LLM) araçlarını canlıya aldım.\n\nGüncel özgeçmişimi ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubunu ekte bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur; ÇSGB Bilişim Sektörü Muafiyeti kapsamındayım).\n\nUygun görürseniz 10 dakikalık kısa bir tanışma görüşmesinde geliştirdiğim canlı sistemleri ekran paylaşımıyla göstermek isterim.\n\nSaygılarımla,\n\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
@@ -5662,21 +5672,30 @@
         if (target !== "hr" && item.aiIntel.customExecutiveDm) return stripRoleBadgeClient(item.aiIntel.customExecutiveDm);
       }
 
+      const roleForDm = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer";
       if (chosenLang === "EN") {
         const permitPhrase = item.countryGroup === "IE"
-          ? "(backed by a signed recommendation letter from our General Manager, and qualifying directly for Ireland's Critical Skills Permit)"
+          ? "qualifying directly for Ireland's Critical Skills Permit"
           : item.countryGroup === "DE"
-          ? "(backed by a signed recommendation letter from our General Manager, with ANABIN H+ verified M.Eng. degree for the EU Blue Card)"
+          ? "with an ANABIN H+ M.Eng. degree eligible for the EU Blue Card"
           : item.countryGroup === "NL"
-          ? "(backed by a signed recommendation letter from our General Manager, qualifying for the IND Highly Skilled Migrant fast-track)"
+          ? "eligible for the Netherlands IND Highly Skilled Migrant fast-track"
           : item.countryGroup === "UK"
-          ? "(backed by a signed recommendation letter from our General Manager)"
-          : "(based in Istanbul with active work permit and a signed recommendation letter from our General Manager)";
+          ? "eligible for UK Skilled Worker sponsorship"
+          : "based in Istanbul with an active work permit";
 
-        return `Hi,\n\nI am a Senior Full-Stack Developer specializing in .NET, C#, React/TypeScript, Azure, modern Cloud, and Enterprise AI.\n\nAt Pilz Türkiye (German multinational Pilz GmbH), I architected and built 5 enterprise platforms end-to-end, solving SAP and e-Invoice bottlenecks and cutting turnaround time by 80%.\n\nI would love to contribute hands-on to the engineering team at ${cleanComp}. My CV is attached ${permitPhrase}.\n\nI would welcome the opportunity for you to review my background or connect me with the engineering hiring team.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
+        const appliedLineEn = item.hasAppliedInCrm
+          ? `I recently applied for the ${roleForDm} role at ${cleanComp} and wanted to say hello directly.`
+          : `I'm reaching out regarding ${roleForDm} opportunities on your team at ${cleanComp}.`;
+
+        return `Hi,\n\n${appliedLineEn} At Pilz Türkiye (Pilz GmbH), I architected and built 5 enterprise platforms end-to-end (.NET, C#, React/Next.js, Azure, LLM/RAG), automating SAP & e-Invoice workflows by 80%.\n\nI'm ${permitPhrase}, backed by a signed recommendation letter from our General Manager — happy to share my CV or a quick 2-minute live demo if helpful.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
       }
 
-      return `Merhaba,\n\nUzun süredir Microsoft ekosistemi (.NET, C#, React/TypeScript, Azure ve kurumsal yapay zeka) odaklı çalışan kıdemli bir Full-Stack Yazılım Geliştiricisiyim.\n\nPilz Türkiye bünyesinde .NET ve Azure mimarisiyle 5 kurumsal platformu bizzat uçtan uca geliştirdim; SAP & e-Fatura süreçlerini %80 hızlandırıp yapay zeka araçlarını canlıya aldık.\n\nTüm mühendislik odağım kurumsal yazılım mimarisi ve modern teknolojiler üzerine kurulu olduğu için ${cleanComp} ekibi bünyesindeki yazılım / mühendislik rollerinde yer almayı çok istiyorum.\n\nGüncel özgeçmişimi bilgilerinize sunuyorum (İstanbul’da ikamet ediyorum ve aktif çalışma iznim mevcuttur). Uygun göreceğiniz açık pozisyonlar için profilimi değerlendirmenizi veya ilgili teknik ekibe / İK'ya yönlendirmenizi rica ederim.\n\nVaktiniz için çok teşekkürler,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
+      const appliedLineTr = item.hasAppliedInCrm
+        ? `${cleanComp} bünyesindeki ${roleForDm} pozisyonuna başvurumu ilettim ve doğrudan selam vermek istedim.`
+        : `${cleanComp} ekibinizdeki yazılım / mimari fırsatları (${roleForDm}) için doğrudan ulaşmak istedim.`;
+
+      return `Merhaba,\n\n${appliedLineTr} Pilz Türkiye (Pilz GmbH) bünyesinde .NET, C#, React/Next.js ve Azure ile 5 kurumsal platformu uçtan uca geliştirdim; SAP & GİB e-Fatura süreçlerini %80 hızlandırıp kurumsal yapay zeka (RAG) sistemlerini canlıya aldım.\n\nİstanbul’da ikamet ediyorum ve aktif çalışma iznim ile Genel Müdürümüzün imzalı referans mektubu hazırdır. Uygun görürseniz özgeçmişimi ve 2 dakikalık canlı sistem demolarımı paylaşmaktan memnuniyet duyarım.\n\nTeşekkürler, iyi çalışmalar,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
     }
     function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
 
@@ -5743,7 +5762,7 @@
         const unfinishedPortals = apps.filter(a => a.status === "Clicked Apply ⏳");
         const rejectedRoles = apps.filter(a => a.status === "Rejected");
 
-        if (!activeRoles.length && !unfinishedPortals.length && !vip && !TOP_GIANT_RANK_MAP[companyKey]) {
+        if (!activeRoles.length && !unfinishedPortals.length && !vip && !TOP_GIANT_RANK_MAP[companyKey] && !rejectedRoles.length) {
           continue;
         }
 
@@ -5919,17 +5938,22 @@
       const rejected = item.rejectedRoles || [];
       if (!active.length && !portals.length && !rejected.length) return "";
 
-      const renderRolePill = (r, styleClass, badgeText) => {
+      const statusOpts = ["Applied", "Clicked Apply ⏳", "Viewed 👀", "CV Downloaded ⭐", "HR Messaged 💬", "Interview 🎯", "Offer 🏆", "Rejected"];
+      const renderRolePill = (r, styleClass) => {
         const hasUrl = r.url && r.url !== "#";
+        const curSt = r.status || "Applied";
         return `
           <div class="flex flex-wrap items-center justify-between gap-2 p-2 rounded-lg border ${styleClass} text-[11px]">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-1.5 py-0.5 rounded font-bold text-[10px] bg-black/40">${badgeText}</span>
-              <span class="font-semibold text-white">${r.title}</span>
-              <span class="text-slate-400">(${r.platform || "Portal"} · ${r.appliedAt || ""})</span>
+              <select onchange="updateAppStatus('${r.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-bold text-slate-100 cursor-pointer">
+                ${statusOpts.map(s => `<option value="${s}" ${curSt === s ? "selected" : ""}>${s}</option>`).join("")}
+              </select>
+              <span class="font-semibold text-white">${escapeHtmlSafe(r.title)}</span>
+              <span class="text-slate-400">(${escapeHtmlSafe(r.platform || "Portal")} · ${escapeHtmlSafe(r.appliedAt || "")})</span>
             </div>
-            <div class="flex items-center gap-2">
-              ${r.notes ? `<span class="text-slate-300 max-w-md truncate" title="${(r.notes || "").replace(/"/g, "&quot;")}">${r.notes}</span>` : ""}
+            <div class="flex items-center gap-1.5">
+              ${r.notes ? `<span class="text-slate-300 max-w-xs truncate" title="${escapeHtmlSafe(r.notes)}">${escapeHtmlSafe(r.notes)}</span>` : ""}
+              ${curSt !== "Rejected" ? `<button type="button" onclick="updateAppStatus('${r.id}', 'Rejected')" class="px-2 py-0.5 rounded bg-rose-900/40 hover:bg-rose-700/60 border border-rose-500/40 text-rose-200 font-semibold transition shrink-0 cursor-pointer" title="Mark this application as Rejected">✕ Rejected</button>` : ""}
               ${hasUrl ? `<a href="${r.url}" target="_blank" class="px-2 py-0.5 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 font-semibold transition shrink-0">↗ Open Role</a>` : ""}
             </div>
           </div>
@@ -5938,10 +5962,10 @@
 
       return `
         <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-          <div class="text-[11px] font-bold text-slate-300 mb-1">📂 Reconciled Roles at ${item.company} (${active.length} Active${portals.length ? ` · ${portals.length} Finish Portal` : ""}${rejected.length ? ` · ${rejected.length} Closed/Rejected` : ""}):</div>
-          ${active.map(r => renderRolePill(r, "bg-emerald-950/30 border-emerald-500/30 text-emerald-200", r.status || "✅ Active")).join("")}
-          ${portals.map(r => renderRolePill(r, "bg-amber-950/30 border-amber-500/40 text-amber-200", "⏳ Finish External Portal")).join("")}
-          ${rejected.map(r => renderRolePill(r, "bg-rose-950/25 border-rose-500/30 text-rose-300/90 opacity-80", "❌ Rejected")).join("")}
+          <div class="text-[11px] font-bold text-slate-300 mb-1">📂 Reconciled Roles at ${escapeHtmlSafe(item.company)} (${active.length} Active${portals.length ? ` · ${portals.length} Finish Portal` : ""}${rejected.length ? ` · ${rejected.length} Closed/Rejected` : ""}):</div>
+          ${active.map(r => renderRolePill(r, "bg-emerald-950/30 border-emerald-500/30 text-emerald-200")).join("")}
+          ${portals.map(r => renderRolePill(r, "bg-amber-950/30 border-amber-500/40 text-amber-200")).join("")}
+          ${rejected.map(r => renderRolePill(r, "bg-rose-950/25 border-rose-500/30 text-rose-300/90 opacity-80")).join("")}
         </div>
       `;
     }
@@ -6763,6 +6787,11 @@
       const filtered = countryScoped.filter(item => {
         const ch = resolveItemChannels(item, checks);
 
+        if (filter === "REJECTED") {
+          if (!item.rejectedRoles?.length) return false;
+        } else if (!item.activeRoles?.length && !item.unfinishedPortals?.length && item.rejectedRoles?.length && !item.giantRank) {
+          return false;
+        }
         if (filter === "TOP_GIANTS" && !item.giantRank) return false;
         if (filter === "FAST_HIRE_DEC31" && !(item.smartMeta?.isFastSponsor && !item.isAgency)) return false;
         if (filter === "PENDING_EMAIL" && (ch.email || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail)) return false;
@@ -6874,6 +6903,7 @@
       updateGlobalCountryCounts();
       renderCrm();
       renderUnifiedPipeline();
+      showToast(`✅ Saved manual application for "${escapeHtmlSafe(entry.company)}"!`, true);
     }
 
     function initPremiumBookmarklet() {
