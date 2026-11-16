@@ -3278,16 +3278,35 @@
       showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
-    const CLIENT_NON_SOFTWARE_IT_REGEX = /\b(helpdesk|help desk|it support|teknik destek|sistem ve ağ|network engineer|network specialist|system administrator|sistem yöneticisi|bilgi işlem uzmanı|bilgi işlem sorumlusu|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|manual test|qa engineer|test automation|test uzmanı|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|flutter|react native|unity|unreal|game developer|php|laravel|golang|ruby|cobol|mainframe|embedded|gömülü|plc|scada|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b/i;
-    const CLIENT_FOREIGN_TITLE_REGEX = /\b(entwickler|entwicklerin|softwareentwickler|architektin|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|referent|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|anwendungsentwickler|systemarchitekt|datenbankentwickler|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|beheerder|adviseur|medewerker|gezocht|vacature|stage|afstudeer|systeembeheerder|applicatiebeheerder|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b/i;
-    const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|proficient\s+in\s+german|must\s+speak\s+german|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|vloeiend\s+nederlands|must\s+speak\s+dutch)\b/i;
+    const CLIENT_NON_SOFTWARE_IT_REGEX = /\b(helpdesk|help desk|it support|teknik destek|sistem ve ağ|network engineer|network specialist|system administrator|sistem yöneticisi|bilgi işlem uzmanı|bilgi işlem sorumlusu|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|manual test|qa engineer|test automation|test uzmanı|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|php|laravel|golang|ruby|cobol|mainframe|embedded|gömülü|plc|scada|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b/i;
+    const CLIENT_FOREIGN_TITLE_REGEX = /(?:(?:entwickler|entwicklerin|softwareentwickler|anwendungsentwickler|datenbankentwickler|architektin|systemarchitekt|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|systeembeheerder|applicatiebeheerder|beheerder|adviseur|medewerker|gezocht|vacature|afstudeer)\b|\b(?:referent|stage|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b)/i;
+    const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|proficient\s+in\s+german|must\s+speak\s+german|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
+    const CLIENT_FOREIGN_STOPWORDS_REGEX = /\b(und|oder|für|wir|ihre|unser|unsere|bei|zur|zum|eine|einen|einem|einer|sowie|über|aufgaben|anforderungsprofil|kenntnisse|erfahrung|entwicklung|zusammenarbeit|bewerbung|voor|wij|jij|jouw|onze|het|zijn|worden|werkt|ervaring|kennis|functie)\b/gi;
     const CLIENT_NO_VISA_REGEX = /\b(no\s+visa\s+sponsorship|cannot\s+sponsor|unable\s+to\s+sponsor|do\s+not\s+offer\s+(?:visa\s+)?sponsorship|does\s+not\s+offer\s+(?:visa\s+)?sponsorship|without\s+(?:visa\s+)?sponsorship|sponsorship\s+is\s+not\s+available|must\s+already\s+hold\s+a?\s*valid|must\s+have\s+(?:the\s+)?(?:legal\s+)?right\s+to\s+work\s+in\s+(?:the\s+)?(?:uk|ireland|eu|europe|germany|netherlands)\s+without|stamp\s*4\s*(?:only|required)|eu\s+(?:citizens?|passport)\s+only|uk\s+(?:citizens?|nationals?)\s+only|security\s+clearance\s+required|sc\s+cleared|dv\s+cleared)\b/i;
+
+    function isClientDevOpsOrInfraHeavy(title, desc) {
+      if (/\b(devops|sre|site reliability|platform engineer|infrastructure engineer|cloud ops|sysops|devsecops|kubernetes engineer)\b/i.test(title)) {
+        return true;
+      }
+      if (!desc || desc.length < 120) return false;
+      const infraMatches = (desc.match(/\b(kubernetes|eks|aks|gke|argo\s*cd|karpenter|keda|terraform|ansible|helm|prometheus|datadog|gitops|node\s+lifecycle|cluster\s+autoscaling|data\s+residency|istio|fluxcd|grafana\s+loki)\b/gi) || []).length;
+      const strongAppBuild = /\b(c#|asp\.net\s*core|entity\s+framework|react\b|angular\b|typescript|next\.js|blazor|linq)\b/i.test(desc);
+      return infraMatches >= 3 && !strongAppBuild;
+    }
 
     function isValidClientJob(job) {
       const title = (job.title || "").toLowerCase();
       const desc = (job.description || "").toLowerCase();
       const full = `${title} ${desc}`;
-      if (CLIENT_NON_SOFTWARE_IT_REGEX.test(title) || CLIENT_FOREIGN_TITLE_REGEX.test(title) || CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full)) {
+      if (
+        CLIENT_NON_SOFTWARE_IT_REGEX.test(title) ||
+        CLIENT_FOREIGN_TITLE_REGEX.test(title) ||
+        CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) ||
+        isClientDevOpsOrInfraHeavy(title, desc)
+      ) {
+        return false;
+      }
+      if ((desc.match(CLIENT_FOREIGN_STOPWORDS_REGEX) || []).length >= 6) {
         return false;
       }
       const cg = classifyCountryGroup(job.company, job.location, job.countryGroup);
