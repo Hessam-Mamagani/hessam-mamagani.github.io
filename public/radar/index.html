@@ -589,30 +589,38 @@
       const comp = String(company || "").toLowerCase();
       const isTurkishPhysicalLoc = /istanbul|i̇stanbul|türkiye|turkiye|turkey|beşiktaş|levent|maslak|şişli|ataşehir|üsküdar|ümraniye|pendik|kartal|maltepe|tuzla|sarıyer|beykoz|gebze|kocaeli|çayırova|dilovası|bilişim vadisi/i.test(loc);
 
+      if (!isTurkishPhysicalLoc && (/\b(ireland|dublin|cork|galway|limerick)\b/i.test(loc) || /\b(workday dublin|stripe dublin|intercom dublin|toast dublin|mastercard.*dublin)\b/i.test(comp))) {
+        return "IE";
+      }
+
+      if (!isTurkishPhysicalLoc && (/\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|the hague|den haag|delft)\b/i.test(loc) || /\b(booking\.com|adyen|backbase|asml|philips.*eindhoven)\b/i.test(comp))) {
+        return "NL";
+      }
+
+      if (!isTurkishPhysicalLoc && (/\b(germany|deutschland|berlin|munich|münchen|bavaria|hamburg|frankfurt|hesse|stuttgart|walldorf|cologne|köln|düsseldorf|dortmund|erlangen|karlsruhe|leipzig|dresden|hannover)\b/i.test(loc) || /\b(sap se|adesso se|delivery hero se|bosch digital.*germany|siemens.*germany)\b/i.test(comp))) {
+        return "DE";
+      }
+
+      if (
+        /\b(wise|revolut|monzo|mondrian alpha|virtuetech|oho group|arc it|mrj recruitment|understanding recruitment|acceler8|roc search|swi-tch|tenth revolution|identify solutions|erg group|spectrum it|harrington starr|noir|saragossa)\b/i.test(comp) ||
+        (!isTurkishPhysicalLoc && /\b(united kingdom|\buk\b|england|scotland|wales|london|cambridge|manchester|birmingham|leeds|basingstoke|eastleigh|bristol|edinburgh|cardiff|belfast)\b/i.test(loc))
+      ) {
+        return "UK";
+      }
+
+      if (savedGroup && ["IE", "DE", "NL", "UK", "TR", "GLOBAL_REMOTE", "OTHER_ABROAD"].includes(savedGroup)) {
+        if (savedGroup === "TR" && !isTurkishPhysicalLoc && /\b(ireland|germany|netherlands|united kingdom|\buk\b)\b/i.test(loc)) {
+          // ignore stale TR override if abroad loc
+        } else {
+          return savedGroup;
+        }
+      }
+
       if (
         /\b(deel|canonical|alignerr|jobgether|ruby labs|sezzle|oak's lab|oaks lab|flatiron software|crossing hurdles|turing|tbi bank)\b/i.test(comp) ||
         (!isTurkishPhysicalLoc && /\b(europe|emea|global remote|worldwide|anywhere)\b/i.test(loc) && /remote/i.test(loc))
       ) {
         return "GLOBAL_REMOTE";
-      }
-
-      if (!isTurkishPhysicalLoc && (/\b(ireland|dublin|cork|galway|limerick)\b/i.test(loc) || /\b(workday dublin|stripe dublin|intercom dublin|toast dublin|mastercard.*dublin)\b/i.test(comp))) {
-        return "IE";
-      }
-
-      if (!isTurkishPhysicalLoc && (/\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|the hague|den haag)\b/i.test(loc) || /\b(booking\.com|adyen|backbase|asml|philips.*eindhoven)\b/i.test(comp))) {
-        return "NL";
-      }
-
-      if (!isTurkishPhysicalLoc && (/\b(germany|deutschland|berlin|munich|münchen|hamburg|frankfurt|stuttgart|walldorf|cologne|köln|düsseldorf|dortmund|erlangen)\b/i.test(loc) || /\b(sap se|adesso se|delivery hero se|bosch digital.*germany|siemens.*germany)\b/i.test(comp))) {
-        return "DE";
-      }
-
-      if (
-        /\b(wise|revolut|mondrian alpha|virtuetech|oho group|arc it|mrj recruitment|understanding recruitment|acceler8|roc search|swi-tch|tenth revolution|identify solutions|erg group|spectrum it|harrington starr|noir|saragossa)\b/i.test(comp) ||
-        (!isTurkishPhysicalLoc && /\b(united kingdom|\buk\b|england|scotland|london|cambridge|manchester|birmingham|leeds|basingstoke|eastleigh|bristol|edinburgh)\b/i.test(loc))
-      ) {
-        return "UK";
       }
 
       if (
@@ -622,9 +630,6 @@
         return "OTHER_ABROAD";
       }
 
-      if (savedGroup && ["IE", "DE", "NL", "UK", "GLOBAL_REMOTE", "OTHER_ABROAD"].includes(savedGroup) && !isTurkishPhysicalLoc) {
-        return savedGroup;
-      }
       if (savedGroup === "ABROAD" && !isTurkishPhysicalLoc) {
         return "OTHER_ABROAD";
       }
@@ -3273,8 +3278,8 @@
       showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
-    const CLIENT_NON_SOFTWARE_IT_REGEX = /\b(helpdesk|help desk|it support|teknik destek|sistem ve ağ|network engineer|network specialist|system administrator|sistem yöneticisi|bilgi işlem uzmanı|bilgi işlem sorumlusu|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|manual test|qa engineer|test automation|test uzmanı|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|flutter|react native|unity|unreal|game developer|php|laravel|golang|ruby|cobol|mainframe|embedded|gömülü|plc|scada|intern|stajyer|junior|jr\.)\b/i;
-    const CLIENT_FOREIGN_TITLE_REGEX = /\(m\/w\/d\)|\(w\/m\/d\)|\(d\/m\/w\)|\(m\/f\/d\)|\(f\/m\/d\)|\(gn\)|\b(entwickler|softwareentwickler|architekt|ingenieur|berater|projektleiter|teamleiter|abteilungsleiter|referent|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|anwendungsentwickler|systemarchitekt|datenbankentwickler|vollzeit|teilzeit|ontwikkelaar|softwareontwikkelaar|beheerder|adviseur|medewerker|gezocht|vacature|stage|afstudeer|systeembeheerder|applicatiebeheerder|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b/i;
+    const CLIENT_NON_SOFTWARE_IT_REGEX = /\b(helpdesk|help desk|it support|teknik destek|sistem ve ağ|network engineer|network specialist|system administrator|sistem yöneticisi|bilgi işlem uzmanı|bilgi işlem sorumlusu|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|manual test|qa engineer|test automation|test uzmanı|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|flutter|react native|unity|unreal|game developer|php|laravel|golang|ruby|cobol|mainframe|embedded|gömülü|plc|scada|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b/i;
+    const CLIENT_FOREIGN_TITLE_REGEX = /\b(entwickler|entwicklerin|softwareentwickler|architektin|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|referent|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|anwendungsentwickler|systemarchitekt|datenbankentwickler|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|beheerder|adviseur|medewerker|gezocht|vacature|stage|afstudeer|systeembeheerder|applicatiebeheerder|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b/i;
     const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|proficient\s+in\s+german|must\s+speak\s+german|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|vloeiend\s+nederlands|must\s+speak\s+dutch)\b/i;
     const CLIENT_NO_VISA_REGEX = /\b(no\s+visa\s+sponsorship|cannot\s+sponsor|unable\s+to\s+sponsor|do\s+not\s+offer\s+(?:visa\s+)?sponsorship|does\s+not\s+offer\s+(?:visa\s+)?sponsorship|without\s+(?:visa\s+)?sponsorship|sponsorship\s+is\s+not\s+available|must\s+already\s+hold\s+a?\s*valid|must\s+have\s+(?:the\s+)?(?:legal\s+)?right\s+to\s+work\s+in\s+(?:the\s+)?(?:uk|ireland|eu|europe|germany|netherlands)\s+without|stamp\s*4\s*(?:only|required)|eu\s+(?:citizens?|passport)\s+only|uk\s+(?:citizens?|nationals?)\s+only|security\s+clearance\s+required|sc\s+cleared|dv\s+cleared)\b/i;
 
@@ -3642,16 +3647,30 @@
         let anyDirectSuccess = false;
         let alreadyDispatchedByWorker = false;
         let totalQueries = 0;
-        let totalFound = 0;
+        let totalRawLi = 0;
+        let totalAts = 0;
+        let totalAlreadyHandled = 0;
+        let totalFilteredOut = 0;
+
+        // Fast-probe local server once (350ms max) instead of stalling 2s per country if PC server is off
+        let localServerUp = false;
+        try {
+          const probe = await fetch("http://localhost:4545/api/state", { signal: AbortSignal.timeout(350) });
+          localServerUp = probe.ok;
+        } catch {}
+
+        const scanEndpoints = localServerUp
+          ? ["http://localhost:4545/api/scan", `${CF_WORKER_URL}/api/scan`]
+          : [`${CF_WORKER_URL}/api/scan`];
 
         for (let i = 0; i < tracksToScan.length; i++) {
           const trackCode = tracksToScan[i];
           const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
           const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
-          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} via 24/7 Edge...`;
+          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} (LinkedIn + Direct Visa Sponsor ATS)...`;
 
-          for (const scanUrl of ["http://localhost:4545/api/scan", `${CF_WORKER_URL}/api/scan`]) {
+          for (const scanUrl of scanEndpoints) {
             try {
               const res = await fetch(scanUrl, {
                 method: "POST",
@@ -3660,24 +3679,46 @@
               });
               if (res.ok) {
                 const data = await res.json();
-                if (data.mode !== "github-actions-fallback") {
-                  anyDirectSuccess = true;
-                  totalQueries += Number(data.scannedQueries || 0);
-                  totalFound += Number(data.newCount ?? (data.jobs || []).length);
-                  mergeFreshScanJobs(data.jobs || [], trackCode);
-                  updateGlobalCountryCounts();
-                  renderRadarList();
-                } else {
+                const d = data.diagnostics || {};
+                totalQueries += Number(data.scannedQueries || 0);
+                totalRawLi += Number(d.rawLinkedIn || 0);
+                totalAts += Number(d.atsFetched || 0);
+                totalAlreadyHandled += Number(d.skippedOrApplied || 0);
+                totalFilteredOut += Number(d.rejectedLangOrCountry || 0) + Number(d.rejectedVisa || 0) + Number(d.rejectedQuick || 0) + Number(d.rejectedAi || 0);
+                if (d.githubFallbackTriggered || data.mode === "github-actions-fallback") {
                   alreadyDispatchedByWorker = true;
                 }
+                if (Array.isArray(data.jobs) && data.jobs.length > 0) {
+                  anyDirectSuccess = true;
+                }
+                if (data.mode !== "github-actions-fallback") {
+                  anyDirectSuccess = true;
+                }
+                mergeFreshScanJobs(data.jobs || [], trackCode);
+                updateGlobalCountryCounts();
+                renderRadarList();
                 break;
               }
             } catch {}
           }
+          if (i + 1 < tracksToScan.length && !localServerUp) {
+            await new Promise(r => setTimeout(r, 420));
+          }
         }
 
-        if (anyDirectSuccess) {
-          document.getElementById("scanStatusText").textContent = `Scanned ${totalQueries || ""} ${cMeta.flag} ${cMeta.label} feeds live via 24/7 Edge (${totalFound} matching jobs).`;
+        const visibleTotal = ALL_SCAN_JOBS.length;
+        if (anyDirectSuccess || visibleTotal > 0) {
+          const summaryBits = [
+            `${visibleTotal} active unseen match(es)`,
+            `LinkedIn raw: ${totalRawLi}`,
+            `Sponsor ATS scanned: ${totalAts}`,
+            `already applied/skipped: ${totalAlreadyHandled}`,
+            `filtered (non-EN/TR, German/Dutch, no-visa, non-stack): ${totalFilteredOut}`
+          ];
+          document.getElementById("scanStatusText").textContent = `Scan complete (${cMeta.flag} ${cMeta.label}) — ${summaryBits.join(" · ")}${alreadyDispatchedByWorker ? " · ☁️ LinkedIn Runner refreshing in 30s..." : "."}`;
+          if (alreadyDispatchedByWorker) {
+            setTimeout(() => loadCloudFeed(true), 28000);
+          }
           isScanRunning = false;
           if (btn) btn.disabled = false;
           refreshScanButtonLabel();
@@ -3695,7 +3736,7 @@
                 Accept: "application/vnd.github+json",
                 "Content-Type": "application/json"
               },
-              body: JSON.stringify({ ref: "main", inputs: { tpr } })
+              body: JSON.stringify({ ref: "main", inputs: { tpr, country: isAllTracks ? "ALL" : scanCountry } })
             });
           }
           let countdown = 30;
