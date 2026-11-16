@@ -3301,6 +3301,10 @@
     function refreshScanButtonLabel() {
       const btn = document.getElementById("scanBtn");
       if (!btn || isScanRunning) return;
+      if (ACTIVE_COUNTRY === "ALL") {
+        btn.innerHTML = `🔍 Scan 🌐 All 5 Tracks Now`;
+        return;
+      }
       const scanCountry = ["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR";
       const meta = COUNTRY_DISPLAY_META[scanCountry] || COUNTRY_DISPLAY_META.TR;
       btn.innerHTML = `🔍 Scan ${meta.flag} ${meta.short} Jobs Now`;
@@ -3588,8 +3592,10 @@
       if (overrideCountry && ACTIVE_COUNTRY !== overrideCountry) {
         ACTIVE_COUNTRY = overrideCountry;
       }
+      const isAllTracks = ACTIVE_COUNTRY === "ALL";
       const scanCountry = ["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR";
-      const cMeta = COUNTRY_DISPLAY_META[scanCountry] || COUNTRY_DISPLAY_META.TR;
+      const tracksToScan = isAllTracks ? ["TR", "IE", "DE", "NL", "UK"] : [scanCountry];
+      const cMeta = isAllTracks ? COUNTRY_DISPLAY_META.ALL : (COUNTRY_DISPLAY_META[scanCountry] || COUNTRY_DISPLAY_META.TR);
 
       isScanRunning = true;
       const tpr = document.getElementById("tprSelect").value;
@@ -3597,19 +3603,26 @@
       if (btn) btn.disabled = true;
 
       if (IS_LOCAL) {
-        if (btn) btn.innerHTML = `⏳ Scanning ${cMeta.flag} ${cMeta.short}...`;
-        document.getElementById("scanStatusText").textContent = `Querying LinkedIn Guest API for ${cMeta.flag} ${cMeta.label} & filtering out applied/skipped roles...`;
         try {
-          const res = await fetch("/api/scan", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ tpr, country: scanCountry })
-          });
-          const data = await res.json();
-          mergeFreshScanJobs(data.jobs || [], scanCountry);
-          document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries || ""} ${cMeta.flag} ${cMeta.label} searches live. Showing unseen matching roles.`;
-          updateGlobalCountryCounts();
-          renderRadarList();
+          let totalQueries = 0;
+          for (let i = 0; i < tracksToScan.length; i++) {
+            const trackCode = tracksToScan[i];
+            const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
+            const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
+            if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
+            document.getElementById("scanStatusText").textContent = `Querying LinkedIn Guest API for ${tMeta.flag} ${tMeta.label}${stepLabel} & filtering out applied/skipped roles...`;
+            const res = await fetch("/api/scan", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tpr, country: trackCode })
+            });
+            const data = await res.json();
+            totalQueries += Number(data.scannedQueries || 0);
+            mergeFreshScanJobs(data.jobs || [], trackCode);
+            updateGlobalCountryCounts();
+            renderRadarList();
+          }
+          document.getElementById("scanStatusText").textContent = `Scanned ${totalQueries || ""} ${cMeta.flag} ${cMeta.label} searches live. Showing unseen matching roles.`;
         } catch (e) {
           document.getElementById("scanStatusText").textContent = "Error scanning: " + e.message;
         } finally {
@@ -3618,32 +3631,49 @@
           refreshScanButtonLabel();
         }
       } else {
-        if (btn) btn.innerHTML = `⏳ Scanning ${cMeta.flag} ${cMeta.short} 24/7...`;
+        let anyDirectSuccess = false;
         let alreadyDispatchedByWorker = false;
-        for (const scanUrl of ["http://localhost:4545/api/scan", `${CF_WORKER_URL}/api/scan`]) {
-          try {
-            const res = await fetch(scanUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ tpr, country: scanCountry })
-            });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.mode !== "github-actions-fallback") {
-                mergeFreshScanJobs(data.jobs || [], scanCountry);
-                document.getElementById("scanStatusText").textContent = `Scanned ${data.scannedQueries || ""} ${cMeta.flag} ${cMeta.label} feeds live via 24/7 Edge (${data.newCount ?? (data.jobs || []).length} matching jobs).`;
-                updateGlobalCountryCounts();
-                renderRadarList();
-                isScanRunning = false;
-                if (btn) btn.disabled = false;
-                refreshScanButtonLabel();
-                return;
-              } else {
-                alreadyDispatchedByWorker = true;
+        let totalQueries = 0;
+        let totalFound = 0;
+
+        for (let i = 0; i < tracksToScan.length; i++) {
+          const trackCode = tracksToScan[i];
+          const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
+          const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
+          if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
+          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} via 24/7 Edge...`;
+
+          for (const scanUrl of ["http://localhost:4545/api/scan", `${CF_WORKER_URL}/api/scan`]) {
+            try {
+              const res = await fetch(scanUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tpr, country: trackCode })
+              });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.mode !== "github-actions-fallback") {
+                  anyDirectSuccess = true;
+                  totalQueries += Number(data.scannedQueries || 0);
+                  totalFound += Number(data.newCount ?? (data.jobs || []).length);
+                  mergeFreshScanJobs(data.jobs || [], trackCode);
+                  updateGlobalCountryCounts();
+                  renderRadarList();
+                } else {
+                  alreadyDispatchedByWorker = true;
+                }
                 break;
               }
-            }
-          } catch {}
+            } catch {}
+          }
+        }
+
+        if (anyDirectSuccess) {
+          document.getElementById("scanStatusText").textContent = `Scanned ${totalQueries || ""} ${cMeta.flag} ${cMeta.label} feeds live via 24/7 Edge (${totalFound} matching jobs).`;
+          isScanRunning = false;
+          if (btn) btn.disabled = false;
+          refreshScanButtonLabel();
+          return;
         }
 
         if (btn) btn.innerHTML = "☁️ Triggering Cloud Scan...";
@@ -3705,14 +3735,15 @@
       refreshScanButtonLabel();
 
       if (!filtered.length) {
-        const targetScanCountry = ["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR";
-        const scanMeta = COUNTRY_DISPLAY_META[targetScanCountry] || COUNTRY_DISPLAY_META.TR;
+        const isAllTracks = ACTIVE_COUNTRY === "ALL";
+        const targetScanCountry = isAllTracks ? "ALL" : (["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR");
+        const scanMeta = isAllTracks ? COUNTRY_DISPLAY_META.ALL : (COUNTRY_DISPLAY_META[targetScanCountry] || COUNTRY_DISPLAY_META.TR);
         container.innerHTML = `
           <div class="glass rounded-xl p-8 text-center space-y-3 border border-slate-800">
             <div class="text-sm font-bold text-slate-200">No cached unseen roles for ${activeMeta.flag} ${activeMeta.label} in this window yet.</div>
-            <p class="text-xs text-slate-400 max-w-md mx-auto">Click below to run a live LinkedIn scan for ${scanMeta.flag} ${scanMeta.label} sponsors right now, or switch the time filter to "Last 3 Days" / "Last 7 Days".</p>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">${isAllTracks ? 'Click below to run a live LinkedIn scan across all 5 visa-sponsoring tracks (🇹🇷 TR · 🇮🇪 IE · 🇩🇪 DE · 🇳🇱 NL · 🇬🇧 UK) right now, or switch the time filter to "Last 3 Days" / "Last 7 Days".' : `Click below to run a live LinkedIn scan for ${scanMeta.flag} ${scanMeta.label} sponsors right now, or switch the time filter to "Last 3 Days" / "Last 7 Days".`}</p>
             <button type="button" onclick="runScan('${targetScanCountry}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition cursor-pointer">
-              🔍 Scan Live ${scanMeta.flag} ${scanMeta.label} Jobs Now
+              🔍 ${isAllTracks ? "Scan Live 🌐 All 5 Visa Tracks Now" : `Scan Live ${scanMeta.flag} ${scanMeta.label} Jobs Now`}
             </button>
           </div>
         `;
