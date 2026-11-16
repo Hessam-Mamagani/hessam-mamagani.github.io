@@ -3316,8 +3316,8 @@
       if (cg === "TR") {
         const combined = `${title} ${job.location || ""}`.toLowerCase();
         const isRemote = /\b(remote|uzaktan|work from home|evden)\b/i.test(combined);
-        // Allow Istanbul + Gebze / Kocaeli / Bilişim Vadisi / Çayırova / Tuzla (25m Marmaray from Kartal); block distant Turkish cities unless remote
-        if (!isRemote && /\b(ankara|bursa|izmir|i̇zmir|antalya|sakarya|konya|adana|mersin|kayseri|eskisehir|eskişehir|gaziantep|trabzon|samsun|denizli|manisa|tekirdağ|çorlu|düzce)\b/i.test(combined)) {
+        // Istanbul (incl. Maslak/Levent/Asian side) + Remote only; block Kocaeli/Gebze and distant Turkish cities unless remote
+        if (!isRemote && /(?:kocaeli|gebze|çayırova|dilovası|bilişim vadisi|\b(?:ankara|bursa|izmir|i̇zmir|antalya|sakarya|konya|adana|mersin|kayseri|eskisehir|eskişehir|gaziantep|trabzon|samsun|denizli|manisa|tekirdağ|çorlu|düzce)\b)/i.test(combined)) {
           return false;
         }
       }
