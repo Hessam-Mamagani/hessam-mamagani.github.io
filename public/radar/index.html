@@ -3359,7 +3359,7 @@
       showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
-    const CLIENT_NON_SOFTWARE_IT_REGEX = /(?:gömülü|sistem ve ağ|bilgi işlem uzmanı|bilgi işlem sorumlusu|test uzmanı|sızma test|\(\s*go\s*\)|\bgo\s+(?:developer|engineer)\b|\b(helpdesk|help desk|it support|teknik destek|network engineer|network specialist|system administrator|sistem yöneticisi|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|penetration test\w*|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|oracle\s+(?:cloud\s+)?(?:financials|fusion)|data\s+cent(?:re|er)\s+networking|network\s+architect|ccna|ccnp|ccie|manual test|qa engineer|test automation|quality control|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|machine learning engineer|ml engineer|data scientist|veri bilimci|deep learning|computer vision|ai research|php|laravel|golang|ruby|cobol|mainframe|embedded|plc|scada|working student|part[\s-]*time|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b)/i;
+    const CLIENT_NON_SOFTWARE_IT_REGEX = /(?:gömülü|sistem ve ağ|bilgi işlem uzmanı|bilgi işlem sorumlusu|test uzmanı|sızma test|\(\s*go\s*\)|\bgo\s+(?:developer|engineer)\b|\b(helpdesk|help desk|it support|teknik destek|network engineer|network specialist|system administrator|sistem yöneticisi|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|penetration test\w*|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|oracle\s+(?:cloud\s+)?(?:financials|fusion)|data\s+cent(?:re|er)\s+networking|network\s+architect|ccna|ccnp|ccie|manual test|qa engineer|test automation|quality control|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|machine learning engineer|ml engineer|data scientist|veri bilimci|deep learning|computer vision|ai research|account management|account manager|deal desk|\blegal\b|counsel|mandarin|cantonese|php|laravel|golang|ruby|cobol|mainframe|embedded|plc|scada|working student|part[\s-]*time|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b)/i;
     const CLIENT_FOREIGN_TITLE_REGEX = /(?:(?:entwickler|entwicklerin|softwareentwickler|anwendungsentwickler|datenbankentwickler|architektin|systemarchitekt|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|systeembeheerder|applicatiebeheerder|beheerder|adviseur|medewerker|gezocht|vacature|afstudeer)\b|\b(?:referent|stage|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b)/i;
     const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|french|spanish)\s+and\s+)?german|(?:german|dutch)\s+and\s+english\s+at\s+(?:a\s+)?(?:c1|c2|b2|fluent|native)|proficient\s+in\s+german|must\s+speak\s+german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|german)\s+and\s+)?dutch|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
     const CLIENT_FOREIGN_STOPWORDS_REGEX = /\b(und|oder|für|wir|ihre|unser|unsere|bei|zur|zum|eine|einen|einem|einer|sowie|über|aufgaben|anforderungsprofil|kenntnisse|erfahrung|entwicklung|zusammenarbeit|bewerbung|voor|wij|jij|jouw|onze|het|zijn|worden|werkt|ervaring|kennis|functie)\b/gi;
@@ -3368,10 +3368,13 @@
     const CLIENT_EXPLICIT_VISA_REGEX = /\b(visa\s+sponsorship|visa\s+support|relocation|blue\s+card|critical\s+skills|kennismigrant|highly\s+skilled\s+migrant|skilled\s+worker|sponsor\s+visas?)\b/i;
 
     function isClientDevOpsOrInfraHeavy(title, desc) {
-      if (/\b(devops|sre|site reliability|platform engineer|infrastructure engineer|cloud ops|sysops|devsecops|kubernetes engineer)\b/i.test(title)) {
+      if (/\b(devops|sre|site reliability|platform engineer|platform engineering|developer platform|developer experience|\bdevex\b|\bdevxp\b|developer productivity|infrastructure engineer|cloud ops|sysops|devsecops|kubernetes engineer)\b/i.test(title)) {
         return true;
       }
       if (!desc || desc.length < 120) return false;
+      if (/\b(internal developer platform|sandboxed execution environments|agent workflows in ci|developer productivity\s*·\s*ai coding agents)\b/i.test(desc)) {
+        return true;
+      }
       const infraMatches = (desc.match(/\b(kubernetes|eks|aks|gke|argo\s*cd|karpenter|keda|terraform|ansible|helm|prometheus|datadog|gitops|node\s+lifecycle|cluster\s+autoscaling|data\s+residency|istio|fluxcd|grafana\s+loki)\b/gi) || []).length;
       const strongAppBuild = /\b(c#|asp\.net\s*core|entity\s+framework|react\b|angular\b|typescript|next\.js|blazor|linq)\b/i.test(desc);
       return infraMatches >= 3 && !strongAppBuild;
@@ -3771,31 +3774,35 @@
           refreshScanButtonLabel();
         }
       } else {
-        let anyDirectSuccess = false;
-        let alreadyDispatchedByWorker = false;
         let totalQueries = 0;
         let totalRawLi = 0;
         let totalAts = 0;
         let totalAlreadyHandled = 0;
         let totalFilteredOut = 0;
 
-        // Fast-probe local server once (350ms max) instead of stalling 2s per country if PC server is off
-        let localServerUp = false;
-        try {
-          const probe = await fetch("http://localhost:4545/api/state", { signal: AbortSignal.timeout(350) });
-          localServerUp = probe.ok;
-        } catch {}
+        // Probe local PC backend (127.0.0.1:4545 / localhost:4545 — uses clean residential IP with 0% LinkedIn block!)
+        let localBaseUrl = "";
+        for (const candidateBase of ["http://127.0.0.1:4545", "http://localhost:4545"]) {
+          try {
+            const probe = await fetch(`${candidateBase}/api/state`, { signal: AbortSignal.timeout(1200) });
+            if (probe.ok) {
+              localBaseUrl = candidateBase;
+              break;
+            }
+          } catch {}
+        }
 
-        const scanEndpoints = localServerUp
-          ? ["http://localhost:4545/api/scan", `${CF_WORKER_URL}/api/scan`]
+        const scanEndpoints = localBaseUrl
+          ? [`${localBaseUrl}/api/scan`, `${CF_WORKER_URL}/api/scan`]
           : [`${CF_WORKER_URL}/api/scan`];
 
         for (let i = 0; i < tracksToScan.length; i++) {
           const trackCode = tracksToScan[i];
           const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
           const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
+          const engineLabel = localBaseUrl ? "Local PC Residential IP + 22 Official Sponsor ATS JSON APIs" : "Cloudflare Worker + 22 Official Sponsor ATS JSON APIs";
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
-          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} (LinkedIn + Direct Visa Sponsor ATS)...`;
+          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} via ${engineLabel} (Zero GitHub Actions delay)...`;
 
           for (const scanUrl of scanEndpoints) {
             try {
@@ -3812,15 +3819,6 @@
                 totalAts += Number(d.atsFetched || 0);
                 totalAlreadyHandled += Number(d.skippedOrApplied || 0);
                 totalFilteredOut += Number(d.rejectedLangOrCountry || 0) + Number(d.rejectedVisa || 0) + Number(d.rejectedQuick || 0) + Number(d.rejectedAi || 0);
-                if (d.githubFallbackTriggered || data.mode === "github-actions-fallback") {
-                  alreadyDispatchedByWorker = true;
-                }
-                if (Array.isArray(data.jobs) && data.jobs.length > 0) {
-                  anyDirectSuccess = true;
-                }
-                if (data.mode !== "github-actions-fallback") {
-                  anyDirectSuccess = true;
-                }
                 mergeFreshScanJobs(data.jobs || [], trackCode);
                 updateGlobalCountryCounts();
                 renderRadarList();
@@ -3828,69 +3826,26 @@
               }
             } catch {}
           }
-          if (i + 1 < tracksToScan.length && !localServerUp) {
-            await new Promise(r => setTimeout(r, 420));
+          if (i + 1 < tracksToScan.length && !localBaseUrl) {
+            await new Promise(r => setTimeout(r, 350));
           }
         }
 
+        await loadCloudFeed();
         const visibleTotal = ALL_SCAN_JOBS.length;
-        if (anyDirectSuccess || visibleTotal > 0) {
-          const summaryBits = [
-            `${visibleTotal} active unseen match(es)`,
-            `LinkedIn raw: ${totalRawLi}`,
-            `Sponsor ATS scanned: ${totalAts}`,
-            `already applied/skipped: ${totalAlreadyHandled}`,
-            `filtered (non-EN/TR, German/Dutch, no-visa, non-stack): ${totalFilteredOut}`
-          ];
-          document.getElementById("scanStatusText").textContent = `Scan complete (${cMeta.flag} ${cMeta.label}) — ${summaryBits.join(" · ")}${alreadyDispatchedByWorker ? " · ☁️ LinkedIn Runner refreshing in 30s..." : "."}`;
-          if (alreadyDispatchedByWorker) {
-            setTimeout(() => loadCloudFeed(true), 28000);
-          }
-          isScanRunning = false;
-          if (btn) btn.disabled = false;
-          refreshScanButtonLabel();
-          return;
-        }
-
-        if (btn) btn.innerHTML = "☁️ Triggering Cloud Scan...";
-        const token = getGhToken();
-        try {
-          if (!alreadyDispatchedByWorker && token) {
-            await fetch(`https://api.github.com/repos/${GH_REPO}/actions/workflows/job-radar-scan.yml/dispatches`, {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/vnd.github+json",
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({ ref: "main", inputs: { tpr, country: isAllTracks ? "ALL" : scanCountry } })
-            });
-          }
-          let countdown = 30;
-          document.getElementById("scanStatusText").textContent = `☁️ Cloud scanner running (${countdown}s)...`;
-          const cdInterval = setInterval(() => {
-            countdown--;
-            if (countdown > 0) {
-              document.getElementById("scanStatusText").textContent = `☁️ Cloud scanner running (${countdown}s)...`;
-            } else {
-              clearInterval(cdInterval);
-            }
-          }, 1000);
-
-          setTimeout(async () => {
-            clearInterval(cdInterval);
-            await loadCloudFeed();
-            isScanRunning = false;
-            if (btn) btn.disabled = false;
-            refreshScanButtonLabel();
-            setTimeout(loadCloudFeed, 10000);
-          }, 30000);
-        } catch (e) {
-          await loadCloudFeed();
-          isScanRunning = false;
-          if (btn) btn.disabled = false;
-          refreshScanButtonLabel();
-        }
+        const modeTag = localBaseUrl ? "🏠 Local PC Residential IP + Direct ATS" : "⚡ Edge Direct Sponsor ATS JSON";
+        const summaryBits = [
+          `${visibleTotal} verified sponsor match(es)`,
+          modeTag,
+          totalAts ? `Official ATS scanned: ${totalAts}` : null,
+          totalRawLi ? `LinkedIn cards: ${totalRawLi}` : null,
+          totalAlreadyHandled ? `already applied/skipped: ${totalAlreadyHandled}` : null,
+          totalFilteredOut ? `filtered (no-visa/off-stack): ${totalFilteredOut}` : null
+        ].filter(Boolean);
+        document.getElementById("scanStatusText").textContent = `Scan complete (${cMeta.flag} ${cMeta.label}) — ${summaryBits.join(" · ")}.`;
+        isScanRunning = false;
+        if (btn) btn.disabled = false;
+        refreshScanButtonLabel();
       }
     }
 
@@ -7933,232 +7888,4 @@
           { label: "📝 'Why Us?' Portal Answer", prompt: `Write a ready-to-paste answer in ${isTr ? "both Turkish and English" : "English"} for the portal question: Why do you want to join ${comp} and why are you a strong fit for ${role}?` },
           { label: "⚖️ Visa / Muafiyet Pitch", prompt: `Draft the exact ${isTr ? "Turkish HR message explaining my 31.12.2026 active work permit + e-İzin transfer + ÇSGB Bilişim Uzmanı 5-Turkish-employee exemption" : "recruiter message pitching my Critical Skills / EU Blue Card / HSM sponsorship readiness and GMT+3 remote bridge"} for ${comp}.` },
           { label: "💬 Tailor Tech + HR DMs", prompt: `Write tailored LinkedIn DMs for both a CTO/Engineering Manager and an HR Recruiter at ${comp} for ${role}, mentioning my 5 live Pilz/EvenTracer/InsightfulAI platforms.` },
-          { label: "🎤 Top 3 Interview Q&As", prompt: `Give me the 3 most likely technical + architecture interview questions ${comp} will ask for ${role}, with plain-language answers tied to my PilzPortal and EvenTracer code.` }
-        ];
-        chipsEl.innerHTML = quickList.map((chip, idx) => {
-          const pKey = registerCopyPayload(`cp_chip_${chatKey}_${idx}`, chip.prompt);
-          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
-        }).join("");
-      } else {
-        if (badgeEl) badgeEl.textContent = "🌐 Global Career, Legal, Salary & Interview Copilot";
-        if (globalBtn) globalBtn.classList.add("hidden");
-        if (titleEl) titleEl.textContent = "Full-Context Copilot (Synced Across Devices via Cloudflare D1)";
-        if (subEl) subEl.textContent = "Knows your 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas, and live D1 CRM.";
-        const globalChips = [
-          { label: "📅 Today's Top 5 Actions", prompt: "Look at my live CRM, 31.12.2026 work-permit timeline, and 6-country tracks. Give me a concrete, prioritized 5-step execution plan for today." },
-          { label: "⚖️ Pilz Dec 31 & İzin Audit", prompt: "Review my Pilz payout numbers (369k TL Dec net after avans, 14.12 vs 31.12 notice/izin overlap, 01.01–10.01.2027 window) and tell me how to protect both my GM reference and my legal rights." },
-          { label: "🇹🇷 Fast Dec 31 Sponsors", prompt: "Which Istanbul Asian-side, Gebze/Bilişim Vadisi, or Teknopark companies in my target universe can realistically sign an offer and file e-İzin before Jan 10, 2027?" },
-          { label: "🇮🇪🇩🇪🇳🇱 EU Visa Comparison", prompt: "Compare Ireland Critical Skills, Germany EU Blue Card, and Netherlands HSM for my family of 3 (including my 9-year-old daughter's English schooling and path to permanent residency)." },
-          { label: "🎤 Start Live Mock Interview", prompt: "Run a realistic Senior .NET 10 + Architecture + AI mock interview with me. Ask Question 1 first, wait for my answer, and coach me in plain language." }
-        ];
-        chipsEl.innerHTML = globalChips.map((chip, idx) => {
-          const pKey = registerCopyPayload(`cp_gchip_${idx}`, chip.prompt);
-          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
-        }).join("");
-      }
-
-      const history = getJobChatHistory(chatKey);
-      if (subEl) {
-        const baseSub = ctx
-          ? (ctx.subtitle || "")
-          : "Knows your v1 vs v2 CVs, 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas & live D1 CRM.";
-        subEl.textContent = `${baseSub} · 🧠 Thread Memory: ${history.length} turn(s) synced`;
-      }
-      if (!history.length) {
-        msgEl.innerHTML = `
-          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2.5 leading-relaxed">
-            <div class="font-bold text-emerald-300 text-sm">👋 Multi-Agent Orchestrator Ready, Hessam.</div>
-            <div class="flex flex-wrap gap-1.5 text-[10px]">
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-cyan-500/40 text-cyan-300 font-semibold">🧠 Main Orchestrator (Full Thread Memory)</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-emerald-500/40 text-emerald-300 font-semibold">📂 v2 CV &amp; Codebase Vault Agent</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-amber-500/40 text-amber-300 font-semibold">🗄️ D1 CRM &amp; Live DNS Tool Agent</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-indigo-500/40 text-indigo-300 font-semibold">🌐 Live Web &amp; LinkedIn Research Subagent</span>
-            </div>
-            <p>Click any quick-prompt chip above, or type/paste anything below — I keep <strong>100% of our conversation context</strong> across every turn:</p>
-            <ul class="list-disc pl-5 space-y-1 text-slate-400">
-              <li>Paste a job description or tough application portal question for a ready-to-copy answer</li>
-              <li>Ask follow-up edits (<code class="text-slate-200">"make it shorter"</code>, <code class="text-slate-200">"translate that to Turkish"</code>, <code class="text-slate-200">"check their CTO on the net"</code>)</li>
-              <li>Ask which exact <code class="text-slate-200">v2</code> CV file &amp; 2027 salary band to use for any country</li>
-              <li>Practice any C#/.NET, SQL, React, or System Design interview topic interactively</li>
-            </ul>
-          </div>
-        `;
-        return;
-      }
-
-      msgEl.innerHTML = history.map((m, idx) => {
-        const isUser = m.role === "user";
-        const snippetText = m.copySnippet || m.copyableAnswer || "";
-        const copyKey = snippetText ? registerCopyPayload(`cp_ans_${chatKey}_${idx}`, snippetText) : "";
-        const fullCopyKey = !isUser ? registerCopyPayload(`cp_full_${chatKey}_${idx}`, m.content || "") : "";
-        const traceHtml = !isUser && Array.isArray(m.agentTrace) && m.agentTrace.length
-          ? `<div class="flex flex-wrap gap-1 pt-0.5">${m.agentTrace.map(t => `<span class="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700/80 text-[10px] text-cyan-300 font-semibold" title="${escapeHtmlSafe(t.summary || '')}">${escapeHtmlSafe(t.agent)}${t.summary ? ` · <span class="text-slate-400 font-normal">${escapeHtmlSafe(t.summary.slice(0, 56))}</span>` : ''}</span>`).join("")}</div>`
-          : "";
-        return `
-          <div class="p-3 rounded-xl ${isUser ? "bg-blue-950/50 border border-blue-500/35 ml-8" : "bg-slate-900/95 border border-emerald-500/30 mr-3"} space-y-2">
-            <div class="flex items-center justify-between gap-2 flex-wrap">
-              <span class="text-[10px] font-bold tracking-wider ${isUser ? "text-blue-300" : "text-emerald-300"}">${isUser ? `👤 YOU (Turn ${idx + 1})` : `🧠 ORCHESTRATOR${m.provider ? ` · ${escapeHtmlSafe(m.provider)}` : ""}`}</span>
-              ${!isUser ? `
-                <div class="flex items-center gap-1.5">
-                  ${copyKey ? `<button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Ready answer copied!')" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy Ready Answer</button>` : ""}
-                  <button type="button" onclick="copyFromStore('${fullCopyKey}', this, '📋 Reply copied!')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold cursor-pointer">📋 Copy</button>
-                </div>
-              ` : ""}
-            </div>
-            ${traceHtml}
-            <div class="text-xs text-slate-100 whitespace-pre-wrap leading-relaxed">${escapeHtmlSafe(m.content || "")}</div>
-            ${!isUser && snippetText && !(m.content || "").includes(snippetText.slice(0, 45)) ? `
-              <div class="p-2.5 rounded-lg bg-emerald-950/45 border border-emerald-500/40 space-y-1">
-                <div class="text-[10px] font-bold text-emerald-300">📋 Drafted Copy-Ready Text:</div>
-                <pre class="text-xs text-emerald-100 whitespace-pre-wrap font-sans leading-relaxed">${escapeHtmlSafe(snippetText)}</pre>
-              </div>
-            ` : ""}
-            ${m.appliedNote ? `<div class="text-[10px] text-amber-300 font-semibold pt-1 border-t border-slate-800">⚡ ${escapeHtmlSafe(m.appliedNote)}</div>` : ""}
-          </div>
-        `;
-      }).join("");
-      msgEl.scrollTop = msgEl.scrollHeight;
-    }
-
-    async function sendCopilotPrompt(presetText = "") {
-      const inputEl = document.getElementById("copilotInput");
-      const btnEl = document.getElementById("copilotSendBtn");
-      const rawMsg = (presetText || (inputEl ? inputEl.value : "")).trim();
-      if (!rawMsg) return;
-      if (inputEl && !presetText) inputEl.value = "";
-
-      const ctx = CURRENT_COPILOT_CONTEXT;
-      const chatKey = getActiveCopilotChatKey();
-      const priorHistory = getJobChatHistory(chatKey).slice(-24);
-      const history = [...priorHistory, { role: "user", content: rawMsg, ts: new Date().toISOString() }];
-      saveJobChatHistory(chatKey, history, true);
-      renderCopilotDrawer();
-
-      const msgEl = document.getElementById("copilotMessages");
-      if (msgEl) {
-        msgEl.insertAdjacentHTML(
-          "beforeend",
-          `<div id="copilotOrchestratorPending" class="p-3 rounded-xl bg-slate-900/95 border border-cyan-500/40 mr-3 space-y-1.5 animate-pulse">
-            <div class="text-[11px] font-bold text-cyan-300">🧠 Main Orchestrator active (${priorHistory.length} prior turns in memory)...</div>
-            <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">📂 Checking v2 CV &amp; Codebase Vault</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🗄️ Querying D1 CRM &amp; DNS</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🌐 Running Web &amp; LinkedIn Research Subagent</span>
-            </div>
-          </div>`
-        );
-        msgEl.scrollTop = msgEl.scrollHeight;
-      }
-
-      if (btnEl) {
-        btnEl.disabled = true;
-        btnEl.innerHTML = "⏳ Orchestrating...";
-      }
-
-      const endpoint = IS_LOCAL ? "/api/ai-chat" : `${CF_WORKER_URL}/api/ai-chat`;
-      const globalSnapshot = {
-        activeCountryPill: ACTIVE_COUNTRY,
-        activeTab: ACTIVE_TAB,
-        totalAppliedCount: STATE.applied.length,
-        recentApplications: STATE.applied.slice(0, 12).map(a => ({
-          company: a.company,
-          title: a.title,
-          location: a.location,
-          status: a.status,
-          salaryQuote: a.salaryQuote,
-          appliedAt: a.appliedAt
-        }))
-      };
-
-      try {
-        let res = await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chatKey,
-            message: rawMsg,
-            jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
-            history: priorHistory
-          })
-        });
-        if (!res.ok && IS_LOCAL) {
-          res = await fetch(`${CF_WORKER_URL}/api/ai-chat`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chatKey,
-              message: rawMsg,
-              jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
-              history: priorHistory
-            })
-          });
-        }
-
-        const data = res.ok ? await res.json() : null;
-        if (data && data.reply) {
-          let appliedChanges = [];
-          if (ctx?.pipelineItemId && data.actions) {
-            const pipeItem = findPipelineItem(ctx.pipelineItemId);
-            if (pipeItem) {
-              appliedChanges = await applyJobAgentActions(pipeItem, data.actions);
-            }
-          }
-          const snippet = data.copySnippet || data.copyableAnswer || "";
-          const updated = getJobChatHistory(chatKey);
-          updated.push({
-            role: "assistant",
-            content: data.reply,
-            copySnippet: snippet,
-            copyableAnswer: snippet,
-            agentTrace: data.agentTrace || [],
-            provider: data.provider || "",
-            appliedNote: appliedChanges.length ? `Updated on card & D1: ${appliedChanges.join(" · ")}` : "",
-            ts: new Date().toISOString()
-          });
-          saveJobChatHistory(chatKey, updated, true);
-          if (appliedChanges.length) {
-            renderUnifiedPipeline();
-            renderCrm();
-          }
-        } else {
-          const updated = getJobChatHistory(chatKey);
-          updated.push({
-            role: "assistant",
-            content: "⚠️ Copilot timed out or hit a temporary rate limit — please click Send again in 3 seconds.",
-            ts: new Date().toISOString()
-          });
-          saveJobChatHistory(chatKey, updated, false);
-        }
-      } catch (err) {
-        const updated = getJobChatHistory(chatKey);
-        updated.push({
-          role: "assistant",
-          content: `⚠️ Network error contacting AI Copilot: ${err.message || "Check connection"}`,
-          ts: new Date().toISOString()
-        });
-        saveJobChatHistory(chatKey, updated, false);
-      } finally {
-        if (btnEl) {
-          btnEl.disabled = false;
-          btnEl.innerHTML = "🤖 Send";
-        }
-        renderCopilotDrawer();
-        if (ctx?.pipelineItemId) {
-          const inlineLog = document.getElementById(`jobAgentLog-${ctx.pipelineItemId}`);
-          if (inlineLog) inlineLog.innerHTML = renderJobAgentMessagesHtml(ctx.pipelineItemId);
-        }
-      }
-    }
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        const drawer = document.getElementById("copilotDrawer");
-        if (drawer && !drawer.classList.contains("hidden")) closeCopilotDrawer();
-      }
-    });
-
-    renderCoachTab();
-    initApp();
-  </script>
-</body>
-</html>
+... [truncated for diff preview]
