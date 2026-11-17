@@ -90,7 +90,7 @@
 
       <!-- Scan Controls -->
       <div id="scanControls" class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <select id="tprSelect" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
+        <select id="tprSelect" onchange="updateGlobalCountryCounts(); renderRadarList();" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500">
           <option value="r3600">Last 1 Hour</option>
           <option value="r21600">Last 6 Hours</option>
           <option value="r86400" selected>Last 24 Hours (Daily)</option>
@@ -982,7 +982,7 @@
       const counts = { TR: 0, IE: 0, DE: 0, NL: 0, UK: 0, GLOBAL_REMOTE: 0, OTHER_ABROAD: 0, ALL: 0 };
 
       if (ACTIVE_TAB === "radar") {
-        const source = ALL_SCAN_JOBS.length ? ALL_SCAN_JOBS : LAST_SCAN_JOBS;
+        const source = typeof getVisibleRadarPool === "function" ? getVisibleRadarPool() : (ALL_SCAN_JOBS.length ? ALL_SCAN_JOBS : LAST_SCAN_JOBS);
         source.forEach(j => {
           const cg = j.countryGroup && keys.includes(j.countryGroup)
             ? j.countryGroup
@@ -3390,6 +3390,157 @@
       return false;
     }
 
+    function foldClientIdentity(s = "") {
+      return String(s || "")
+        .replace(/İ/g, "i")
+        .replace(/I/g, "i")
+        .replace(/ı/g, "i")
+        .replace(/Ş/g, "s")
+        .replace(/ş/g, "s")
+        .replace(/Ğ/g, "g")
+        .replace(/ğ/g, "g")
+        .replace(/Ü/g, "u")
+        .replace(/ü/g, "u")
+        .replace(/Ö/g, "o")
+        .replace(/ö/g, "o")
+        .replace(/Ç/g, "c")
+        .replace(/ç/g, "c")
+        .toLowerCase();
+    }
+
+    function normClientCompanyBrand(c = "") {
+      return foldClientIdentity(c)
+        .replace(/\(.*?\)/g, " ")
+        .replace(/\buseinsider\b/g, "insider")
+        .replace(/\b(bilgi ve iletisim teknolojileri|information and communication technologies|global bilgi|anonim sirketi)\b/g, " ")
+        .replace(/\b(one|group|holding|teknoloji|technology|technologies|yazilim|software|bilisim|solutions|digital|turkiye|turkey|dublin|london|amsterdam|berlin|munich|germany|ireland|netherlands|uk|gmbh|inc|ltd|as|se|corp|llc|plc)\b/g, " ")
+        .replace(/[^a-z0-9]+/g, "")
+        .trim();
+    }
+
+    function normClientRoleCore(t = "") {
+      return foldClientIdentity(t)
+        .replace(/\(.*?\)/g, " ")
+        .replace(/\[.*?\]/g, " ")
+        .split("|")[0]
+        .replace(/\s+-\s+(?:remote|hybrid|onsite|istanbul|ankara|turkey|turkiye|london|dublin|berlin|amsterdam|europe|emea).*$/i, "")
+        .replace(/\b(m\/f\/d|f\/m\/d|m\/f\/x|f\/m\/x|remote|hybrid|hibrit|uzaktan)\b/g, " ")
+        .replace(/front[\s-]*end/g, "frontend")
+        .replace(/back[\s-]*end/g, "backend")
+        .replace(/full[\s-]*stack/g, "fullstack")
+        .replace(/\.net\s*core/g, "dotnet")
+        .replace(/\.net/g, "dotnet")
+        .replace(/c#/g, "csharp")
+        .replace(/[^a-z0-9]+/g, "")
+        .trim();
+    }
+
+    function buildClientAppliedSkippedMatcher() {
+      const appliedIds = new Set();
+      const skippedIds = new Set([...(STATE.skipped || []).map(String), ...getLocalSkippedCache().map(String)]);
+      const appliedUrls = new Set();
+      const appliedBrandRoles = new Set();
+      const hideSameCompany = document.getElementById("hideSameCompanyChk")?.checked === false ? false : false; // exact role+company always skipped; strict whole-company opt-in only inside Premium modal
+      for (const a of (STATE.applied || [])) {
+        if (!a) continue;
+        if (a.id) appliedIds.add(String(a.id));
+        const rawUrl = String(a.url || "").split("?")[0].replace(/\/+$/, "").toLowerCase();
+        if (rawUrl) {
+          appliedUrls.add(rawUrl);
+          const liM = rawUrl.match(/linkedin\.com\/jobs\/view\/(?:[^/]*-)?(\d{8,})/);
+          if (liM) appliedIds.add(liM[1]);
+        }
+        const brand = normClientCompanyBrand(a.company || "");
+        const role = normClientRoleCore(a.title || "");
+        if (brand.length >= 3 && role.length >= 6) {
+          appliedBrandRoles.add(`${brand}::${role}`);
+        }
+      }
+      return {
+        appliedIds,
+        skippedIds,
+        has(jobOrId, company = "", title = "", url = "") {
+          const isObj = jobOrId && typeof jobOrId === "object";
+          const id = String(isObj ? jobOrId.id || "" : jobOrId || "");
+          const comp = isObj ? jobOrId.company || "" : company;
+          const tit = isObj ? jobOrId.title || "" : title;
+          const u = String(isObj ? jobOrId.url || "" : url || "").split("?")[0].replace(/\/+$/, "").toLowerCase();
+          if (id && (appliedIds.has(id) || skippedIds.has(id))) return true;
+          if (u) {
+            if (appliedUrls.has(u)) return true;
+            const liM = u.match(/linkedin\.com\/jobs\/view\/(?:[^/]*-)?(\d{8,})/);
+            if (liM && (appliedIds.has(liM[1]) || skippedIds.has(liM[1]))) return true;
+          }
+          const brand = normClientCompanyBrand(comp);
+          const role = normClientRoleCore(tit);
+          if (brand.length >= 3 && role.length >= 6 && appliedBrandRoles.has(`${brand}::${role}`)) {
+            return true;
+          }
+          return false;
+        }
+      };
+    }
+
+    function clientTprToMaxHours(tpr) {
+      const v = tpr || document.getElementById("tprSelect")?.value || "r86400";
+      if (v === "r3600") return 1.5;
+      if (v === "r21600") return 6.5;
+      if (v === "r86400") return 26;
+      if (v === "r259200") return 76;
+      if (v === "r604800") return 176;
+      return 26;
+    }
+
+    function parseClientJobAgeHours(job) {
+      if (!job) return 9999;
+      const idStr = String(job.id || "").trim();
+      if (/^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
+      if (job.postedTs && Number(job.postedTs) > 1000000000000) {
+        return Math.max(0, (Date.now() - Number(job.postedTs)) / 3600000);
+      }
+      if (job.datetime) {
+        const dt = Date.parse(job.datetime);
+        if (!Number.isNaN(dt) && dt > 1000000000000) return Math.max(0, (Date.now() - dt) / 3600000);
+      }
+      const s = foldClientIdentity(job.postedAgo || "").trim();
+      if (!s) return null;
+      if (/\b(just now|today|az once|simdi|bugun|minutes?|mins?|dakika|\bdk\b|seconds?|saniye)\b/.test(s)) return 0.5;
+      let m = s.match(/(\d+)\s*(?:hours?|hrs?|\bh\b|saat)/);
+      if (m) return Number(m[1]);
+      m = s.match(/(\d+)\s*(?:days?|\bd\b|gun)/);
+      if (m) return Number(m[1]) * 24;
+      m = s.match(/(\d+)\s*(?:weeks?|\bw\b|hafta)/);
+      if (m) return Number(m[1]) * 168;
+      m = s.match(/(\d+)\s*(?:months?|\bmo\b|\bay\b)/);
+      if (m) return Number(m[1]) * 720;
+      m = s.match(/(\d+)\s*(?:years?|yil|sene)/);
+      if (m) return Number(m[1]) * 8760;
+      return null;
+    }
+
+    function isClientJobWithinTpr(job, tprOverride) {
+      const maxHrs = clientTprToMaxHours(tprOverride);
+      const ageHrs = parseClientJobAgeHours(job);
+      if (ageHrs === null) return false;
+      return ageHrs <= maxHrs;
+    }
+
+    function getVisibleRadarPool(tprOverride) {
+      const matcher = buildClientAppliedSkippedMatcher();
+      const raw = (ALL_SCAN_JOBS && ALL_SCAN_JOBS.length) ? ALL_SCAN_JOBS : LAST_SCAN_JOBS;
+      const seenRoleSigs = new Set();
+      return (raw || []).filter(j => {
+        if (!j || !j.id || matcher.has(j)) return false;
+        if (!isValidClientJob(j)) return false;
+        if (!isClientJobWithinTpr(j, tprOverride)) return false;
+        const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
+        const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
+        if (seenRoleSigs.has(sig)) return false;
+        seenRoleSigs.add(sig);
+        return true;
+      });
+    }
+
     function isValidClientJob(job) {
       if ((job.score || 0) > 0 && (job.score || 0) < 65) return false;
       const title = (job.title || "").toLowerCase();
@@ -3505,10 +3656,19 @@
           }
         }
 
-        const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
-        const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
+        const matcher = buildClientAppliedSkippedMatcher();
+        const seenRoleSigs = new Set();
         ALL_SCAN_JOBS = Array.from(combinedMap.values())
-          .filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isValidClientJob(j))
+          .filter(j => {
+            if (!j || !j.id || matcher.has(j) || !isValidClientJob(j)) return false;
+            const ageHrs = parseClientJobAgeHours(j);
+            if (ageHrs === null || ageHrs > 176) return false;
+            const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
+            const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
+            if (seenRoleSigs.has(sig)) return false;
+            seenRoleSigs.add(sig);
+            return true;
+          })
           .sort((a, b) => (b.score || 0) - (a.score || 0));
         LAST_SCAN_JOBS = ALL_SCAN_JOBS;
 
@@ -3712,8 +3872,7 @@
     }
 
     function mergeFreshScanJobs(freshJobs, fallbackCountry) {
-      const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
-      const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
+      const matcher = buildClientAppliedSkippedMatcher();
       const mergedMap = new Map();
       for (const existing of (ALL_SCAN_JOBS || [])) {
         if (existing && existing.id) mergedMap.set(String(existing.id), existing);
@@ -3724,8 +3883,18 @@
         const cg = classifyCountryGroup(j.company, j.location, j.countryGroup || prev.countryGroup || fallbackCountry);
         mergedMap.set(String(j.id), { ...prev, ...j, countryGroup: cg });
       }
+      const seenRoleSigs = new Set();
       ALL_SCAN_JOBS = Array.from(mergedMap.values())
-        .filter(j => !appliedIds.has(String(j.id)) && !skippedIds.has(String(j.id)) && isValidClientJob(j))
+        .filter(j => {
+          if (!j || !j.id || matcher.has(j) || !isValidClientJob(j)) return false;
+          const ageHrs = parseClientJobAgeHours(j);
+          if (ageHrs === null || ageHrs > 176) return false;
+          const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
+          const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
+          if (seenRoleSigs.has(sig)) return false;
+          seenRoleSigs.add(sig);
+          return true;
+        })
         .sort((a, b) => (b.score || 0) - (a.score || 0));
       LAST_SCAN_JOBS = ALL_SCAN_JOBS;
     }
@@ -3776,8 +3945,8 @@
         }
       } else {
         // 100% Online Published Mode (GitHub Pages + Cloudflare Worker + Direct Browser CORS Sponsor JSON APIs — Zero Local Server Required!)
-        const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
-        const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
+        const clientMatcher = buildClientAppliedSkippedMatcher();
+        const maxAgeMs = clientTprToMaxHours(tpr) * 3600000;
         const POS_SW_TITLE_RE = /(\.net|c#|dotnet|full[\s-]*stack|fullstack|backend|back-end|frontend|front-end|react|next\.?js|typescript|software engineer|software developer|yazılım geliştirme|yazılım uzmanı|yazılım mühendisi|architect|mimar|engineering manager|yazılım müdürü|uygulama geliştirme|iş uygulamaları|iş çözümleri|dijital dönüşüm|digital transformation|süreç otomasyon|process automation|enterprise applications|çözüm mühendisi|solutions engineer|uygulama mimarı|(?:software|engineering|technical|tech|backend|frontend|yazılım)\s+(?:team\s+)?lead|tech lead|yazılım takım lideri|ai engineer|ai product engineer|yapay zeka|llm|genai|ai agent|automation developer)/i;
 
         const stripHtmlFast = (h = "") =>
@@ -3802,6 +3971,9 @@
           const desc = String(raw.description || "");
           const loc = String(raw.location || "");
           const comp = String(raw.company || "");
+          const postedTs = Number(raw.postedTs || 0);
+          if (!postedTs || Date.now() - postedTs > maxAgeMs) return null;
+          if (clientMatcher.has(raw.id, comp, title, raw.url)) return null;
           if (!title || !desc || desc.length < 80) return null;
           if (CLIENT_NON_SOFTWARE_IT_REGEX.test(title) || !POS_SW_TITLE_RE.test(title)) return null;
           if (isClientDevOpsOrInfraHeavy(`${title} ${dept}`, desc)) return null;
@@ -3826,7 +3998,8 @@
             title,
             company: comp,
             location: loc,
-            postedAgo: raw.postedAgo || "Direct Sponsor ATS",
+            postedTs,
+            postedAgo: raw.postedAgo,
             url: raw.url,
             description: desc.slice(0, 3500),
             countryGroup: trackCode,
@@ -3844,7 +4017,6 @@
         const fetchBrowserSponsorAtsForTrack = async (trackCode) => {
           let rawCount = 0;
           const ageStr = (ms) => {
-            if (!ms || Number.isNaN(ms)) return "Direct Sponsor ATS";
             const h = Math.max(1, Math.round((Date.now() - ms) / 3600000));
             return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`;
           };
@@ -3855,8 +4027,10 @@
               const d = await r.json();
               rawCount += (d.jobs || []).length;
               const hits = (d.jobs || []).filter(j => {
+                const ts = Date.parse(j.first_published || j.updated_at || "");
+                if (!ts || Number.isNaN(ts) || Date.now() - ts > maxAgeMs) return false;
                 const id = `gh_${slug}_${j.id}`;
-                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                if (clientMatcher.has(id, company, j.title || "")) return false;
                 return locRe.test(String(j.location?.name || "")) && POS_SW_TITLE_RE.test(j.title || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.title || "");
               }).slice(0, 6);
               const dets = await Promise.all(hits.map(async j => {
@@ -3864,13 +4038,16 @@
                   const dr = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs/${j.id}`, { signal: AbortSignal.timeout(4500) });
                   if (!dr.ok) return null;
                   const det = await dr.json();
+                  const pubTs = Date.parse(det.first_published || det.updated_at || j.updated_at || "");
+                  if (!pubTs || Number.isNaN(pubTs) || Date.now() - pubTs > maxAgeMs) return null;
                   return {
                     id: `gh_${slug}_${j.id}`,
                     title: stripHtmlFast(det.title || j.title || ""),
                     department: (det.departments || []).map(x => x.name || "").join(" "),
                     company,
                     location: `${det.location?.name || fallbackLoc} (Direct Sponsor ATS)`,
-                    postedAgo: ageStr(Date.parse(det.updated_at || j.updated_at || "")),
+                    postedTs: pubTs,
+                    postedAgo: ageStr(pubTs),
                     url: det.absolute_url || `https://boards.greenhouse.io/${slug}/jobs/${j.id}`,
                     description: stripHtmlFast(det.content || ""),
                     badge
@@ -3888,8 +4065,10 @@
               if (!Array.isArray(arr)) return [];
               rawCount += arr.length;
               return arr.filter(j => {
+                const ts = Number(j.createdAt || 0);
+                if (!ts || Date.now() - ts > maxAgeMs) return false;
                 const id = `lev_${slug}_${String(j.id).slice(0, 36)}`;
-                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                if (clientMatcher.has(id, company, j.text || "", j.hostedUrl || "")) return false;
                 const lStr = `${j.categories?.location || ""} ${(j.categories?.allLocations || []).join(" ")} ${j.country || ""}`;
                 return locRe.test(lStr) && POS_SW_TITLE_RE.test(j.text || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.text || "");
               }).slice(0, 8).map(j => ({
@@ -3898,7 +4077,8 @@
                 department: `${j.categories?.department || ""} ${j.categories?.team || ""}`,
                 company,
                 location: `${j.categories?.location || fallbackLoc} (Direct Sponsor ATS)`,
-                postedAgo: ageStr(j.createdAt || 0),
+                postedTs: Number(j.createdAt),
+                postedAgo: ageStr(Number(j.createdAt)),
                 url: j.hostedUrl || j.applyUrl,
                 description: [j.descriptionPlain || stripHtmlFast(j.description || ""), ...(j.lists || []).map(l => `${l.text || ""}: ${stripHtmlFast(l.content || "")}`), j.additionalPlain || ""].filter(Boolean).join("\n\n"),
                 badge
@@ -3913,23 +4093,29 @@
               rawCount += (d.jobs || []).length;
               return (d.jobs || []).filter(j => {
                 if (j.isListed === false) return false;
+                const ts = Date.parse(j.publishedAt || "");
+                if (!ts || Number.isNaN(ts) || Date.now() - ts > maxAgeMs) return false;
                 const id = `ash_${slug}_${String(j.id).slice(0, 36)}`;
-                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                if (clientMatcher.has(id, company, j.title || "", j.jobUrl || "")) return false;
                 const lStr = [j.location || "", ...(j.secondaryLocations || []).map(s => s.location || "")].join(" ");
                 if (!locRe.test(lStr) || !POS_SW_TITLE_RE.test(j.title || "") || CLIENT_NON_SOFTWARE_IT_REGEX.test(j.title || "")) return false;
                 const plain = j.descriptionPlain || stripHtmlFast(j.descriptionHtml || "");
                 return !reqRe || reqRe.test(plain);
-              }).slice(0, 6).map(j => ({
-                id: `ash_${slug}_${String(j.id).slice(0, 36)}`,
-                title: stripHtmlFast(j.title || ""),
-                department: `${j.department || ""} ${j.team || ""}`,
-                company,
-                location: `${fallbackLoc}`,
-                postedAgo: ageStr(Date.parse(j.publishedAt || "")),
-                url: j.jobUrl || j.applyUrl,
-                description: j.descriptionPlain || stripHtmlFast(j.descriptionHtml || ""),
-                badge
-              }));
+              }).slice(0, 6).map(j => {
+                const pubTs = Date.parse(j.publishedAt || "");
+                return {
+                  id: `ash_${slug}_${String(j.id).slice(0, 36)}`,
+                  title: stripHtmlFast(j.title || ""),
+                  department: `${j.department || ""} ${j.team || ""}`,
+                  company,
+                  location: `${fallbackLoc}`,
+                  postedTs: pubTs,
+                  postedAgo: ageStr(pubTs),
+                  url: j.jobUrl || j.applyUrl,
+                  description: j.descriptionPlain || stripHtmlFast(j.descriptionHtml || ""),
+                  badge
+                };
+              });
             } catch { return []; }
           };
           const sr = async (slug, company, countryParam, locRe, badge, fallbackLoc) => {
@@ -3939,8 +4125,10 @@
               const d = await r.json();
               rawCount += (d.content || []).length;
               const hits = (d.content || []).filter(j => {
+                const ts = Date.parse(j.releasedDate || "");
+                if (!ts || Number.isNaN(ts) || Date.now() - ts > maxAgeMs) return false;
                 const id = `sr_${slug.toLowerCase()}_${j.id}`;
-                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                if (clientMatcher.has(id, company, j.name || "")) return false;
                 const lStr = `${j.location?.fullLocation || ""} ${j.location?.city || ""} ${j.location?.country || ""}`;
                 return locRe.test(lStr) && POS_SW_TITLE_RE.test(j.name || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.name || "");
               }).slice(0, 5);
@@ -3951,13 +4139,15 @@
                   const det = await dr.json();
                   const sec = det.jobAd?.sections || {};
                   const desc = [sec.companyDescription?.text, sec.jobDescription?.text, sec.qualifications?.text, sec.additionalInformation?.text].map(x => stripHtmlFast(x || "")).filter(Boolean).join("\n\n");
+                  const relTs = Date.parse(j.releasedDate || "");
                   return {
                     id: `sr_${slug.toLowerCase()}_${j.id}`,
                     title: stripHtmlFast(j.name || ""),
                     department: `${j.department?.label || ""} ${j.function?.label || ""}`,
                     company,
                     location: `${j.location?.fullLocation || fallbackLoc} (Direct Sponsor ATS)`,
-                    postedAgo: ageStr(Date.parse(j.releasedDate || "")),
+                    postedTs: relTs,
+                    postedAgo: ageStr(relTs),
                     url: det.postingUrl || `https://jobs.smartrecruiters.com/${slug}/${j.id}`,
                     description: desc,
                     badge
@@ -4028,7 +4218,7 @@
           const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
           const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
-          document.getElementById("scanStatusText").textContent = `⚡ Wave 1: Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live (22 Official Sponsor Career APIs + Cloudflare Edge)...`;
+          document.getElementById("scanStatusText").textContent = `⚡ Wave 1: Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live (strictly enforcing selected time window)...`;
 
           const [browserAtsRes, workerRes] = await Promise.all([
             fetchBrowserSponsorAtsForTrack(trackCode),
@@ -4063,13 +4253,13 @@
         if (btn) btn.disabled = false;
         refreshScanButtonLabel();
 
-        const visibleAfterW1 = ALL_SCAN_JOBS.length;
+        const visibleAfterW1 = getVisibleRadarPool(tpr).length;
         const bgSuffix = ghBgTriggered
-          ? " · 🤖 Wave 2 (AI Web Agent: LinkedIn + Kariyer.net) & 🔄 Wave 3 (Full Fresh-IP LinkedIn Sweep) running in background..."
-          : " · 🤖 Wave 2 (AI Web Agent: LinkedIn + Kariyer.net) running in background...";
-        document.getElementById("scanStatusText").textContent = `⚡ Wave 1 complete (${cMeta.flag} ${cMeta.label}) — ${visibleAfterW1} verified Visa-First roles active (${totalAts}+ ATS${totalRawLi ? ` + ${totalRawLi} LinkedIn` : ""})${bgSuffix}`;
+          ? " · 🤖 Wave 2 (AI Web Agent) & 🔄 Wave 3 (Full Fresh-IP LinkedIn Sweep) running in background..."
+          : " · 🤖 Wave 2 (AI Web Agent) running in background...";
+        document.getElementById("scanStatusText").textContent = `⚡ Wave 1 complete (${cMeta.flag} ${cMeta.label}) — ${visibleAfterW1} unseen roles in selected time window (${totalAts}+ ATS${totalRawLi ? ` + ${totalRawLi} LinkedIn` : ""} checked)${bgSuffix}`;
 
-        // WAVE 2 (~7s, Non-Blocking Background): Live AI Web-Search Agent (GPT-4o / Claude / Gemini) across ALL LinkedIn, Kariyer.net & Open Web
+        // WAVE 2 (~7s, Non-Blocking Background): Live AI Web-Search Agent (GPT-4o / Claude / Gemini) strictly locked to tpr!
         (async () => {
           let aiFoundTotal = 0;
           let lastProvider = "AI Web Search";
@@ -4078,17 +4268,17 @@
               const r = await fetch(`${CF_WORKER_URL}/api/ai-web-scan`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ country: trackCode })
+                body: JSON.stringify({ country: trackCode, tpr })
               });
               if (!r.ok) continue;
               const aiRes = await r.json();
               if (aiRes?.provider) lastProvider = aiRes.provider;
-              const prevLen = ALL_SCAN_JOBS.length;
+              const prevLen = getVisibleRadarPool(tpr).length;
               if (Array.isArray(aiRes?.jobs) && aiRes.jobs.length > 0) {
                 mergeFreshScanJobs(aiRes.jobs, trackCode);
                 updateGlobalCountryCounts();
                 renderRadarList();
-                const delta = Math.max(0, ALL_SCAN_JOBS.length - prevLen);
+                const delta = Math.max(0, getVisibleRadarPool(tpr).length - prevLen);
                 aiFoundTotal += delta;
               }
             } catch {}
@@ -4097,7 +4287,7 @@
             showToast(`🤖 AI Web Agent (${lastProvider}) discovered ${aiFoundTotal} new verified role(s)!`, true);
           }
           const wave3Note = ghBgTriggered ? " · 🔄 Wave 3 (GitHub Actions Fresh-IP LinkedIn Sweep) auto-syncing in ~15s" : "";
-          document.getElementById("scanStatusText").textContent = `✅ Wave 1 + 🤖 Wave 2 (${lastProvider}) complete — ${ALL_SCAN_JOBS.length} verified Visa-First roles active${wave3Note}.`;
+          document.getElementById("scanStatusText").textContent = `✅ Wave 1 + 🤖 Wave 2 (${lastProvider}) complete — ${getVisibleRadarPool(tpr).length} unseen roles in selected time window${wave3Note}.`;
         })();
 
         // WAVE 3 (~18s & ~32s, Non-Blocking Background): Auto-pull full 21-query Fresh-IP GitHub Actions LinkedIn results from D1
@@ -4112,7 +4302,7 @@
       renderTodayActionStrip();
       const container = document.getElementById("radarList");
       if (!container) return;
-      const pool = (ALL_SCAN_JOBS && ALL_SCAN_JOBS.length) ? ALL_SCAN_JOBS : LAST_SCAN_JOBS;
+      const pool = getVisibleRadarPool();
       const filtered = ACTIVE_COUNTRY === "ALL"
         ? pool
         : pool.filter(j => classifyCountryGroup(j.company, j.location, j.countryGroup) === ACTIVE_COUNTRY);
@@ -4128,13 +4318,18 @@
         const isAllTracks = ACTIVE_COUNTRY === "ALL";
         const targetScanCountry = isAllTracks ? "ALL" : (["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR");
         const scanMeta = isAllTracks ? COUNTRY_DISPLAY_META.ALL : (COUNTRY_DISPLAY_META[targetScanCountry] || COUNTRY_DISPLAY_META.TR);
+        const curTpr = document.getElementById("tprSelect")?.value || "r86400";
+        const wider7dPool = getVisibleRadarPool("r604800").filter(j => isAllTracks || classifyCountryGroup(j.company, j.location, j.countryGroup) === ACTIVE_COUNTRY);
         container.innerHTML = `
           <div class="glass rounded-xl p-8 text-center space-y-3 border border-slate-800">
-            <div class="text-sm font-bold text-slate-200">No cached unseen roles for ${activeMeta.flag} ${activeMeta.label} in this window yet.</div>
-            <p class="text-xs text-slate-400 max-w-md mx-auto">${isAllTracks ? 'Click below to run a live LinkedIn scan across all 5 visa-sponsoring tracks (🇹🇷 TR · 🇮🇪 IE · 🇩🇪 DE · 🇳🇱 NL · 🇬🇧 UK) right now, or switch the time filter to "Last 3 Days" / "Last 7 Days".' : `Click below to run a live LinkedIn scan for ${scanMeta.flag} ${scanMeta.label} sponsors right now, or switch the time filter to "Last 3 Days" / "Last 7 Days".`}</p>
-            <button type="button" onclick="runScan('${targetScanCountry}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition cursor-pointer">
-              🔍 ${isAllTracks ? "Scan Live 🌐 All 5 Visa Tracks Now" : `Scan Live ${scanMeta.flag} ${scanMeta.label} Jobs Now`}
-            </button>
+            <div class="text-sm font-bold text-slate-200">0 unseen roles for ${activeMeta.flag} ${activeMeta.label} inside your selected time window (all matching roles already applied/skipped or none posted yet).</div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">Click below to run a live scan right now, or widen the time filter to Last 3 Days / Last 7 Days${wider7dPool.length ? ` (${wider7dPool.length} verified role(s) waiting in 7-day window)` : ""}.</p>
+            <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+              <button type="button" onclick="runScan('${targetScanCountry}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition cursor-pointer">
+                🔍 ${isAllTracks ? "Scan Live 🌐 All 5 Visa Tracks Now" : `Scan Live ${scanMeta.flag} ${scanMeta.label} Jobs Now`}
+              </button>
+              ${curTpr !== "r604800" ? `<button type="button" onclick="document.getElementById('tprSelect').value='r604800'; updateGlobalCountryCounts(); renderRadarList(); runScan('${targetScanCountry}');" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 transition cursor-pointer">📅 Widen to Last 7 Days &amp; Scan</button>` : ""}
+            </div>
           </div>
         `;
         return;
