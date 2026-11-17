@@ -871,11 +871,16 @@
       if (/\bwise\b/.test(s)) return "wise";
       if (/\brevolut\b/.test(s)) return "revolut";
       if (/\bteleport\b/.test(s)) return "teleport";
-      return s
+      if (/\btcm\b/.test(s)) return "tcm";
+      const baseWords = s
         .split("(")[0]
-        .replace(/\b(a\.ş\.|a\.s\.|anonim şirketi|san\.|tic\.|ltd\.|şti\.|inc\.|group|teknoloji|bilişim|hizmetleri|danışmanlık)\b/gi, "")
-        .replace(/[^a-z0-9ğüşıöç]/gi, "")
-        .trim();
+        .replace(/\./g, "")
+        .replace(/[,/-]+/g, " ")
+        .trim()
+        .split(/\s+/)
+        .filter(w => !/^(aş|as|anonim|şirketi|sirketi|san|sanayi|tic|ticaret|ltd|şti|sti|inc|corp|gmbh|bv|group|teknoloji|bilişim|bilisim|hizmetleri|danışmanlık|danismanlik|ve)$/i.test(w));
+      const joined = (baseWords.length ? baseWords.join("") : s).replace(/[^a-z0-9ğüşıöç]/gi, "").trim();
+      return joined || s.replace(/[^a-z0-9ğüşıöç]/gi, "").trim();
     }
 
     const TOP_GIANT_RANK_MAP = {
@@ -5524,18 +5529,27 @@
       d1Post("/api/outreach-check", { itemId: cKey, checks: updated });
 
       // Auto-advance CRM status if user completed outreach on an Applied job
+      const compKeyForOutreach = item?.companyKey || normalizeCompanyKey(item?.company || "");
+      const matchingAppliedRows = compKeyForOutreach
+        ? STATE.applied.filter(a => normalizeCompanyKey(a.company || "") === compKeyForOutreach && a.status === "Applied")
+        : [];
       const crmTargetId = item?.primaryCrmId || strId;
       const crmItem = STATE.applied.find(a => String(a.id) === String(crmTargetId));
-      if (crmItem && (field === "email" || field === "techDm" || field === "hrDm" || field === "connDm" || field === "callWalk") && value && crmItem.status === "Applied") {
-        crmItem.status = "HR Messaged 💬";
-        if (IS_LOCAL) {
-          fetch("/api/status", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: crmItem.id, status: "HR Messaged 💬" })
-          }).catch(() => {});
+      const rowsToAdvance = crmItem && crmItem.status === "Applied"
+        ? [crmItem, ...matchingAppliedRows.filter(r => String(r.id) !== String(crmItem.id))]
+        : matchingAppliedRows;
+      if (rowsToAdvance.length && (field === "email" || field === "techDm" || field === "hrDm" || field === "connDm" || field === "callWalk") && value) {
+        for (const row of rowsToAdvance) {
+          row.status = "HR Messaged 💬";
+          if (IS_LOCAL) {
+            fetch("/api/status", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: row.id, status: "HR Messaged 💬" })
+            }).catch(() => {});
+          }
+          d1Post("/api/status", { id: row.id, status: "HR Messaged 💬" });
         }
-        d1Post("/api/status", { id: crmItem.id, status: "HR Messaged 💬" });
         updateHeaderCounts();
         renderCrm();
       }
