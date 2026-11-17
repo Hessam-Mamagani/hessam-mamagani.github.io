@@ -3774,75 +3774,288 @@
           refreshScanButtonLabel();
         }
       } else {
-        let totalQueries = 0;
+        // 100% Online Published Mode (GitHub Pages + Cloudflare Worker + Direct Browser CORS Sponsor JSON APIs — Zero Local Server Required!)
+        const appliedIds = new Set(STATE.applied.map(a => String(a.id)));
+        const skippedIds = new Set([...STATE.skipped.map(String), ...getLocalSkippedCache().map(String)]);
+        const POS_SW_TITLE_RE = /(\.net|c#|dotnet|full[\s-]*stack|fullstack|backend|back-end|frontend|front-end|react|next\.?js|typescript|software engineer|software developer|yazılım geliştirme|yazılım uzmanı|yazılım mühendisi|architect|mimar|engineering manager|yazılım müdürü|uygulama geliştirme|iş uygulamaları|iş çözümleri|dijital dönüşüm|digital transformation|süreç otomasyon|process automation|enterprise applications|çözüm mühendisi|solutions engineer|uygulama mimarı|(?:software|engineering|technical|tech|backend|frontend|yazılım)\s+(?:team\s+)?lead|tech lead|yazılım takım lideri|ai engineer|ai product engineer|yapay zeka|llm|genai|ai agent|automation developer)/i;
+
+        const stripHtmlFast = (h = "") =>
+          String(h || "")
+            .replace(/&amp;/g, "&")
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&nbsp;/g, " ")
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<\/p>/gi, "\n\n")
+            .replace(/<\/li>/gi, "\n")
+            .replace(/<li>/gi, "• ")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+        const scoreBrowserAtsJob = (raw, trackCode) => {
+          const title = String(raw.title || "").trim();
+          const dept = String(raw.department || "");
+          const desc = String(raw.description || "");
+          const loc = String(raw.location || "");
+          const comp = String(raw.company || "");
+          if (!title || !desc || desc.length < 80) return null;
+          if (CLIENT_NON_SOFTWARE_IT_REGEX.test(title) || !POS_SW_TITLE_RE.test(title)) return null;
+          if (isClientDevOpsOrInfraHeavy(`${title} ${dept}`, desc)) return null;
+          if (isClientPurePythonMlOrResearchRole(title, desc)) return null;
+          const full = `${title} ${comp} ${loc} ${desc}`;
+          if (CLIENT_FOREIGN_TITLE_REGEX.test(title) || CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) || CLIENT_B2B_NO_PERMIT_REGEX.test(full)) return null;
+          if ((desc.match(CLIENT_FOREIGN_STOPWORDS_REGEX) || []).length >= 6) return null;
+          if (trackCode !== "TR" && CLIENT_NO_VISA_REGEX.test(full)) return null;
+
+          let score = 74; // Visa-First Direct Verified Sponsor base!
+          const tags = [raw.badge || "🛂 Verified Sponsor ATS"];
+          if (/(\.net\b|c#|asp\.net)/i.test(full)) { score += 14; tags.push(".NET / C#"); }
+          if (/(\breact\b|next\.?js)/i.test(full)) { score += 8; tags.push("React / Next.js"); }
+          if (/\btypescript\b/i.test(full)) { score += 6; tags.push("TypeScript"); }
+          if (/\b(llm|openai|anthropic|claude|rag\b|semantic kernel|ai\s+agents?|agentic)\b/i.test(full)) { score += 8; tags.push("AI / RAG"); }
+          if (/\b(architect|mimar|engineering manager|principal|tech lead)\b/i.test(title)) { score += 5; tags.push("Lead / Architect"); }
+          score = Math.min(99, score);
+
+          const smart = computeClientSmartSalaryAndTier(comp, title, loc, desc);
+          return {
+            id: raw.id,
+            title,
+            company: comp,
+            location: loc,
+            postedAgo: raw.postedAgo || "Direct Sponsor ATS",
+            url: raw.url,
+            description: desc.slice(0, 3500),
+            countryGroup: trackCode,
+            score,
+            tags: tags.slice(0, 4),
+            tier: smart.tier,
+            tierLabel: smart.tierLabel,
+            hiringSpeed: smart.hiringSpeed,
+            recommendedSalary: smart.salaryBand,
+            recommendedCvCode: smart.cvCode,
+            recommendedCv: smart.cvFile,
+          };
+        };
+
+        const fetchBrowserSponsorAtsForTrack = async (trackCode) => {
+          let rawCount = 0;
+          const ageStr = (ms) => {
+            if (!ms || Number.isNaN(ms)) return "Direct Sponsor ATS";
+            const h = Math.max(1, Math.round((Date.now() - ms) / 3600000));
+            return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`;
+          };
+          const gh = async (slug, company, locRe, badge, fallbackLoc) => {
+            try {
+              const r = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`, { signal: AbortSignal.timeout(6000) });
+              if (!r.ok) return [];
+              const d = await r.json();
+              rawCount += (d.jobs || []).length;
+              const hits = (d.jobs || []).filter(j => {
+                const id = `gh_${slug}_${j.id}`;
+                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                return locRe.test(String(j.location?.name || "")) && POS_SW_TITLE_RE.test(j.title || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.title || "");
+              }).slice(0, 6);
+              const dets = await Promise.all(hits.map(async j => {
+                try {
+                  const dr = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs/${j.id}`, { signal: AbortSignal.timeout(4500) });
+                  if (!dr.ok) return null;
+                  const det = await dr.json();
+                  return {
+                    id: `gh_${slug}_${j.id}`,
+                    title: stripHtmlFast(det.title || j.title || ""),
+                    department: (det.departments || []).map(x => x.name || "").join(" "),
+                    company,
+                    location: `${det.location?.name || fallbackLoc} (Direct Sponsor ATS)`,
+                    postedAgo: ageStr(Date.parse(det.updated_at || j.updated_at || "")),
+                    url: det.absolute_url || `https://boards.greenhouse.io/${slug}/jobs/${j.id}`,
+                    description: stripHtmlFast(det.content || ""),
+                    badge
+                  };
+                } catch { return null; }
+              }));
+              return dets.filter(Boolean);
+            } catch { return []; }
+          };
+          const lev = async (slug, company, locRe, badge, fallbackLoc) => {
+            try {
+              const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`, { signal: AbortSignal.timeout(7000) });
+              if (!r.ok) return [];
+              const arr = await r.json();
+              if (!Array.isArray(arr)) return [];
+              rawCount += arr.length;
+              return arr.filter(j => {
+                const id = `lev_${slug}_${String(j.id).slice(0, 36)}`;
+                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                const lStr = `${j.categories?.location || ""} ${(j.categories?.allLocations || []).join(" ")} ${j.country || ""}`;
+                return locRe.test(lStr) && POS_SW_TITLE_RE.test(j.text || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.text || "");
+              }).slice(0, 8).map(j => ({
+                id: `lev_${slug}_${String(j.id).slice(0, 36)}`,
+                title: stripHtmlFast(j.text || ""),
+                department: `${j.categories?.department || ""} ${j.categories?.team || ""}`,
+                company,
+                location: `${j.categories?.location || fallbackLoc} (Direct Sponsor ATS)`,
+                postedAgo: ageStr(j.createdAt || 0),
+                url: j.hostedUrl || j.applyUrl,
+                description: [j.descriptionPlain || stripHtmlFast(j.description || ""), ...(j.lists || []).map(l => `${l.text || ""}: ${stripHtmlFast(l.content || "")}`), j.additionalPlain || ""].filter(Boolean).join("\n\n"),
+                badge
+              }));
+            } catch { return []; }
+          };
+          const ash = async (slug, company, locRe, badge, fallbackLoc, reqRe = null) => {
+            try {
+              const r = await fetch(`https://api.ashbyhq.com/posting-api/job-board/${slug}`, { signal: AbortSignal.timeout(7000) });
+              if (!r.ok) return [];
+              const d = await r.json();
+              rawCount += (d.jobs || []).length;
+              return (d.jobs || []).filter(j => {
+                if (j.isListed === false) return false;
+                const id = `ash_${slug}_${String(j.id).slice(0, 36)}`;
+                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                const lStr = [j.location || "", ...(j.secondaryLocations || []).map(s => s.location || "")].join(" ");
+                if (!locRe.test(lStr) || !POS_SW_TITLE_RE.test(j.title || "") || CLIENT_NON_SOFTWARE_IT_REGEX.test(j.title || "")) return false;
+                const plain = j.descriptionPlain || stripHtmlFast(j.descriptionHtml || "");
+                return !reqRe || reqRe.test(plain);
+              }).slice(0, 6).map(j => ({
+                id: `ash_${slug}_${String(j.id).slice(0, 36)}`,
+                title: stripHtmlFast(j.title || ""),
+                department: `${j.department || ""} ${j.team || ""}`,
+                company,
+                location: `${fallbackLoc}`,
+                postedAgo: ageStr(Date.parse(j.publishedAt || "")),
+                url: j.jobUrl || j.applyUrl,
+                description: j.descriptionPlain || stripHtmlFast(j.descriptionHtml || ""),
+                badge
+              }));
+            } catch { return []; }
+          };
+          const sr = async (slug, company, countryParam, locRe, badge, fallbackLoc) => {
+            try {
+              const r = await fetch(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?limit=50${countryParam ? `&country=${countryParam}` : ""}`, { signal: AbortSignal.timeout(6000) });
+              if (!r.ok) return [];
+              const d = await r.json();
+              rawCount += (d.content || []).length;
+              const hits = (d.content || []).filter(j => {
+                const id = `sr_${slug.toLowerCase()}_${j.id}`;
+                if (appliedIds.has(id) || skippedIds.has(id)) return false;
+                const lStr = `${j.location?.fullLocation || ""} ${j.location?.city || ""} ${j.location?.country || ""}`;
+                return locRe.test(lStr) && POS_SW_TITLE_RE.test(j.name || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.name || "");
+              }).slice(0, 5);
+              const dets = await Promise.all(hits.map(async j => {
+                try {
+                  const dr = await fetch(j.ref, { signal: AbortSignal.timeout(4500) });
+                  if (!dr.ok) return null;
+                  const det = await dr.json();
+                  const sec = det.jobAd?.sections || {};
+                  const desc = [sec.companyDescription?.text, sec.jobDescription?.text, sec.qualifications?.text, sec.additionalInformation?.text].map(x => stripHtmlFast(x || "")).filter(Boolean).join("\n\n");
+                  return {
+                    id: `sr_${slug.toLowerCase()}_${j.id}`,
+                    title: stripHtmlFast(j.name || ""),
+                    department: `${j.department?.label || ""} ${j.function?.label || ""}`,
+                    company,
+                    location: `${j.location?.fullLocation || fallbackLoc} (Direct Sponsor ATS)`,
+                    postedAgo: ageStr(Date.parse(j.releasedDate || "")),
+                    url: det.postingUrl || `https://jobs.smartrecruiters.com/${slug}/${j.id}`,
+                    description: desc,
+                    badge
+                  };
+                } catch { return null; }
+              }));
+              return dets.filter(Boolean);
+            } catch { return []; }
+          };
+
+          let lists = [];
+          if (trackCode === "TR") {
+            const trRe = /(?:istanbul|i̇stanbul|gebze|kocaeli|türkiye|turkiye|turkey|\btr\b)/i;
+            lists = await Promise.all([
+              lev("getmidas", "Midas", trRe, "🇹🇷 Tier-1 FinTech ATS", "Istanbul, Türkiye"),
+              lev("commencis", "Commencis (İTÜ Teknokent)", trRe, "🛂 Teknokent e-İzin ATS", "Istanbul, Türkiye"),
+              lev("iyzico", "iyzico", trRe, "🇹🇷 Tier-1 FinTech ATS", "Istanbul, Türkiye"),
+              lev("insiderone", "Insider", trRe, "🦄 Istanbul Unicorn ATS", "Istanbul, Türkiye"),
+              sr("BoschGroup", "Bosch Türkiye", "tr", /(?:istanbul|i̇stanbul|kocaeli|gebze)/i, "🇩🇪🇹🇷 Bosch R&D ATS", "Istanbul, Türkiye")
+            ]);
+          } else if (trackCode === "IE") {
+            const ieRe = /\b(dublin|ireland|cork|galway)\b/i;
+            lists = await Promise.all([
+              gh("stripe", "Stripe Dublin", ieRe, "🇮🇪 Critical Skills ATS", "Dublin, Ireland"),
+              gh("intercom", "Intercom Dublin", ieRe, "🇮🇪 Critical Skills ATS", "Dublin, Ireland"),
+              gh("toast", "Toast Dublin", ieRe, "🇮🇪 Critical Skills ATS", "Dublin, Ireland"),
+              gh("datadog", "Datadog Dublin", ieRe, "🇮🇪 Critical Skills ATS", "Dublin, Ireland"),
+              gh("mongodb", "MongoDB Dublin", ieRe, "🇮🇪 Critical Skills ATS", "Dublin, Ireland")
+            ]);
+          } else if (trackCode === "DE") {
+            const deRe = /\b(germany|deutschland|berlin|munich|münchen|hamburg|frankfurt|stuttgart|cologne|köln|düsseldorf|karlsruhe|walldorf)\b/i;
+            lists = await Promise.all([
+              gh("celonis", "Celonis", deRe, "🇩🇪 EU Blue Card ATS", "Munich / Berlin, Germany"),
+              gh("contentful", "Contentful", deRe, "🇩🇪 EU Blue Card ATS", "Berlin, Germany"),
+              gh("datadog", "Datadog Germany", deRe, "🇩🇪 EU Blue Card ATS", "Germany"),
+              sr("DeliveryHero", "Delivery Hero SE (Berlin HQ)", "", /berlin|germany/i, "🇩🇪 Berlin Blue Card ATS", "Berlin, Germany"),
+              ash("n8n", "n8n (Berlin HQ)", /berlin|germany/i, "🇩🇪 Sponsors Visa to Germany", "Berlin, Germany (Sponsors DE Relocation Visa)", /sponsor\s+visas?\s+(?:to|for)\s+germany/i)
+            ]);
+          } else if (trackCode === "NL") {
+            const nlRe = /\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|delft|the hague|den haag)\b/i;
+            lists = await Promise.all([
+              gh("adyen", "Adyen (Amsterdam HQ)", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
+              gh("elastic", "Elastic Amsterdam", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
+              gh("datadog", "Datadog Amsterdam", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
+              ash("mollie", "Mollie (Amsterdam HQ)", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands")
+            ]);
+          } else if (trackCode === "UK") {
+            const ukRe = /\b(london|united kingdom|\buk\b|england|manchester|cambridge|edinburgh|bristol|cardiff)\b/i;
+            lists = await Promise.all([
+              gh("monzo", "Monzo Bank", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
+              gh("deliveroo", "Deliveroo", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
+              gh("cloudflare", "Cloudflare London", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
+              gh("stripe", "Stripe London", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
+              sr("Wise", "Wise (London HQ)", "", /london|united kingdom|\bgb\b|\buk\b/i, "🇬🇧 Wise Skilled Worker ATS", "London, UK")
+            ]);
+          }
+          const scored = lists.flat().map(r => scoreBrowserAtsJob(r, trackCode)).filter(Boolean);
+          return { jobs: scored, rawScanned: rawCount };
+        };
+
         let totalRawLi = 0;
         let totalAts = 0;
-        let totalAlreadyHandled = 0;
-        let totalFilteredOut = 0;
-
-        // Probe local PC backend (127.0.0.1:4545 / localhost:4545 — uses clean residential IP with 0% LinkedIn block!)
-        let localBaseUrl = "";
-        for (const candidateBase of ["http://127.0.0.1:4545", "http://localhost:4545"]) {
-          try {
-            const probe = await fetch(`${candidateBase}/api/state`, { signal: AbortSignal.timeout(1200) });
-            if (probe.ok) {
-              localBaseUrl = candidateBase;
-              break;
-            }
-          } catch {}
-        }
-
-        const scanEndpoints = localBaseUrl
-          ? [`${localBaseUrl}/api/scan`, `${CF_WORKER_URL}/api/scan`]
-          : [`${CF_WORKER_URL}/api/scan`];
 
         for (let i = 0; i < tracksToScan.length; i++) {
           const trackCode = tracksToScan[i];
           const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
           const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
-          const engineLabel = localBaseUrl ? "Local PC Residential IP + 22 Official Sponsor ATS JSON APIs" : "Cloudflare Worker + 22 Official Sponsor ATS JSON APIs";
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
-          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} via ${engineLabel} (Zero GitHub Actions delay)...`;
+          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live from browser (22 Official Sponsor Career APIs + Cloudflare Edge)...`;
 
-          for (const scanUrl of scanEndpoints) {
-            try {
-              const res = await fetch(scanUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tpr, country: trackCode })
-              });
-              if (res.ok) {
-                const data = await res.json();
-                const d = data.diagnostics || {};
-                totalQueries += Number(data.scannedQueries || 0);
-                totalRawLi += Number(d.rawLinkedIn || 0);
-                totalAts += Number(d.atsFetched || 0);
-                totalAlreadyHandled += Number(d.skippedOrApplied || 0);
-                totalFilteredOut += Number(d.rejectedLangOrCountry || 0) + Number(d.rejectedVisa || 0) + Number(d.rejectedQuick || 0) + Number(d.rejectedAi || 0);
-                mergeFreshScanJobs(data.jobs || [], trackCode);
-                updateGlobalCountryCounts();
-                renderRadarList();
-                break;
-              }
-            } catch {}
-          }
-          if (i + 1 < tracksToScan.length && !localBaseUrl) {
-            await new Promise(r => setTimeout(r, 350));
-          }
+          const [browserAtsRes, workerRes] = await Promise.all([
+            fetchBrowserSponsorAtsForTrack(trackCode),
+            fetch(`${CF_WORKER_URL}/api/scan`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ tpr, country: trackCode })
+            }).then(r => r.ok ? r.json() : { jobs: [] }).catch(() => ({ jobs: [] }))
+          ]);
+
+          totalAts += Number(browserAtsRes.rawScanned || 0) + Number(workerRes?.diagnostics?.atsFetched || 0);
+          totalRawLi += Number(workerRes?.diagnostics?.rawLinkedIn || 0);
+
+          const combinedTrackJobs = [...(browserAtsRes.jobs || []), ...(workerRes?.jobs || [])];
+          mergeFreshScanJobs(combinedTrackJobs, trackCode);
+          updateGlobalCountryCounts();
+          renderRadarList();
         }
 
-        await loadCloudFeed();
+        // Sync merged verified feed back to Cloudflare D1 so mobile & Telegram stay 100% in sync!
+        if (ALL_SCAN_JOBS.length > 0) {
+          fetch(`${CF_WORKER_URL}/api/feed`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jobs: ALL_SCAN_JOBS.slice(0, 75) })
+          }).catch(() => {});
+        }
+
         const visibleTotal = ALL_SCAN_JOBS.length;
-        const modeTag = localBaseUrl ? "🏠 Local PC Residential IP + Direct ATS" : "⚡ Edge Direct Sponsor ATS JSON";
-        const summaryBits = [
-          `${visibleTotal} verified sponsor match(es)`,
-          modeTag,
-          totalAts ? `Official ATS scanned: ${totalAts}` : null,
-          totalRawLi ? `LinkedIn cards: ${totalRawLi}` : null,
-          totalAlreadyHandled ? `already applied/skipped: ${totalAlreadyHandled}` : null,
-          totalFilteredOut ? `filtered (no-visa/off-stack): ${totalFilteredOut}` : null
-        ].filter(Boolean);
-        document.getElementById("scanStatusText").textContent = `Scan complete (${cMeta.flag} ${cMeta.label}) — ${summaryBits.join(" · ")}.`;
+        document.getElementById("scanStatusText").textContent = `Live Online Scan complete (${cMeta.flag} ${cMeta.label}) — ${visibleTotal} verified Visa-First roles active · Scanned ${totalAts}+ official sponsor ATS postings${totalRawLi ? ` + ${totalRawLi} LinkedIn cards` : ""} in real time.`;
         isScanRunning = false;
         if (btn) btn.disabled = false;
         refreshScanButtonLabel();
