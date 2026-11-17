@@ -601,15 +601,20 @@
     }
 
     function classifyCountryGroup(company = "", location = "", savedGroup = "") {
-      const loc = String(location || "").toLowerCase();
+      const loc = String(location || "").toLowerCase().trim();
       const comp = String(company || "").toLowerCase();
-      const isTurkishPhysicalLoc = /istanbul|i̇stanbul|türkiye|turkiye|turkey|beşiktaş|levent|maslak|şişli|ataşehir|üsküdar|ümraniye|pendik|kartal|maltepe|tuzla|sarıyer|beykoz|gebze|kocaeli|çayırova|dilovası|bilişim vadisi/i.test(loc);
+      const isTurkishPhysicalLoc = /(?:istanbul|i̇stanbul|türkiye|turkiye|turkey|beşiktaş|levent|maslak|şişli|ataşehir|üsküdar|ümraniye|pendik|kartal|maltepe|tuzla|sarıyer|kağıthane|beykoz|gebze|kocaeli|çayırova|dilovası|bilişim vadisi|ankara|izmir|i̇zmir|bursa|antalya)/i.test(loc);
+      const isExplicitNonTrCountry = /\b(cyprus|limassol|nicosia|paphos|larnaca|czechia|czech|brno|prague|hungary|budapest|spain|madrid|barcelona|poland|warsaw|krakow|portugal|lisbon|romania|bulgaria|malta|greece|athens|italy|milan|france|paris|sweden|stockholm|finland|espoo|norway|denmark|austria|vienna|switzerland|zurich|belgium|brussels|luxembourg|estonia|lithuania|latvia|united states|\busa\b|canada|australia|singapore|dubai|uae)\b/i.test(loc);
 
-      if (!isTurkishPhysicalLoc && (/\b(ireland|dublin|cork|galway|limerick)\b/i.test(loc) || /\b(workday dublin|stripe dublin|intercom dublin|toast dublin|mastercard.*dublin)\b/i.test(comp))) {
+      if (isExplicitNonTrCountry && !isTurkishPhysicalLoc) {
+        return "OTHER_ABROAD";
+      }
+
+      if (!isTurkishPhysicalLoc && (/\b(ireland|dublin|cork|galway|limerick|waterford)\b/i.test(loc) || /\b(workday dublin|stripe dublin|intercom dublin|toast dublin|mastercard.*dublin|ey ireland)\b/i.test(comp))) {
         return "IE";
       }
 
-      if (!isTurkishPhysicalLoc && (/\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|the hague|den haag|delft)\b/i.test(loc) || /\b(booking\.com|adyen|backbase|asml|philips.*eindhoven)\b/i.test(comp))) {
+      if (!isTurkishPhysicalLoc && (/\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|the hague|den haag|delft|alphen aan den rijn|groningen)\b/i.test(loc) || /\b(booking\.com|adyen|backbase|asml|philips.*eindhoven)\b/i.test(comp))) {
         return "NL";
       }
 
@@ -618,38 +623,35 @@
       }
 
       if (
-        /\b(wise|revolut|monzo|mondrian alpha|virtuetech|oho group|arc it|mrj recruitment|understanding recruitment|acceler8|roc search|swi-tch|tenth revolution|identify solutions|erg group|spectrum it|harrington starr|noir|saragossa)\b/i.test(comp) ||
-        (!isTurkishPhysicalLoc && /\b(united kingdom|\buk\b|england|scotland|wales|london|cambridge|manchester|birmingham|leeds|basingstoke|eastleigh|bristol|edinburgh|cardiff|belfast)\b/i.test(loc))
+        /\b(wise|revolut|monzo|mondrian alpha|virtuetech|oho group|arc it|mrj recruitment|understanding recruitment|acceler8|roc search|swi-tch|tenth revolution|identify solutions|erg group|spectrum it|harrington starr|noir|saragossa|neartech)\b/i.test(comp) ||
+        (!isTurkishPhysicalLoc && /\b(united kingdom|\buk\b|england|scotland|wales|london|cambridge|manchester|birmingham|leeds|basingstoke|eastleigh|bristol|edinburgh|cardiff|belfast|reading|oxford)\b/i.test(loc))
       ) {
         return "UK";
       }
 
-      if (savedGroup && ["IE", "DE", "NL", "UK", "TR", "GLOBAL_REMOTE", "OTHER_ABROAD"].includes(savedGroup)) {
-        if (savedGroup === "TR" && !isTurkishPhysicalLoc && /\b(ireland|germany|netherlands|united kingdom|\buk\b)\b/i.test(loc)) {
-          // ignore stale TR override if abroad loc
-        } else {
-          return savedGroup;
-        }
+      if (savedGroup && ["IE", "DE", "NL", "UK", "GLOBAL_REMOTE", "OTHER_ABROAD"].includes(savedGroup) && !isTurkishPhysicalLoc) {
+        return savedGroup;
+      }
+      if (savedGroup === "ABROAD" && !isTurkishPhysicalLoc) {
+        return "OTHER_ABROAD";
+      }
+
+      if (isTurkishPhysicalLoc) {
+        return "TR";
       }
 
       if (
-        /\b(deel|canonical|alignerr|jobgether|ruby labs|sezzle|oak's lab|oaks lab|flatiron software|crossing hurdles|turing|tbi bank)\b/i.test(comp) ||
-        (!isTurkishPhysicalLoc && /\b(europe|emea|global remote|worldwide|anywhere)\b/i.test(loc) && /remote/i.test(loc))
+        /\b(deel|canonical|alignerr|jobgether|ruby labs|sezzle|oak's lab|oaks lab|flatiron software|crossing hurdles|turing|tbi bank|c\s*teleport|threecolts)\b/i.test(comp) ||
+        (/\b(europe|emea|global remote|worldwide|anywhere)\b/i.test(loc) && /remote/i.test(loc))
       ) {
         return "GLOBAL_REMOTE";
       }
 
-      if (
-        /\b(teleport|insight global)\b/i.test(comp) ||
-        (!isTurkishPhysicalLoc && /\b(united states|\busa\b|phoenix|menlo park|new york|san francisco|los angeles|boston|washington|denver|bellevue|westerville|woodbridge|finland|espoo|canada|toronto|vancouver|australia|sydney|switzerland|zurich|poland|spain|austria)\b/i.test(loc))
-      ) {
-        return "OTHER_ABROAD";
+      // Allow empty or generic workplace strings ("Hybrid", "Remote") for historical Turkish CRM rows, otherwise mark OTHER_ABROAD (never leak foreign cities into TR!)
+      if (!loc || /^(?:hybrid|hibrit|remote|uzaktan|onsite|on-site|ofis|[\s()·/-])+$/i.test(loc) || /[ğüşıöç]/i.test(`${comp} ${loc}`)) {
+        return "TR";
       }
-
-      if (savedGroup === "ABROAD" && !isTurkishPhysicalLoc) {
-        return "OTHER_ABROAD";
-      }
-      return "TR";
+      return "OTHER_ABROAD";
     }
 
     function inferClientRecommendedCv(company = "", title = "", location = "", descText = "") {
@@ -3357,7 +3359,7 @@
       showToast(`Saved phone & email for ${existing.company}!`, true);
     }
 
-    const CLIENT_NON_SOFTWARE_IT_REGEX = /(?:gömülü|sistem ve ağ|bilgi işlem uzmanı|bilgi işlem sorumlusu|test uzmanı|sızma test|\(\s*go\s*\)|\bgo\s+(?:developer|engineer)\b|\b(helpdesk|help desk|it support|teknik destek|network engineer|network specialist|system administrator|sistem yöneticisi|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|penetration test\w*|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|oracle\s+(?:cloud\s+)?(?:financials|fusion)|data\s+cent(?:re|er)\s+networking|network\s+architect|ccna|ccnp|ccie|manual test|qa engineer|test automation|quality control|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|php|laravel|golang|ruby|cobol|mainframe|embedded|plc|scada|working student|part[\s-]*time|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b)/i;
+    const CLIENT_NON_SOFTWARE_IT_REGEX = /(?:gömülü|sistem ve ağ|bilgi işlem uzmanı|bilgi işlem sorumlusu|test uzmanı|sızma test|\(\s*go\s*\)|\bgo\s+(?:developer|engineer)\b|\b(helpdesk|help desk|it support|teknik destek|network engineer|network specialist|system administrator|sistem yöneticisi|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|penetration test\w*|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|oracle\s+(?:cloud\s+)?(?:financials|fusion)|data\s+cent(?:re|er)\s+networking|network\s+architect|ccna|ccnp|ccie|manual test|qa engineer|test automation|quality control|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|machine learning engineer|ml engineer|data scientist|veri bilimci|deep learning|computer vision|ai research|php|laravel|golang|ruby|cobol|mainframe|embedded|plc|scada|working student|part[\s-]*time|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b)/i;
     const CLIENT_FOREIGN_TITLE_REGEX = /(?:(?:entwickler|entwicklerin|softwareentwickler|anwendungsentwickler|datenbankentwickler|architektin|systemarchitekt|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|systeembeheerder|applicatiebeheerder|beheerder|adviseur|medewerker|gezocht|vacature|afstudeer)\b|\b(?:referent|stage|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b)/i;
     const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|french|spanish)\s+and\s+)?german|(?:german|dutch)\s+and\s+english\s+at\s+(?:a\s+)?(?:c1|c2|b2|fluent|native)|proficient\s+in\s+german|must\s+speak\s+german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|german)\s+and\s+)?dutch|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
     const CLIENT_FOREIGN_STOPWORDS_REGEX = /\b(und|oder|für|wir|ihre|unser|unsere|bei|zur|zum|eine|einen|einem|einer|sowie|über|aufgaben|anforderungsprofil|kenntnisse|erfahrung|entwicklung|zusammenarbeit|bewerbung|voor|wij|jij|jouw|onze|het|zijn|worden|werkt|ervaring|kennis|functie)\b/gi;
@@ -3375,7 +3377,18 @@
       return infraMatches >= 3 && !strongAppBuild;
     }
 
+    function isClientPurePythonMlOrResearchRole(title, desc) {
+      if (!desc) return false;
+      const hasCoreUserStack = /(\.net\b|c#|asp\.net|entity\s+framework|\breact\b|next\.?js|\btypescript\b|\bblazor\b)/i.test(desc);
+      const isDeepMlTraining = /\b(post-training|supervised\s+fine-tuning|\bsft\b|preference\s+optimi[sz]ation|reinforcement\s+learning|reward\s+models?|rlhf\b|pytorch|tensorflow|cuda\b|graphrag|neo4j|memgraph)\b/i.test(desc);
+      if (isDeepMlTraining && !/(\.net\b|c#|asp\.net)/i.test(desc)) return true;
+      const isPythonHeavy = /\b(strong\s+python|proficiency\s+in\s+python|years\s+of\s+professional\s+experience\s+with\s+python|written\s+python\s+that\s+runs|predominantly\s+a\s+python\s+shop)\b/i.test(desc);
+      if (isPythonHeavy && !hasCoreUserStack) return true;
+      return false;
+    }
+
     function isValidClientJob(job) {
+      if ((job.score || 0) > 0 && (job.score || 0) < 65) return false;
       const title = (job.title || "").toLowerCase();
       const comp = (job.company || "").toLowerCase();
       const loc = (job.location || "").toLowerCase();
@@ -3386,7 +3399,8 @@
         CLIENT_FOREIGN_TITLE_REGEX.test(title) ||
         CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) ||
         CLIENT_B2B_NO_PERMIT_REGEX.test(full) ||
-        isClientDevOpsOrInfraHeavy(title, desc)
+        isClientDevOpsOrInfraHeavy(title, desc) ||
+        isClientPurePythonMlOrResearchRole(title, desc)
       ) {
         return false;
       }
@@ -3394,7 +3408,8 @@
         return false;
       }
       const cg = classifyCountryGroup(job.company, job.location, job.countryGroup);
-      if (cg === "GLOBAL_REMOTE" && !CLIENT_EXPLICIT_VISA_REGEX.test(full)) {
+      // Strictly restrict Live Scanner to the 5 approved target countries ONLY (TR, IE, DE, NL, UK) — block Cyprus, Czechia, Hungary, Global Remote, etc.
+      if (!["TR", "IE", "DE", "NL", "UK"].includes(cg)) {
         return false;
       }
       if (cg !== "TR" && CLIENT_NO_VISA_REGEX.test(full)) {
@@ -3402,6 +3417,9 @@
       }
       if (cg === "TR") {
         const combined = `${title} ${loc}`;
+        if (!/(istanbul|i̇stanbul|gebze|kocaeli|çayırova|dilovası|bilişim vadisi|tuzla|pendik|kartal|maltepe|ataşehir|üsküdar|ümraniye|maslak|levent|beşiktaş|şişli|sarıyer|kağıthane|beykoz|türkiye|turkiye|turkey)/i.test(loc)) {
+          return false;
+        }
         const isRemote = /\b(remote|uzaktan|work from home|evden)\b/i.test(combined);
         if (/\b(emea\s+remote|europe\s+remote|remote\s*-\s*europe)\b/i.test(combined) && !/(istanbul|türkiye|turkey)/i.test(combined)) {
           return false;
