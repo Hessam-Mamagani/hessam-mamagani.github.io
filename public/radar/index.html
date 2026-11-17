@@ -7888,4 +7888,232 @@
           { label: "📝 'Why Us?' Portal Answer", prompt: `Write a ready-to-paste answer in ${isTr ? "both Turkish and English" : "English"} for the portal question: Why do you want to join ${comp} and why are you a strong fit for ${role}?` },
           { label: "⚖️ Visa / Muafiyet Pitch", prompt: `Draft the exact ${isTr ? "Turkish HR message explaining my 31.12.2026 active work permit + e-İzin transfer + ÇSGB Bilişim Uzmanı 5-Turkish-employee exemption" : "recruiter message pitching my Critical Skills / EU Blue Card / HSM sponsorship readiness and GMT+3 remote bridge"} for ${comp}.` },
           { label: "💬 Tailor Tech + HR DMs", prompt: `Write tailored LinkedIn DMs for both a CTO/Engineering Manager and an HR Recruiter at ${comp} for ${role}, mentioning my 5 live Pilz/EvenTracer/InsightfulAI platforms.` },
-... [truncated for diff preview]
+          { label: "🎤 Top 3 Interview Q&As", prompt: `Give me the 3 most likely technical + architecture interview questions ${comp} will ask for ${role}, with plain-language answers tied to my PilzPortal and EvenTracer code.` }
+        ];
+        chipsEl.innerHTML = quickList.map((chip, idx) => {
+          const pKey = registerCopyPayload(`cp_chip_${chatKey}_${idx}`, chip.prompt);
+          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
+        }).join("");
+      } else {
+        if (badgeEl) badgeEl.textContent = "🌐 Global Career, Legal, Salary & Interview Copilot";
+        if (globalBtn) globalBtn.classList.add("hidden");
+        if (titleEl) titleEl.textContent = "Full-Context Copilot (Synced Across Devices via Cloudflare D1)";
+        if (subEl) subEl.textContent = "Knows your 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas, and live D1 CRM.";
+        const globalChips = [
+          { label: "📅 Today's Top 5 Actions", prompt: "Look at my live CRM, 31.12.2026 work-permit timeline, and 5-country tracks. Give me a concrete, prioritized 5-step execution plan for today." },
+          { label: "⚖️ Pilz Dec 31 & İzin Audit", prompt: "Review my Pilz payout numbers (399k TL Dec net after avans, 14.12 vs 31.12 notice/izin overlap, 01.01–10.01.2027 window) and tell me how to protect both my GM reference and my legal rights." },
+          { label: "🇹🇷 Fast Dec 31 Sponsors", prompt: "Which Istanbul Asian-side, Gebze/Bilişim Vadisi, or Teknopark companies in my target universe can realistically sign an offer and file e-İzin before Jan 10, 2027?" },
+          { label: "🇮🇪🇩🇪🇳🇱 EU Visa Comparison", prompt: "Compare Ireland Critical Skills, Germany EU Blue Card, and Netherlands HSM for my family of 3 (including my 9-year-old daughter's English schooling and path to permanent residency)." },
+          { label: "🎤 Start Live Mock Interview", prompt: "Run a realistic Senior .NET 10 + Architecture + AI mock interview with me. Ask Question 1 first, wait for my answer, and coach me in plain language." }
+        ];
+        chipsEl.innerHTML = globalChips.map((chip, idx) => {
+          const pKey = registerCopyPayload(`cp_gchip_${idx}`, chip.prompt);
+          return `<button type="button" onclick="sendCopilotPrompt(OUTREACH_COPY_STORE.get('${pKey}'))" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-emerald-600/30 border border-slate-700 hover:border-emerald-500/40 text-slate-200 text-[11px] font-semibold transition cursor-pointer">${escapeHtmlSafe(chip.label)}</button>`;
+        }).join("");
+      }
+
+      const history = getJobChatHistory(chatKey);
+      if (subEl) {
+        const baseSub = ctx
+          ? (ctx.subtitle || "")
+          : "Knows your v1 vs v2 CVs, 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas & live D1 CRM.";
+        subEl.textContent = `${baseSub} · 🧠 Thread Memory: ${history.length} turn(s) synced`;
+      }
+      if (!history.length) {
+        msgEl.innerHTML = `
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 text-xs text-slate-300 space-y-2.5 leading-relaxed">
+            <div class="font-bold text-emerald-300 text-sm">👋 Multi-Agent Orchestrator Ready, Hessam.</div>
+            <div class="flex flex-wrap gap-1.5 text-[10px]">
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-cyan-500/40 text-cyan-300 font-semibold">🧠 Main Orchestrator (Full Thread Memory)</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-emerald-500/40 text-emerald-300 font-semibold">📂 v2 CV &amp; Codebase Vault Agent</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-amber-500/40 text-amber-300 font-semibold">🗄️ D1 CRM &amp; Live DNS Tool Agent</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-indigo-500/40 text-indigo-300 font-semibold">🌐 Live Web &amp; LinkedIn Research Subagent</span>
+            </div>
+            <p>Click any quick-prompt chip above, or type/paste anything below — I keep <strong>100% of our conversation context</strong> across every turn:</p>
+            <ul class="list-disc pl-5 space-y-1 text-slate-400">
+              <li>Paste a job description or tough application portal question for a ready-to-copy answer</li>
+              <li>Ask follow-up edits (<code class="text-slate-200">"make it shorter"</code>, <code class="text-slate-200">"translate that to Turkish"</code>, <code class="text-slate-200">"check their CTO on the net"</code>)</li>
+              <li>Ask which exact <code class="text-slate-200">v2</code> CV file &amp; 2027 salary band to use for any country</li>
+              <li>Practice any C#/.NET, SQL, React, or System Design interview topic interactively</li>
+            </ul>
+          </div>
+        `;
+        return;
+      }
+
+      msgEl.innerHTML = history.map((m, idx) => {
+        const isUser = m.role === "user";
+        const snippetText = m.copySnippet || m.copyableAnswer || "";
+        const copyKey = snippetText ? registerCopyPayload(`cp_ans_${chatKey}_${idx}`, snippetText) : "";
+        const fullCopyKey = !isUser ? registerCopyPayload(`cp_full_${chatKey}_${idx}`, m.content || "") : "";
+        const traceHtml = !isUser && Array.isArray(m.agentTrace) && m.agentTrace.length
+          ? `<div class="flex flex-wrap gap-1 pt-0.5">${m.agentTrace.map(t => `<span class="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700/80 text-[10px] text-cyan-300 font-semibold" title="${escapeHtmlSafe(t.summary || '')}">${escapeHtmlSafe(t.agent)}${t.summary ? ` · <span class="text-slate-400 font-normal">${escapeHtmlSafe(t.summary.slice(0, 56))}</span>` : ''}</span>`).join("")}</div>`
+          : "";
+        return `
+          <div class="p-3 rounded-xl ${isUser ? "bg-blue-950/50 border border-blue-500/35 ml-8" : "bg-slate-900/95 border border-emerald-500/30 mr-3"} space-y-2">
+            <div class="flex items-center justify-between gap-2 flex-wrap">
+              <span class="text-[10px] font-bold tracking-wider ${isUser ? "text-blue-300" : "text-emerald-300"}">${isUser ? `👤 YOU (Turn ${idx + 1})` : `🧠 ORCHESTRATOR${m.provider ? ` · ${escapeHtmlSafe(m.provider)}` : ""}`}</span>
+              ${!isUser ? `
+                <div class="flex items-center gap-1.5">
+                  ${copyKey ? `<button type="button" onclick="copyFromStore('${copyKey}', this, '📋 Ready answer copied!')" class="px-2.5 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold cursor-pointer">📋 Copy Ready Answer</button>` : ""}
+                  <button type="button" onclick="copyFromStore('${fullCopyKey}', this, '📋 Reply copied!')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-semibold cursor-pointer">📋 Copy</button>
+                </div>
+              ` : ""}
+            </div>
+            ${traceHtml}
+            <div class="text-xs text-slate-100 whitespace-pre-wrap leading-relaxed">${escapeHtmlSafe(m.content || "")}</div>
+            ${!isUser && snippetText && !(m.content || "").includes(snippetText.slice(0, 45)) ? `
+              <div class="p-2.5 rounded-lg bg-emerald-950/45 border border-emerald-500/40 space-y-1">
+                <div class="text-[10px] font-bold text-emerald-300">📋 Drafted Copy-Ready Text:</div>
+                <pre class="text-xs text-emerald-100 whitespace-pre-wrap font-sans leading-relaxed">${escapeHtmlSafe(snippetText)}</pre>
+              </div>
+            ` : ""}
+            ${m.appliedNote ? `<div class="text-[10px] text-amber-300 font-semibold pt-1 border-t border-slate-800">⚡ ${escapeHtmlSafe(m.appliedNote)}</div>` : ""}
+          </div>
+        `;
+      }).join("");
+      msgEl.scrollTop = msgEl.scrollHeight;
+    }
+
+    async function sendCopilotPrompt(presetText = "") {
+      const inputEl = document.getElementById("copilotInput");
+      const btnEl = document.getElementById("copilotSendBtn");
+      const rawMsg = (presetText || (inputEl ? inputEl.value : "")).trim();
+      if (!rawMsg) return;
+      if (inputEl && !presetText) inputEl.value = "";
+
+      const ctx = CURRENT_COPILOT_CONTEXT;
+      const chatKey = getActiveCopilotChatKey();
+      const priorHistory = getJobChatHistory(chatKey).slice(-24);
+      const history = [...priorHistory, { role: "user", content: rawMsg, ts: new Date().toISOString() }];
+      saveJobChatHistory(chatKey, history, true);
+      renderCopilotDrawer();
+
+      const msgEl = document.getElementById("copilotMessages");
+      if (msgEl) {
+        msgEl.insertAdjacentHTML(
+          "beforeend",
+          `<div id="copilotOrchestratorPending" class="p-3 rounded-xl bg-slate-900/95 border border-cyan-500/40 mr-3 space-y-1.5 animate-pulse">
+            <div class="text-[11px] font-bold text-cyan-300">🧠 Main Orchestrator active (${priorHistory.length} prior turns in memory)...</div>
+            <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">📂 Checking v2 CV &amp; Codebase Vault</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🗄️ Querying D1 CRM &amp; DNS</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🌐 Running Web &amp; LinkedIn Research Subagent</span>
+            </div>
+          </div>`
+        );
+        msgEl.scrollTop = msgEl.scrollHeight;
+      }
+
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = "⏳ Orchestrating...";
+      }
+
+      const endpoint = IS_LOCAL ? "/api/ai-chat" : `${CF_WORKER_URL}/api/ai-chat`;
+      const globalSnapshot = {
+        activeCountryPill: ACTIVE_COUNTRY,
+        activeTab: ACTIVE_TAB,
+        totalAppliedCount: STATE.applied.length,
+        recentApplications: STATE.applied.slice(0, 12).map(a => ({
+          company: a.company,
+          title: a.title,
+          location: a.location,
+          status: a.status,
+          salaryQuote: a.salaryQuote,
+          appliedAt: a.appliedAt
+        }))
+      };
+
+      try {
+        let res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chatKey,
+            message: rawMsg,
+            jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
+            history: priorHistory
+          })
+        });
+        if (!res.ok && IS_LOCAL) {
+          res = await fetch(`${CF_WORKER_URL}/api/ai-chat`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chatKey,
+              message: rawMsg,
+              jobContext: ctx ? { ...ctx.jobContext, globalSnapshot } : { mode: "GLOBAL_CAREER_LEGAL_INTERVIEW_COPILOT", ...globalSnapshot },
+              history: priorHistory
+            })
+          });
+        }
+
+        const data = res.ok ? await res.json() : null;
+        if (data && data.reply) {
+          let appliedChanges = [];
+          if (ctx?.pipelineItemId && data.actions) {
+            const pipeItem = findPipelineItem(ctx.pipelineItemId);
+            if (pipeItem) {
+              appliedChanges = await applyJobAgentActions(pipeItem, data.actions);
+            }
+          }
+          const snippet = data.copySnippet || data.copyableAnswer || "";
+          const updated = getJobChatHistory(chatKey);
+          updated.push({
+            role: "assistant",
+            content: data.reply,
+            copySnippet: snippet,
+            copyableAnswer: snippet,
+            agentTrace: data.agentTrace || [],
+            provider: data.provider || "",
+            appliedNote: appliedChanges.length ? `Updated on card & D1: ${appliedChanges.join(" · ")}` : "",
+            ts: new Date().toISOString()
+          });
+          saveJobChatHistory(chatKey, updated, true);
+          if (appliedChanges.length) {
+            renderUnifiedPipeline();
+            renderCrm();
+          }
+        } else {
+          const updated = getJobChatHistory(chatKey);
+          updated.push({
+            role: "assistant",
+            content: "⚠️ Copilot timed out or hit a temporary rate limit — please click Send again in 3 seconds.",
+            ts: new Date().toISOString()
+          });
+          saveJobChatHistory(chatKey, updated, false);
+        }
+      } catch (err) {
+        const updated = getJobChatHistory(chatKey);
+        updated.push({
+          role: "assistant",
+          content: `⚠️ Network error contacting AI Copilot: ${err.message || "Check connection"}`,
+          ts: new Date().toISOString()
+        });
+        saveJobChatHistory(chatKey, updated, false);
+      } finally {
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.innerHTML = "🤖 Send";
+        }
+        renderCopilotDrawer();
+        if (ctx?.pipelineItemId) {
+          const inlineLog = document.getElementById(`jobAgentLog-${ctx.pipelineItemId}`);
+          if (inlineLog) inlineLog.innerHTML = renderJobAgentMessagesHtml(ctx.pipelineItemId);
+        }
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const drawer = document.getElementById("copilotDrawer");
+        if (drawer && !drawer.classList.contains("hidden")) closeCopilotDrawer();
+      }
+    });
+
+    renderCoachTab();
+    initApp();
+  </script>
+</body>
+</html>
