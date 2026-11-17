@@ -3483,11 +3483,12 @@
         } catch {}
 
         let localFeed = null;
-        try {
-          const localUrl = IS_LOCAL ? "/api/feed" : "http://localhost:4545/api/feed";
-          const lr = await fetch(localUrl, { signal: AbortSignal.timeout(2500) });
-          if (lr.ok) localFeed = await lr.json();
-        } catch {}
+        if (IS_LOCAL) {
+          try {
+            const lr = await fetch("/api/feed", { signal: AbortSignal.timeout(2500) });
+            if (lr.ok) localFeed = await lr.json();
+          } catch {}
+        }
 
         const combinedMap = new Map();
         for (const existing of (ALL_SCAN_JOBS || [])) {
@@ -3513,7 +3514,7 @@
 
         const latestTimeStr = cfFeed?.scannedAt || localFeed?.scannedAt;
         const scannedTime = latestTimeStr ? new Date(latestTimeStr).toLocaleString() : "Recent";
-        document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes every 90s across 6 country tracks).`;
+        document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes every 90s across 5 country tracks).`;
         updateGlobalCountryCounts();
         refreshScanButtonLabel();
         renderRadarList();
@@ -3526,7 +3527,7 @@
     }
 
     setInterval(() => {
-      if (!IS_LOCAL && getGhToken()) loadCloudFeed(true);
+      if (!IS_LOCAL) loadCloudFeed(true);
     }, 90000);
 
     function updateHeaderCounts() {
@@ -4019,13 +4020,15 @@
 
         let totalRawLi = 0;
         let totalAts = 0;
+        let ghBgTriggered = false;
 
+        // WAVE 1 (~2-3s, Instant UI): Direct Browser 22-Sponsor CORS JSON APIs + Cloudflare Edge Worker
         for (let i = 0; i < tracksToScan.length; i++) {
           const trackCode = tracksToScan[i];
           const tMeta = COUNTRY_DISPLAY_META[trackCode] || COUNTRY_DISPLAY_META.TR;
           const stepLabel = tracksToScan.length > 1 ? ` (${i + 1}/${tracksToScan.length})` : "";
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
-          document.getElementById("scanStatusText").textContent = `Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live from browser (22 Official Sponsor Career APIs + Cloudflare Edge)...`;
+          document.getElementById("scanStatusText").textContent = `⚡ Wave 1: Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live (22 Official Sponsor Career APIs + Cloudflare Edge)...`;
 
           const [browserAtsRes, workerRes] = await Promise.all([
             fetchBrowserSponsorAtsForTrack(trackCode),
@@ -4038,6 +4041,7 @@
 
           totalAts += Number(browserAtsRes.rawScanned || 0) + Number(workerRes?.diagnostics?.atsFetched || 0);
           totalRawLi += Number(workerRes?.diagnostics?.rawLinkedIn || 0);
+          if (workerRes?.diagnostics?.githubFallbackTriggered) ghBgTriggered = true;
 
           const combinedTrackJobs = [...(browserAtsRes.jobs || []), ...(workerRes?.jobs || [])];
           mergeFreshScanJobs(combinedTrackJobs, trackCode);
@@ -4045,20 +4049,62 @@
           renderRadarList();
         }
 
-        // Sync merged verified feed back to Cloudflare D1 so mobile & Telegram stay 100% in sync!
+        // Sync Wave 1 verified jobs additively to Cloudflare D1 so mobile & Telegram stay 100% in sync!
         if (ALL_SCAN_JOBS.length > 0) {
           fetch(`${CF_WORKER_URL}/api/feed`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ jobs: ALL_SCAN_JOBS.slice(0, 75) })
+            body: JSON.stringify({ jobs: ALL_SCAN_JOBS.slice(0, 80) })
           }).catch(() => {});
         }
 
-        const visibleTotal = ALL_SCAN_JOBS.length;
-        document.getElementById("scanStatusText").textContent = `Live Online Scan complete (${cMeta.flag} ${cMeta.label}) — ${visibleTotal} verified Visa-First roles active · Scanned ${totalAts}+ official sponsor ATS postings${totalRawLi ? ` + ${totalRawLi} LinkedIn cards` : ""} in real time.`;
+        // Unlock Scan button immediately after Wave 1 (~2-3s) — ZERO UI blocking!
         isScanRunning = false;
         if (btn) btn.disabled = false;
         refreshScanButtonLabel();
+
+        const visibleAfterW1 = ALL_SCAN_JOBS.length;
+        const bgSuffix = ghBgTriggered
+          ? " · 🤖 Wave 2 (AI Web Agent: LinkedIn + Kariyer.net) & 🔄 Wave 3 (Full Fresh-IP LinkedIn Sweep) running in background..."
+          : " · 🤖 Wave 2 (AI Web Agent: LinkedIn + Kariyer.net) running in background...";
+        document.getElementById("scanStatusText").textContent = `⚡ Wave 1 complete (${cMeta.flag} ${cMeta.label}) — ${visibleAfterW1} verified Visa-First roles active (${totalAts}+ ATS${totalRawLi ? ` + ${totalRawLi} LinkedIn` : ""})${bgSuffix}`;
+
+        // WAVE 2 (~7s, Non-Blocking Background): Live AI Web-Search Agent (GPT-4o / Claude / Gemini) across ALL LinkedIn, Kariyer.net & Open Web
+        (async () => {
+          let aiFoundTotal = 0;
+          let lastProvider = "AI Web Search";
+          for (const trackCode of tracksToScan) {
+            try {
+              const r = await fetch(`${CF_WORKER_URL}/api/ai-web-scan`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ country: trackCode })
+              });
+              if (!r.ok) continue;
+              const aiRes = await r.json();
+              if (aiRes?.provider) lastProvider = aiRes.provider;
+              const prevLen = ALL_SCAN_JOBS.length;
+              if (Array.isArray(aiRes?.jobs) && aiRes.jobs.length > 0) {
+                mergeFreshScanJobs(aiRes.jobs, trackCode);
+                updateGlobalCountryCounts();
+                renderRadarList();
+                const delta = Math.max(0, ALL_SCAN_JOBS.length - prevLen);
+                aiFoundTotal += delta;
+              }
+            } catch {}
+          }
+          if (aiFoundTotal > 0) {
+            showToast(`🤖 AI Web Agent (${lastProvider}) discovered ${aiFoundTotal} new verified role(s)!`, true);
+          }
+          const wave3Note = ghBgTriggered ? " · 🔄 Wave 3 (GitHub Actions Fresh-IP LinkedIn Sweep) auto-syncing in ~15s" : "";
+          document.getElementById("scanStatusText").textContent = `✅ Wave 1 + 🤖 Wave 2 (${lastProvider}) complete — ${ALL_SCAN_JOBS.length} verified Visa-First roles active${wave3Note}.`;
+        })();
+
+        // WAVE 3 (~18s & ~32s, Non-Blocking Background): Auto-pull full 21-query Fresh-IP GitHub Actions LinkedIn results from D1
+        if (ghBgTriggered) {
+          setTimeout(() => loadCloudFeed(true), 18000);
+          setTimeout(() => loadCloudFeed(true), 32000);
+        }
       }
     }
 
