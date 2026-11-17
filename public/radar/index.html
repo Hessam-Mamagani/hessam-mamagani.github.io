@@ -872,6 +872,7 @@
       if (/\brevolut\b/.test(s)) return "revolut";
       if (/\bteleport\b/.test(s)) return "teleport";
       if (/\btcm\b/.test(s)) return "tcm";
+      if (/\b(bgts|bilge\s*adam)\b/.test(s)) return "bgts";
       const baseWords = s
         .split("(")[0]
         .replace(/\./g, "")
