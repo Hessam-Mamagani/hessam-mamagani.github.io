@@ -3361,7 +3361,7 @@
 
     const CLIENT_NON_SOFTWARE_IT_REGEX = /(?:gömülü|sistem ve ağ|bilgi işlem uzmanı|bilgi işlem sorumlusu|test uzmanı|sızma test|\(\s*go\s*\)|\bgo\s+(?:developer|engineer)\b|\b(helpdesk|help desk|it support|teknik destek|network engineer|network specialist|system administrator|sistem yöneticisi|it specialist|it operations|donanım|cyber security|siber güvenlik|soc analyst|pentester|penetration test\w*|sap fi|sap mm|sap sd|sap pp|sap basis|sap abap|erp danışman|oracle\s+(?:cloud\s+)?(?:financials|fusion)|data\s+cent(?:re|er)\s+networking|network\s+architect|ccna|ccnp|ccie|manual test|qa engineer|test automation|quality control|iş analisti|business analyst|scrum master|product owner|ui\/ux|graphic|grafik|ios developer|android developer|mobile developer|android|ios|flutter|react native|unity|unreal|game developer|devops|sre|site reliability|platform engineer|infrastructure engineer|cloud infrastructure|cloud engineer|kubernetes engineer|release engineer|build engineer|devsecops|mlops|machine learning engineer|ml engineer|data scientist|veri bilimci|deep learning|computer vision|ai research|account management|account manager|deal desk|\blegal\b|counsel|mandarin|cantonese|php|laravel|golang|ruby|cobol|mainframe|embedded|plc|scada|working student|part[\s-]*time|intern|internship|stajyer|junior|jr\.|new grad|graduate engineer)\b)/i;
     const CLIENT_FOREIGN_TITLE_REGEX = /(?:(?:entwickler|entwicklerin|softwareentwickler|anwendungsentwickler|datenbankentwickler|architektin|systemarchitekt|ingenieur|ingenieurin|berater|beraterin|projektleiter|teamleiter|abteilungsleiter|spezialist|werkstudent|praktikant|ausbildung|fachinformatiker|mitarbeiter|vollzeit|teilzeit|gesucht|ontwikkelaar|softwareontwikkelaar|systeembeheerder|applicatiebeheerder|beheerder|adviseur|medewerker|gezocht|vacature|afstudeer)\b|\b(?:referent|stage|développeur|ingénieur|architecte|desarrollador|ingeniero|programista|sviluppatore|ingegnere)\b)/i;
-    const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|german\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|fluent\s+(?:in\s+)?german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|french|spanish)\s+and\s+)?german|(?:german|dutch)\s+and\s+english\s+at\s+(?:a\s+)?(?:c1|c2|b2|fluent|native)|proficient\s+in\s+german|must\s+speak\s+german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|german)\s+and\s+)?dutch|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
+    const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|(?:b1|b2|c1|c2)(?:\s*(?:\/|-|or|to)\s*(?:b2|c1|c2))?\s+(?:level\s+|certification\s+|certificate\s+|proficiency\s+|knowledge\s+|fluency\s+|skills?\s+|in\s+|of\s+|the\s+){0,4}(?:german|deutsch|dutch|nederlands)(?:\s+language)?(?!\s*(?:is\s+)?(?:a\s+plus|nice\s+to\s+have|optional|not\s+required))|german\s*(?:language\s*)?(?:skills?\s*)?(?:\(\s*)?(?:is\s*|are\s*|:\s*|-\s*|min\.?\s*|minimum\s*)?(?:required|mandatory|essential|must|fluent|native|b1|b2|c1|c2)|(?:good|strong|very\s+good|excellent|working|professional|full|business)\s+(?:command|knowledge|proficiency|working\s+proficiency)\s+(?:of|in)\s+(?:the\s+)?(?:german|dutch)(?:\s+language)?|fluent\s+(?:in\s+)?german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|french|spanish)\s+and\s+)?german|(?:german|dutch)\s+and\s+english\s+at\s+(?:a\s+)?(?:c1|c2|b2|fluent|native)|proficient\s+in\s+german|must\s+speak\s+german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|german)\s+and\s+)?dutch|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:skills?\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b1|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
     const CLIENT_FOREIGN_STOPWORDS_REGEX = /\b(und|oder|für|wir|ihre|unser|unsere|bei|zur|zum|eine|einen|einem|einer|sowie|über|aufgaben|anforderungsprofil|kenntnisse|erfahrung|entwicklung|zusammenarbeit|bewerbung|voor|wij|jij|jouw|onze|het|zijn|worden|werkt|ervaring|kennis|functie)\b/gi;
     const CLIENT_NO_VISA_REGEX = /\b(no\s+visa\s+sponsorship|cannot\s+sponsor|unable\s+to\s+sponsor|do\s+not\s+offer\s+(?:visa\s+)?sponsorship|does\s+not\s+offer\s+(?:visa\s+)?sponsorship|without\s+(?:visa\s+)?sponsorship|sponsorship\s+is\s+not\s+available|we\s+do\s+not\s+sponsor|do\s+not\s+relocate|does\s+not\s+relocate|cannot\s+relocate|candidates\s+who\s+already\s+live\s+in|(?:do\s+not|don['’]t)\s+hire\s+applicants\s+living\s+outside|(?:applicants|candidates|you)\s+must\s+(?:already\s+)?be\s+based\s+in\s+(?:the\s+)?(?:uk|united\s+kingdom|ireland|eu|europe|germany|netherlands)|must\s+live\s+within\s+(?:a\s+)?commute\s+of|must\s+already\s+hold\s+a?\s*valid|must\s+have\s+(?:the\s+)?(?:legal\s+)?right\s+to\s+work\s+in\s+(?:the\s+)?(?:uk|united\s+kingdom|ireland|eu|europe|germany|netherlands)(?!\s*(?:or|,|—|-)?\s*(?:visa\s+sponsorship|we\s+(?:can|will)\s+sponsor))|stamp\s*4\s*(?:only|required)|eu\s+(?:citizens?|passport)\s+only|uk\s+(?:citizens?|nationals?)\s+only|security\s+clearance\s+required|sc\s+cleared|dv\s+cleared)\b/i;
     const CLIENT_B2B_NO_PERMIT_REGEX = /\b(b2b\s+contract(?:or)?|independent\s+contractor|freelance\s+contract|1099\s+contract|c2c\s+contract|outside\s+ir35|self[\s-]employed\s+contract|alignerr|outlier|mindrift|dataannotation|remotasks|turing|crossover|toptal|jobgether|lemon\.io|\bdeel\b|\bcanonical\b|c\s*teleport|threecolts|99x\s+europe|distru)\b/i;
@@ -3383,9 +3383,9 @@
     function isClientPurePythonMlOrResearchRole(title, desc) {
       if (!desc) return false;
       const hasCoreUserStack = /(\.net\b|c#|asp\.net|entity\s+framework|\breact\b|next\.?js|\btypescript\b|\bblazor\b)/i.test(desc);
-      const isDeepMlTraining = /\b(post-training|supervised\s+fine-tuning|\bsft\b|preference\s+optimi[sz]ation|reinforcement\s+learning|reward\s+models?|rlhf\b|pytorch|tensorflow|cuda\b|graphrag|neo4j|memgraph)\b/i.test(desc);
+      const isDeepMlTraining = /\b(post-training|supervised\s+fine-tuning|\bsft\b|preference\s+optimi[sz]ation|reinforcement\s+learning|reward\s+models?|rlhf\b|pytorch|tensorflow|cuda\b|graphrag|neo4j|memgraph|deep\s+learning\s+and\s+nlp)\b/i.test(desc);
       if (isDeepMlTraining && !/(\.net\b|c#|asp\.net)/i.test(desc)) return true;
-      const isPythonHeavy = /\b(strong\s+python|proficiency\s+in\s+python|years\s+of\s+professional\s+experience\s+with\s+python|written\s+python\s+that\s+runs|predominantly\s+a\s+python\s+shop)\b/i.test(desc);
+      const isPythonHeavy = /\b(strong\s+python|proficiency\s+in\s+python|years\s+of\s+professional\s+experience\s+with\s+python|written\s+python\s+that\s+runs|predominantly\s+a\s+python\s+shop|coding\s+experience\s+(?:using|in|with)\s+python)\b/i.test(desc);
       if (isPythonHeavy && !hasCoreUserStack) return true;
       return false;
     }
@@ -4001,7 +4001,7 @@
             postedTs,
             postedAgo: raw.postedAgo,
             url: raw.url,
-            description: desc.slice(0, 3500),
+            description: desc.slice(0, 12000),
             countryGroup: trackCode,
             score,
             tags: tags.slice(0, 4),
@@ -8204,11 +8204,13 @@
       if (!job) return openCopilotDrawer(null);
       const cg = classifyCountryGroup(job.company, job.location, job.countryGroup);
       const smart = computeClientSmartSalaryAndTier(job.company, job.title, job.location, cg);
+      const cvLabel = job.recommendedCvCode || smart.cvCode || "EN";
+      const cvFile = job.recommendedCv || smart.cvFile || "Hessam_Mamagani_CV_EN.pdf";
       openCopilotDrawer({
         chatKey: `SCAN_${job.id}`,
         badge: `📡 Scanner Job · ${(COUNTRY_DISPLAY_META[cg] || COUNTRY_DISPLAY_META.TR).flag} ${(COUNTRY_DISPLAY_META[cg] || COUNTRY_DISPLAY_META.TR).label}`,
         title: `${job.company} — ${job.title}`,
-        subtitle: `${job.location || "Hybrid"} · Quote: ${smart.salaryBand} · CV: ${smart.recommendedCv} · ${smart.tierLabel}`,
+        subtitle: `${job.location || "Hybrid"} · Quote: ${smart.salaryBand} · CV: ${cvLabel} · ${smart.tierLabel}`,
         jobContext: {
           id: String(job.id),
           company: job.company,
@@ -8219,8 +8221,8 @@
           smartSalaryBand: smart.salaryBand,
           tierLabel: smart.tierLabel,
           hiringSpeed: smart.hiringSpeed,
-          recommendedCv: smart.recommendedCv,
-          descriptionSnippet: String(job.descriptionText || "").slice(0, 2600)
+          recommendedCv: cvFile,
+          descriptionSnippet: String(job.description || job.descriptionText || "").slice(0, 12000)
         },
         pipelineItemId: null
       });
