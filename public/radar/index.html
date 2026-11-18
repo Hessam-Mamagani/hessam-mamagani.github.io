@@ -4037,6 +4037,7 @@
         const clientMatcher = buildClientAppliedSkippedMatcher();
         const maxAgeMs = clientTprToMaxHours(tpr) * 3600000;
         const CLIENT_OBVIOUS_NOISE_RE = /(?:gömülü|aviyonik|avionics|santral|mağaza müdürü|store manager|yatırımcı ilişkileri|muhasebe|satış uzmanı|çağrı merkezi|müşteri temsilcisi|engelli kadro|\b(helpdesk|help desk|it support|teknik destek|call center|customer service|customer supply chain|sales executive|account executive|account manager|brand manager|influencer marketing|hr technology|recruiter|talent acquisition|legal counsel|ios developer|android developer|principal android|kıdemli ios|flutter developer|react native developer|mobil geliştirme|mobile developer|unity developer|unreal|embedded|firmware|plc|scada|sap abap|sap sd|sap fi|sap mm|oracle forms|arabic|mandarin|cantonese|stajyer|intern|internship|working student)\b)/i;
+        const CLIENT_BROAD_TECH_RE = /(\.net|c#|\b(?:engineer\w*|developer|geliştirici|architect\w*|software|yazılım|mühendis\w*|mimar\w*|full[\s-]*stack|fullstack|backend|back-end|frontend|front-end|react|typescript|next\.?js|ai\b|llm|genai|yapay\s+zeka|agent\w*|automation|otomasyon|technical\s+lead|tech\s+lead|engineering\s+manager|yazılım\s+müdürü|member\s+of\s+technical\s+staff|mts\b|forward\s+deployed|solutions|integration|iş\s+uygulamaları|enterprise\s+applications|erp)\b)/i;
         const prevVerifiedClientMap = new Map((ALL_SCAN_JOBS || []).filter(isClientAiVerified).map(j => [String(j.id), j]));
 
         const stripHtmlFast = (h = "") =>
@@ -4152,7 +4153,7 @@
                 if (!ts || Number.isNaN(ts) || Date.now() - ts > maxAgeMs) return false;
                 const id = `gh_${slug}_${j.id}`;
                 if (clientMatcher.has(id, company, j.title || "") || CLIENT_AI_REJECTED_IDS.has(id)) return false;
-                return locRe.test(String(j.location?.name || "")) && !CLIENT_OBVIOUS_NOISE_RE.test(j.title || "") && !CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "");
+                return locRe.test(String(j.location?.name || "")) && CLIENT_BROAD_TECH_RE.test(j.title || "") && !CLIENT_OBVIOUS_NOISE_RE.test(j.title || "") && !CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "");
               }).slice(0, 6);
               const dets = await Promise.all(hits.map(async j => {
                 try {
@@ -4192,7 +4193,7 @@
                 if (clientMatcher.has(id, company, j.text || "", j.hostedUrl || "") || CLIENT_AI_REJECTED_IDS.has(id)) return false;
                 const lStr = `${j.categories?.location || ""} ${(j.categories?.allLocations || []).join(" ")} ${j.country || ""}`;
                 const deptStr = `${j.categories?.department || ""} ${j.categories?.team || ""}`;
-                return locRe.test(lStr) && !CLIENT_OBVIOUS_NOISE_RE.test(`${j.text || ""} ${deptStr}`) && !CLIENT_FOREIGN_TITLE_REGEX.test(j.text || "");
+                return locRe.test(lStr) && CLIENT_BROAD_TECH_RE.test(j.text || "") && !CLIENT_OBVIOUS_NOISE_RE.test(`${j.text || ""} ${deptStr}`) && !CLIENT_FOREIGN_TITLE_REGEX.test(j.text || "");
               }).slice(0, 8).map(j => ({
                 id: `lev_${slug}_${String(j.id).slice(0, 36)}`,
                 title: stripHtmlFast(j.text || ""),
@@ -4221,7 +4222,7 @@
                 if (clientMatcher.has(id, company, j.title || "", j.jobUrl || "") || CLIENT_AI_REJECTED_IDS.has(id)) return false;
                 const lStr = [j.location || "", ...(j.secondaryLocations || []).map(s => s.location || "")].join(" ");
                 const deptStr = `${j.department || ""} ${j.team || ""}`;
-                if (!locRe.test(lStr) || CLIENT_OBVIOUS_NOISE_RE.test(`${j.title || ""} ${deptStr}`) || CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "")) return false;
+                if (!locRe.test(lStr) || !CLIENT_BROAD_TECH_RE.test(j.title || "") || CLIENT_OBVIOUS_NOISE_RE.test(`${j.title || ""} ${deptStr}`) || CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "")) return false;
                 const plain = j.descriptionPlain || stripHtmlFast(j.descriptionHtml || "");
                 return !reqRe || reqRe.test(plain);
               }).slice(0, 6).map(j => {
@@ -4254,7 +4255,7 @@
                 if (clientMatcher.has(id, company, j.name || "") || CLIENT_AI_REJECTED_IDS.has(id)) return false;
                 const lStr = `${j.location?.fullLocation || ""} ${j.location?.city || ""} ${j.location?.country || ""}`;
                 const deptStr = `${j.department?.label || ""} ${j.function?.label || ""}`;
-                return locRe.test(lStr) && !CLIENT_OBVIOUS_NOISE_RE.test(`${j.name || ""} ${deptStr}`) && !CLIENT_FOREIGN_TITLE_REGEX.test(j.name || "");
+                return locRe.test(lStr) && CLIENT_BROAD_TECH_RE.test(j.name || "") && !CLIENT_OBVIOUS_NOISE_RE.test(`${j.name || ""} ${deptStr}`) && !CLIENT_FOREIGN_TITLE_REGEX.test(j.name || "");
               }).slice(0, 5);
               const dets = await Promise.all(hits.map(async j => {
                 try {
@@ -4299,7 +4300,7 @@
                 const id = `arb_${String(j.slug || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 48)}`;
                 if (clientMatcher.has(id, j.company_name || "", j.title || "", j.url || "") || CLIENT_AI_REJECTED_IDS.has(id)) return false;
                 const lStr = `${j.location || ""} ${(j.tags || []).join(" ")}`;
-                return locRe.test(lStr) && !CLIENT_OBVIOUS_NOISE_RE.test(j.title || "") && !CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "");
+                return locRe.test(lStr) && CLIENT_BROAD_TECH_RE.test(j.title || "") && !CLIENT_OBVIOUS_NOISE_RE.test(j.title || "") && !CLIENT_FOREIGN_TITLE_REGEX.test(j.title || "");
               }).slice(0, 6).map(j => {
                 const ts = Number(j.created_at || 0) * 1000;
                 return {
