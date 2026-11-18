@@ -8193,6 +8193,44 @@
         plainEn: "Use Optimistic Concurrency (`RowVersion` / `xmin` timestamp token) for forms like quotes: EF includes `WHERE RowVersion = @OriginalVersion` on `UPDATE`, and if 0 rows match (`DbUpdateConcurrencyException`), we warn the second user cleanly instead of silently overwriting. For high-contention inventory/tickets, use atomic SQL `UPDATE ... SET Remaining = Remaining - 1 WHERE Id = @Id AND Remaining > 0` inside a transaction.",
         plainTr: "Teklif düzenleme gibi ekranlarda Optimistic Concurrency (`RowVersion`) kullanırım; `UPDATE` sırasında versiyon değişmişse ikinci kullanıcının veriyi ezmesini engellerim. Son bilet/stok düşümü gibi yüksek çakışmalı işlemlerde ise atomik `UPDATE ... SET Stok = Stok - 1 WHERE Id = @Id AND Stok > 0` sorgusuyla yarış durumunu (race condition) veritabanı seviyesinde sıfırlarım.",
         pilzProofEn: "Both EvenTracer ticket inventory and PilzPortal multi-engineer quote revisions enforce concurrency tokens so zero edits or seats get overwritten.",
+        pilzProofTr: "EvenTracer bilet kontenjanlarında atomik güncelleme, PilzPortal çoklu mühendis teklif revizyonlarında ise versiyon kontrolü ile veri ezilmesini engelledim."
+      },
+      {
+        id: "da_3", cat: "DATA", catLabel: "🗄️ SQL & Redis",
+        questionEn: "EF Core LINQ vs Dapper / Raw Parameterized SQL — which one do you prefer?",
+        questionTr: "EF Core LINQ mi yoksa Dapper / Ham SQL mi — hangisini ne zaman tercih edersiniz?",
+        plainEn: "Use EF Core for 85–90% of the app: compile-time type safety, migrations, concurrency tokens, and rapid maintainability. Drop down to Dapper or EF Core `SqlQuery<T>` (always parameterized — never string concatenation!) for the 10% heavy financial aggregations, CTEs, window functions (`ROW_NUMBER() OVER`), or bulk operations where hand-tuned SQL shines.",
+        plainTr: "Uygulamanın %85-90'ında tip güvenliği, migration ve bakım hızı için EF Core kullanırım. Ancak karmaşık finansal mutabakatlar, CTE'ler, pencere fonksiyonları (`ROW_NUMBER() OVER`) ve toplu raporlamalarda Dapper veya parametreli `SqlQuery<T>` kullanarak SQL motorunun tam gücünü alırım.",
+        pilzProofEn: "In Pilz's SAP-vs-Portal revenue & invoice reconciliation audits, window-function SQL queries reconcile thousands of line items instantaneously.",
+        pilzProofTr: "Pilz'deki SAP-Portal gelir ve fatura mutabakat ekranlarında pencere fonksiyonlu optimize SQL sorguları kullanıyorum."
+      },
+      {
+        id: "da_4", cat: "DATA", catLabel: "🗄️ SQL & Redis",
+        questionEn: "How do you use Redis caching safely without serving stale financial or user data?",
+        questionTr: "Redis önbelleğini bayat (eski) veri gösterme riskine girmeden nasıl kurgularsınız?",
+        plainEn: "Use the Cache-Aside pattern with explicit versioned keys (e.g., `catalog:v2:tenant:42`), sensible TTLs (e.g., 5–15 min), and event-driven invalidation whenever a write Command mutates that entity. Never cache sensitive unencrypted PII without tenant scoping, and guard hot keys against cache stampede.",
+        plainTr: "Cache-Aside desenini versiyonlu ve kiracı (tenant) bazlı anahtarlarla kurarım; makul TTL süreleri verir ve ilgili yazma (Command) işlemi gerçekleştiğinde önbelleği anında geçersiz kılarım (invalidation). Fiyat/bakiye gibi kritik verilerde kesin tutarlılığı korurum.",
+        pilzProofEn: "EvenTracer caches public event discovery pages and lookup catalogs in Redis while keeping live seat availability strictly transactional.",
+        pilzProofTr: "EvenTracer'da etkinlik vitrinlerini Redis'te önbelleklerken koltuk/bilet stok kontrolünü doğrudan atomik veritabanı katmanında tutuyorum."
+      },
+      {
+        id: "da_5", cat: "DATA", catLabel: "🗄️ SQL & Redis",
+        questionEn: "How do you keep offline/local state, Cloud DB, and Git backups in sync without data loss?",
+        questionTr: "Yerel durum, bulut veritabanı ve yedek depolar arasında veri kaybı olmadan senkronizasyonu nasıl sağlarsınız?",
+        plainEn: "Design deterministic, monotonic merge functions keyed by unique entity IDs instead of blind file overwrites: union append-only sets, merge status progressions monotonically (e.g., `Interview` > `Viewed` > `Applied`), preserve non-empty contact/intel fields from both sides, and use `UPSERT` (`ON CONFLICT DO UPDATE`) in SQL/D1.",
+        plainTr: "Dosyaları körü körüne ezmek yerine benzersiz ID bazlı deterministik birleştirme (merge) ve SQL tarafında `UPSERT` (`ON CONFLICT DO UPDATE`) kullanırım. Durum geçişlerinde her zaman daha ileri aşamayı (`Mülakat` > `Görüntülendi` > `Başvuruldu`) koruyarak çakışmaları sıfır veri kaybıyla çözerim.",
+        pilzProofEn: "JobRadar itself syncs browser localStorage, Cloudflare D1 SQLite at the edge, Telegram bot updates, and GitHub cold backups with lossless conflict-free merging!",
+        pilzProofTr: "Şu an kullandığımız JobRadar bile tarayıcı, Cloudflare D1, Telegram botu ve GitHub yedeklerini sıfır veri kaybıyla birleştiriyor."
+      },
+
+      // --- REACT (5) ---
+      {
+        id: "re_1", cat: "REACT", catLabel: "⚛️ React & TS",
+        questionEn: "useState vs useRef vs useEffect — what is the #1 mistake mid-level devs make with useEffect?",
+        questionTr: "useState, useRef ve useEffect farkı nedir — geliştiricilerin useEffect'te yaptığı en büyük hata nedir?",
+        plainEn: "`useState` holds UI state that triggers a re-render when changed. `useRef` holds mutable values or DOM references that persist across renders WITHOUT triggering re-renders (timers, scroll position, previous value). The #1 `useEffect` bug is using it to compute derived state (`setFilteredList(...)` inside an effect), causing double renders or infinite loops — derived values should be computed inline during render (or `useMemo`), reserving `useEffect` strictly for external synchronization (DOM, WebSockets, subscriptions).",
+        plainTr: "`useState` değiştiğinde ekranı yeniden çizer. `useRef` ise ekranı yeniden çizdirmeden değer veya DOM referansı tutar. En büyük hata, mevcut state'ten türetilebilecek bir listeyi `useEffect` içinde `setState` ile hesaplayıp gereksiz çift render veya sonsuz döngü yaratmaktır; türetilmiş veri doğrudan render sırasında hesaplanmalı, `useEffect` yalnızca dış sistem senkronizasyonu için kullanılmalıdır.",
+        pilzProofEn: "In PilzPortal's complex multi-machine quote builder, keeping derived totals pure during render eliminated cascading state bugs across 50+ line items.",
         pilzProofTr: "PilzPortal'ın çok makineli karmaşık teklif ekranında toplam/kur hesaplarını saf (derived) tutarak 50+ kalemlik tablolarda sıfır takılma sağladım."
       },
       {
@@ -8252,8 +8290,38 @@
         pilzProofTr: "InsightfulAI ve bu sistemdeki Copilot'ta model canlı web araması, DNS kontrolü ve yapılandırılmış veritabanı aksiyonlarını güvenli şemalarla yürütüyor."
       },
       {
+        id: "ai_3", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
+        questionEn: "How do you make Text-to-SQL (NL2SQL) safe against SQL injection, DROP TABLE, or leaking another customer's rows?",
+        questionTr: "Doğal dilden SQL üreten (NL2SQL) bir yapay zekayı veri silme veya başkasının verisini sızdırma riskine karşı nasıl korursunuz?",
+        plainEn: "Never execute LLM-generated SQL on a read-write connection! I enforce 4 hard walls: (1) execute exclusively on a database user granted ONLY `SELECT` on curated views, (2) parse the SQL AST to reject anything except a single `SELECT` (block `DROP/UPDATE/DELETE/EXEC/WAITFOR`), (3) automatically inject mandatory `WHERE TenantId = @CurrentTenant` + `TOP / LIMIT 200`, and (4) enforce a 3-second statement timeout.",
+        plainTr: "Modelin ürettiği SQL asla yazma yetkili bağlantıda çalıştırılmaz! 4 sert güvenlik duvarı kurarım: (1) Sadece izinli view'larda `SELECT` yetkisi olan salt-okunur DB kullanıcısı, (2) Tek bir `SELECT` dışındaki tüm komutları (`UPDATE/DELETE/DROP/EXEC`) reddeden SQL AST doğrulayıcısı, (3) Otomatik `TenantId` filtresi ve satır limiti (`LIMIT 200`), (4) 3 saniyelik sorgu zaman aşımı.",
+        pilzProofEn: "InsightfulAI's NL2SQL engine uses AST validation + read-only roles + row caps so executives query metrics safely in plain English or Turkish.",
+        pilzProofTr: "InsightfulAI'daki NL2SQL motoru AST doğrulaması ve salt-okunur DB rolü sayesinde yöneticilerin sıfır riskle veri sorgulamasını sağlıyor."
+      },
+      {
+        id: "ai_4", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
+        questionEn: "How do you control LLM latency, token cost, and provider outages in production?",
+        questionTr: "Üretim ortamında yapay zeka gecikmesini, token maliyetini ve API kesintilerini nasıl yönetirsiniz?",
+        plainEn: "Route tasks by complexity: use fast lightweight models (`Flash-Lite` / `Haiku`) for classification, scoring, and extraction; use reasoning models (`Gemini Flash`, `Claude Sonnet`, `GPT`) for complex synthesis; enforce strict JSON output schemas; cache embeddings & frequent answers; and build an automatic model fallback chain so a `429` or `503` on Model A seamlessly retries on Model B without failing the user.",
+        plainTr: "Görevleri karmaşıklığa göre yönlendiririm: sınıflandırma ve puanlama için hızlı/ekonomik modeller, derin analiz için güçlü modeller kullanırım. Sıkı JSON şeması, önbellekleme ve otomatik model yedekleme zinciri (Model A `429/503` verirse anında Model B'ye geçiş) kurarak kesintisiz hizmet sağlarım.",
+        pilzProofEn: "Both InsightfulAI and my Cloudflare Workers implement multi-model fallback chains and token-budgeted context windows.",
+        pilzProofTr: "Hem InsightfulAI hem Cloudflare Worker servislerimde çoklu model yedekleme zinciri ve maliyet/token kontrolü aktif çalışıyor."
+      },
+      {
+        id: "ai_5", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
+        questionEn: "They ask: 'Do you rely on AI coding tools? How do we know you understand the code you ship?'",
+        questionTr: "'AI kodlama araçları kullanıyor musunuz; ürettiğiniz koda hakim olduğunuzdan nasıl emin olabiliriz?' sorusuna en güçlü yanıt nedir?",
         plainEn: "Be proud, transparent, and architectural: 'Yes — I use agentic engineering harnesses daily as a force multiplier, which is how one senior engineer was able to architect, deploy, and maintain 5 production platforms with 1,190+ endpoints and zero data-loss incidents at Pilz Türkiye. AI doesn't decide my transaction boundaries, idempotency keys, SQL indexes, or security policies — I design the architecture, review every diff line-by-line, and own production 24/7. Let me share my screen and walk through any file or SQL query live.'",
         plainTr: "Özgüvenli ve şeffaf yanıt verin: 'Evet, modern AI mühendislik araçlarını çarpan etkisi olarak profesyonelce kullanıyorum; Pilz Türkiye'de tek başıma 5 canlı platformu ve 1.190+ API'yi sıfır veri kaybıyla ayağa kaldırıp yönetebilmemin sırrı bu. Ancak transaction sınırlarını, idempotency anahtarlarını, SQL indexlerini ve güvenlik mimarisini ben tasarlarım; her satırı denetler ve canlı sistemin sorumluluğunu taşırım. İsterseniz ekran paylaşıp herhangi bir modülü canlı inceleyebiliriz.'",
+        pilzProofEn: "Pilz Türkiye General Manager Yavuz Çopur signed a formal recommendation praising your solo delivery of Pilz's entire digital transformation ecosystem.",
+        pilzProofTr: "Pilz Türkiye Genel Müdürü Yavuz Çopur'un imzalı referans mektubu bu uçtan uca mühendislik sahipliğinizi doğrudan belgeliyor."
+      },
+
+      // --- HR_LEGAL (5) ---
+      {
+        id: "hr_1", cat: "HR_LEGAL", catLabel: "⚖️ HR, Permit & Salary",
+        questionEn: "HR asks: 'Why are you leaving Pilz Türkiye at the end of December 2026?'",
+        questionTr: "İK sorar: 'Pilz Türkiye'den Aralık 2026 sonunda neden ayrılıyorsunuz?'",
         plainEn: "Keep it 100% calm, positive, and executive — zero frustration: 'Over the past 2.5+ years at Pilz Türkiye, I built and launched the company's full-stack digital CRM, quoting, SAP automation, e-Invoice, and AI platforms from scratch, which are now mature and running smoothly in production. Due to year-end organizational budget restructuring, my contract concludes cleanly on December 31, 2026 with full mutual goodwill and a formal signed recommendation letter from our General Manager, Yavuz Çopur. I am ready to bring that exact execution speed to your engineering team.'",
         plainTr: "Yüzde yüz sakin, pozitif ve kurumsal kalın — asla sitem etmeyin: 'Pilz Türkiye'de son 2.5+ yılda şirketin uçtan uca CRM, teklif, SAP otomasyonu, e-Fatura ve yapay zeka platformlarını sıfırdan kurup canlıya aldım; sistemler şu an olgunlaşmış şekilde sorunsuz çalışıyor. Yıl sonu organizasyonel bütçe yapılanması kapsamında görevim 31 Aralık 2026 itibarıyla karşılıklı tam memnuniyetle tamamlanıyor; Genel Müdürümüz Yavuz Çopur da yazılı referans mektubu verdi. Şimdi bu üretim hızımı yeni ekibime taşımaya hazırım.'",
         pilzProofEn: "Attach or link Yavuz Çopur's signed recommendation letter early — it instantly turns a layoff question into executive social proof.",
