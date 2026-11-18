@@ -3498,23 +3498,28 @@
       if (job.postedTs && Number(job.postedTs) > 1000000000000) {
         return Math.max(0, (Date.now() - Number(job.postedTs)) / 3600000);
       }
-      if (job.datetime) {
+      if (job.datetime && /T\d{2}:/.test(String(job.datetime))) {
         const dt = Date.parse(job.datetime);
         if (!Number.isNaN(dt) && dt > 1000000000000) return Math.max(0, (Date.now() - dt) / 3600000);
       }
       const s = foldClientIdentity(job.postedAgo || "").trim();
-      if (!s) return null;
-      if (/\b(just now|today|az once|simdi|bugun|minutes?|mins?|dakika|\bdk\b|seconds?|saniye)\b/.test(s)) return 0.5;
-      let m = s.match(/(\d+)\s*(?:hours?|hrs?|\bh\b|saat)/);
-      if (m) return Number(m[1]);
-      m = s.match(/(\d+)\s*(?:days?|\bd\b|gun)/);
-      if (m) return Number(m[1]) * 24;
-      m = s.match(/(\d+)\s*(?:weeks?|\bw\b|hafta)/);
-      if (m) return Number(m[1]) * 168;
-      m = s.match(/(\d+)\s*(?:months?|\bmo\b|\bay\b)/);
-      if (m) return Number(m[1]) * 720;
-      m = s.match(/(\d+)\s*(?:years?|yil|sene)/);
-      if (m) return Number(m[1]) * 8760;
+      if (s) {
+        if (/\b(just now|today|az once|simdi|bugun|minutes?|mins?|dakika|\bdk\b|seconds?|saniye)\b/.test(s)) return 0.5;
+        let m = s.match(/(\d+)\s*(?:hours?|hrs?|\bh\b|saat)/);
+        if (m) return Number(m[1]);
+        m = s.match(/(\d+)\s*(?:days?|\bd\b|gun)/);
+        if (m) return Number(m[1]) * 24;
+        m = s.match(/(\d+)\s*(?:weeks?|\bw\b|hafta)/);
+        if (m) return Number(m[1]) * 168;
+        m = s.match(/(\d+)\s*(?:months?|\bmo\b|\bay\b)/);
+        if (m) return Number(m[1]) * 720;
+        m = s.match(/(\d+)\s*(?:years?|yil|sene)/);
+        if (m) return Number(m[1]) * 8760;
+      }
+      if (job.datetime) {
+        const dt = Date.parse(job.datetime);
+        if (!Number.isNaN(dt) && dt > 1000000000000) return Math.max(0, (Date.now() - dt) / 3600000);
+      }
       return null;
     }
 
@@ -4319,16 +4324,22 @@
         const targetScanCountry = isAllTracks ? "ALL" : (["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE"].includes(ACTIVE_COUNTRY) ? ACTIVE_COUNTRY : "TR");
         const scanMeta = isAllTracks ? COUNTRY_DISPLAY_META.ALL : (COUNTRY_DISPLAY_META[targetScanCountry] || COUNTRY_DISPLAY_META.TR);
         const curTpr = document.getElementById("tprSelect")?.value || "r86400";
-        const wider7dPool = getVisibleRadarPool("r604800").filter(j => isAllTracks || classifyCountryGroup(j.company, j.location, j.countryGroup) === ACTIVE_COUNTRY);
+        const all7dPool = getVisibleRadarPool("r604800");
+        const wider7dSameCountry = all7dPool.filter(j => isAllTracks || classifyCountryGroup(j.company, j.location, j.countryGroup) === ACTIVE_COUNTRY);
+        const otherCountries7d = all7dPool.filter(j => classifyCountryGroup(j.company, j.location, j.countryGroup) !== ACTIVE_COUNTRY);
         container.innerHTML = `
           <div class="glass rounded-xl p-8 text-center space-y-3 border border-slate-800">
-            <div class="text-sm font-bold text-slate-200">0 unseen roles for ${activeMeta.flag} ${activeMeta.label} inside your selected time window (all matching roles already applied/skipped or none posted yet).</div>
-            <p class="text-xs text-slate-400 max-w-md mx-auto">Click below to run a live scan right now, or widen the time filter to Last 3 Days / Last 7 Days${wider7dPool.length ? ` (${wider7dPool.length} verified role(s) waiting in 7-day window)` : ""}.</p>
+            <div class="text-sm font-bold text-slate-200">0 unseen roles for ${activeMeta.flag} ${activeMeta.label} inside your selected time window.</div>
+            <p class="text-xs text-slate-400 max-w-lg mx-auto">
+              ${wider7dSameCountry.length ? `<strong class="text-emerald-300">${wider7dSameCountry.length} verified role(s)</strong> for ${activeMeta.flag} ${activeMeta.label} are in your 7-day D1 feed.` : `All matching ${activeMeta.short} roles in this window are already applied/skipped.`}
+              ${!isAllTracks && otherCountries7d.length ? ` Plus <strong class="text-blue-300">${otherCountries7d.length} unseen role(s)</strong> waiting in your other visa tracks (same feed shown by Telegram <code class="text-slate-200">/jobs</code>).` : ""}
+            </p>
             <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
               <button type="button" onclick="runScan('${targetScanCountry}')" class="px-4 py-2 rounded-lg text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg transition cursor-pointer">
                 🔍 ${isAllTracks ? "Scan Live 🌐 All 5 Visa Tracks Now" : `Scan Live ${scanMeta.flag} ${scanMeta.label} Jobs Now`}
               </button>
-              ${curTpr !== "r604800" ? `<button type="button" onclick="document.getElementById('tprSelect').value='r604800'; updateGlobalCountryCounts(); renderRadarList(); runScan('${targetScanCountry}');" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 transition cursor-pointer">📅 Widen to Last 7 Days &amp; Scan</button>` : ""}
+              ${curTpr !== "r604800" && wider7dSameCountry.length ? `<button type="button" onclick="document.getElementById('tprSelect').value='r604800'; updateGlobalCountryCounts(); renderRadarList();" class="px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 transition cursor-pointer">📅 Show ${wider7dSameCountry.length} ${activeMeta.short} Role(s) (Last 7 Days)</button>` : ""}
+              ${(!isAllTracks && all7dPool.length) ? `<button type="button" onclick="document.getElementById('tprSelect').value='r604800'; setActiveCountry('ALL');" class="px-4 py-2 rounded-lg text-xs font-bold bg-emerald-600/20 hover:bg-emerald-600/35 border border-emerald-500/40 text-emerald-200 transition cursor-pointer">🌐 View All ${all7dPool.length} Unseen Roles (Matches Telegram)</button>` : ""}
             </div>
           </div>
         `;
@@ -8005,15 +8016,6 @@
         questionTr: "'AI kodlama araçları kullanıyor musunuz; ürettiğiniz koda hakim olduğunuzdan nasıl emin olabiliriz?' sorusuna en güçlü yanıt nedir?",
         plainEn: "Be proud, transparent, and architectural: 'Yes — I use agentic engineering harnesses daily as a force multiplier, which is how one senior engineer was able to architect, deploy, and maintain 5 production platforms with 1,190+ endpoints and zero data-loss incidents at Pilz Türkiye. AI doesn't decide my transaction boundaries, idempotency keys, SQL indexes, or security policies — I design the architecture, review every diff line-by-line, and own production 24/7. Let me share my screen and walk through any file or SQL query live.'",
         plainTr: "Özgüvenli ve şeffaf yanıt verin: 'Evet, modern AI mühendislik araçlarını çarpan etkisi olarak profesyonelce kullanıyorum; Pilz Türkiye'de tek başıma 5 canlı platformu ve 1.190+ API'yi sıfır veri kaybıyla ayağa kaldırıp yönetebilmemin sırrı bu. Ancak transaction sınırlarını, idempotency anahtarlarını, SQL indexlerini ve güvenlik mimarisini ben tasarlarım; her satırı denetler ve canlı sistemin sorumluluğunu taşırım. İsterseniz ekran paylaşıp herhangi bir modülü canlı inceleyebiliriz.'",
-        pilzProofEn: "Pilz Türkiye General Manager Yavuz Çopur signed a formal recommendation praising your solo delivery of Pilz's entire digital transformation ecosystem.",
-        pilzProofTr: "Pilz Türkiye Genel Müdürü Yavuz Çopur'un imzalı referans mektubu bu uçtan uca mühendislik sahipliğinizi doğrudan belgeliyor."
-      },
-
-      // --- HR_LEGAL (5) ---
-      {
-        id: "hr_1", cat: "HR_LEGAL", catLabel: "⚖️ HR, Permit & Salary",
-        questionEn: "HR asks: 'Why are you leaving Pilz Türkiye at the end of December 2026?'",
-        questionTr: "İK sorar: 'Pilz Türkiye'den Aralık 2026 sonunda neden ayrılıyorsunuz?'",
         plainEn: "Keep it 100% calm, positive, and executive — zero frustration: 'Over the past 2.5+ years at Pilz Türkiye, I built and launched the company's full-stack digital CRM, quoting, SAP automation, e-Invoice, and AI platforms from scratch, which are now mature and running smoothly in production. Due to year-end organizational budget restructuring, my contract concludes cleanly on December 31, 2026 with full mutual goodwill and a formal signed recommendation letter from our General Manager, Yavuz Çopur. I am ready to bring that exact execution speed to your engineering team.'",
         plainTr: "Yüzde yüz sakin, pozitif ve kurumsal kalın — asla sitem etmeyin: 'Pilz Türkiye'de son 2.5+ yılda şirketin uçtan uca CRM, teklif, SAP otomasyonu, e-Fatura ve yapay zeka platformlarını sıfırdan kurup canlıya aldım; sistemler şu an olgunlaşmış şekilde sorunsuz çalışıyor. Yıl sonu organizasyonel bütçe yapılanması kapsamında görevim 31 Aralık 2026 itibarıyla karşılıklı tam memnuniyetle tamamlanıyor; Genel Müdürümüz Yavuz Çopur da yazılı referans mektubu verdi. Şimdi bu üretim hızımı yeni ekibime taşımaya hazırım.'",
         pilzProofEn: "Attach or link Yavuz Çopur's signed recommendation letter early — it instantly turns a layoff question into executive social proof.",
