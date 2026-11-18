@@ -62,6 +62,21 @@
           <span class="text-slate-600">&middot;</span>
           <span>⭐ Signals: <strong id="activeSignalsCount" class="text-purple-300">0</strong></span>
         </div>
+        <div class="relative" id="healthChipWrap">
+          <button type="button" id="healthChipBtn" onclick="toggleHealthPopover(event)" class="px-2.5 py-1.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer" title="Live AI Agents & Job Scraper Health Status">
+            <span id="healthChipDot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
+            <span id="healthChipLabel">⚡ Agents</span>
+          </button>
+          <div id="healthPopover" class="hidden absolute right-0 mt-2 w-80 sm:w-96 glass rounded-xl p-3.5 border border-slate-700 shadow-2xl z-50 text-xs space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <span class="font-bold text-white">⚡ Live Agents &amp; Scrapers Health</span>
+              <button type="button" id="healthRefreshBtn" onclick="loadSystemHealth(true)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 text-[11px] font-semibold cursor-pointer">🔄 Re-check</button>
+            </div>
+            <div id="healthPopoverBody" class="space-y-1.5 text-[11px] text-slate-300">
+              Checking Cloudflare Worker, AI providers &amp; GitHub Runner...
+            </div>
+          </div>
+        </div>
         <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v2 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
           📄 My v2 CVs
         </button>
@@ -3376,7 +3391,9 @@
     const CLIENT_GERMAN_DUTCH_REQ_REGEX = /\b(fließend\s+deutsch|verhandlungssicheres\s+deutsch|sehr\s+gute\s+deutschkenntnisse|gute\s+deutschkenntnisse|deutschkenntnisse.*(?:b1|b2|c1|c2)|(?:b1|b2|c1|c2)(?:\s*(?:\/|-|or|to)\s*(?:b2|c1|c2))?\s+(?:level\s+|certification\s+|certificate\s+|proficiency\s+|knowledge\s+|fluency\s+|skills?\s+|in\s+|of\s+|the\s+){0,4}(?:german|deutsch|dutch|nederlands)(?:\s+language)?(?!\s*(?:is\s+)?(?:a\s+plus|nice\s+to\s+have|optional|not\s+required))|german\s*(?:language\s*)?(?:skills?\s*)?(?:\(\s*)?(?:is\s*|are\s*|:\s*|-\s*|min\.?\s*|minimum\s*)?(?:required|mandatory|essential|must|fluent|native|b1|b2|c1|c2)|(?:good|strong|very\s+good|excellent|working|professional|full|business)\s+(?:command|knowledge|proficiency|working\s+proficiency)\s+(?:of|in)\s+(?:the\s+)?(?:german|dutch)(?:\s+language)?|fluent\s+(?:in\s+)?german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|french|spanish)\s+and\s+)?german|(?:german|dutch)\s+and\s+english\s+at\s+(?:a\s+)?(?:c1|c2|b2|fluent|native)|proficient\s+in\s+german|must\s+speak\s+german|(?:fluency|fluent|proficient|proficiency)\s+(?:in\s+)?(?:both\s+)?(?:(?:english|german)\s+and\s+)?dutch|fluent\s+(?:in\s+)?dutch|dutch\s*(?:language\s*)?(?:skills?\s*)?(?:is\s*|are\s*)?(?:required|mandatory|essential|must|fluent|native|b1|b2|c1|c2)|german[\s-]+speaking|deutschsprachig|vloeiend\s+nederlands|must\s+speak\s+dutch|dutch[\s-]+speaking|nederlandstalig)\b/i;
     const CLIENT_FOREIGN_STOPWORDS_REGEX = /\b(und|oder|für|wir|ihre|unser|unsere|bei|zur|zum|eine|einen|einem|einer|sowie|über|aufgaben|anforderungsprofil|kenntnisse|erfahrung|entwicklung|zusammenarbeit|bewerbung|voor|wij|jij|jouw|onze|het|zijn|worden|werkt|ervaring|kennis|functie)\b/gi;
     const CLIENT_NO_VISA_REGEX = /\b(no\s+visa\s+sponsorship|cannot\s+sponsor|unable\s+to\s+sponsor|do\s+not\s+offer\s+(?:visa\s+)?sponsorship|does\s+not\s+offer\s+(?:visa\s+)?sponsorship|without\s+(?:visa\s+)?sponsorship|sponsorship\s+is\s+not\s+available|we\s+do\s+not\s+sponsor|do\s+not\s+relocate|does\s+not\s+relocate|cannot\s+relocate|candidates\s+who\s+already\s+live\s+in|(?:do\s+not|don['’]t)\s+hire\s+applicants\s+living\s+outside|(?:applicants|candidates|you)\s+must\s+(?:already\s+)?be\s+based\s+in\s+(?:the\s+)?(?:uk|united\s+kingdom|ireland|eu|europe|germany|netherlands)|must\s+live\s+within\s+(?:a\s+)?commute\s+of|must\s+already\s+hold\s+a?\s*valid|must\s+have\s+(?:the\s+)?(?:legal\s+)?right\s+to\s+work\s+in\s+(?:the\s+)?(?:uk|united\s+kingdom|ireland|eu|europe|germany|netherlands)(?!\s*(?:or|,|—|-)?\s*(?:visa\s+sponsorship|we\s+(?:can|will)\s+sponsor))|stamp\s*4\s*(?:only|required)|eu\s+(?:citizens?|passport)\s+only|uk\s+(?:citizens?|nationals?)\s+only|security\s+clearance\s+required|sc\s+cleared|dv\s+cleared)\b/i;
-    const CLIENT_B2B_NO_PERMIT_REGEX = /\b(b2b\s+contract(?:or)?|independent\s+contractor|freelance\s+contract|1099\s+contract|c2c\s+contract|outside\s+ir35|self[\s-]employed\s+contract|alignerr|outlier|mindrift|dataannotation|remotasks|turing|crossover|toptal|jobgether|lemon\.io|\bdeel\b|\bcanonical\b|c\s*teleport|threecolts|99x\s+europe|distru)\b/i;
+    const CLIENT_B2B_COMPANY_REGEX = /\b(alignerr|outlier|mindrift|dataannotation|remotasks|turing|crossover|toptal|jobgether|lemon\.io|deel|canonical|c\s*teleport|threecolts|99x\s+europe|distru)\b/i;
+    const CLIENT_B2B_CONTRACT_TEXT_REGEX = /\b(b2b\s+contract(?:or)?|independent\s+contractor|freelance\s+contract|1099\s+contract|c2c\s+contract|outside\s+ir35|self[\s-]employed\s+contract)\b/i;
+    const CLIENT_B2B_NO_PERMIT_REGEX = CLIENT_B2B_CONTRACT_TEXT_REGEX;
     const CLIENT_EXPLICIT_VISA_REGEX = /\b(visa\s+sponsorship|visa\s+support|relocation|blue\s+card|critical\s+skills|kennismigrant|highly\s+skilled\s+migrant|skilled\s+worker|sponsor\s+visas?)\b/i;
 
     function isClientDevOpsOrInfraHeavy(title, desc) {
@@ -3447,20 +3464,49 @@
         .trim();
     }
 
+    function normalizeClientJobUrl(raw = "") {
+      if (!raw) return "";
+      try {
+        const u = new URL(String(raw).trim());
+        const pathClean = u.pathname.replace(/\/+$/, "").toLowerCase();
+        const keepParams = ["gh_jid", "ashby_jid", "jobid", "jid", "reqid", "id"];
+        const kept = [];
+        for (const [k, v] of u.searchParams.entries()) {
+          if (keepParams.includes(k.toLowerCase()) && v) kept.push(`${k.toLowerCase()}=${v}`);
+        }
+        kept.sort();
+        return `${u.origin.toLowerCase()}${pathClean}${kept.length ? "?" + kept.join("&") : ""}`;
+      } catch {
+        return String(raw).split("?")[0].replace(/\/+$/, "").toLowerCase();
+      }
+    }
+
+    function extractClientEmbeddedAtsJobId(raw = "") {
+      const m = String(raw || "").match(/[?&]gh_jid=(\d{5,})/i) || String(raw || "").match(/greenhouse\.io\/[^/?#]+\/jobs\/(\d{5,})/i);
+      return m ? m[1] : "";
+    }
+
     function buildClientAppliedSkippedMatcher() {
       const appliedIds = new Set();
       const skippedIds = new Set([...(STATE.skipped || []).map(String), ...getLocalSkippedCache().map(String)]);
+      const appliedGhNumericIds = new Set();
       const appliedUrls = new Set();
       const appliedBrandRoles = new Set();
-      const hideSameCompany = document.getElementById("hideSameCompanyChk")?.checked === false ? false : false; // exact role+company always skipped; strict whole-company opt-in only inside Premium modal
       for (const a of (STATE.applied || [])) {
         if (!a) continue;
-        if (a.id) appliedIds.add(String(a.id));
-        const rawUrl = String(a.url || "").split("?")[0].replace(/\/+$/, "").toLowerCase();
+        if (a.id) {
+          const sid = String(a.id);
+          appliedIds.add(sid);
+          const ghIdMatch = sid.match(/^gh_[^_]+_(\d{5,})$/i);
+          if (ghIdMatch) appliedGhNumericIds.add(ghIdMatch[1]);
+        }
+        const rawUrl = normalizeClientJobUrl(a.url || "");
         if (rawUrl) {
           appliedUrls.add(rawUrl);
           const liM = rawUrl.match(/linkedin\.com\/jobs\/view\/(?:[^/]*-)?(\d{8,})/);
           if (liM) appliedIds.add(liM[1]);
+          const ghNum = extractClientEmbeddedAtsJobId(a.url || "");
+          if (ghNum) appliedGhNumericIds.add(ghNum);
         }
         const brand = normClientCompanyBrand(a.company || "");
         const role = normClientRoleCore(a.title || "");
@@ -3476,12 +3522,17 @@
           const id = String(isObj ? jobOrId.id || "" : jobOrId || "");
           const comp = isObj ? jobOrId.company || "" : company;
           const tit = isObj ? jobOrId.title || "" : title;
-          const u = String(isObj ? jobOrId.url || "" : url || "").split("?")[0].replace(/\/+$/, "").toLowerCase();
+          const rawCandUrl = String(isObj ? jobOrId.url || "" : url || "");
+          const u = normalizeClientJobUrl(rawCandUrl);
           if (id && (appliedIds.has(id) || skippedIds.has(id))) return true;
+          const candGhMatch = id.match(/^gh_[^_]+_(\d{5,})$/i);
+          if (candGhMatch && appliedGhNumericIds.has(candGhMatch[1])) return true;
           if (u) {
             if (appliedUrls.has(u)) return true;
             const liM = u.match(/linkedin\.com\/jobs\/view\/(?:[^/]*-)?(\d{8,})/);
             if (liM && (appliedIds.has(liM[1]) || skippedIds.has(liM[1]))) return true;
+            const ghNum = extractClientEmbeddedAtsJobId(rawCandUrl);
+            if (ghNum && appliedGhNumericIds.has(ghNum)) return true;
           }
           const brand = normClientCompanyBrand(comp);
           const role = normClientRoleCore(tit);
@@ -3569,7 +3620,8 @@
         CLIENT_NON_SOFTWARE_IT_REGEX.test(title) ||
         CLIENT_FOREIGN_TITLE_REGEX.test(title) ||
         CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) ||
-        CLIENT_B2B_NO_PERMIT_REGEX.test(full) ||
+        CLIENT_B2B_COMPANY_REGEX.test(`${comp} ${title}`) ||
+        CLIENT_B2B_CONTRACT_TEXT_REGEX.test(full) ||
         isClientDevOpsOrInfraHeavy(title, desc) ||
         isClientPurePythonMlOrResearchRole(title, desc)
       ) {
@@ -3996,7 +4048,12 @@
           if (isClientDevOpsOrInfraHeavy(`${title} ${dept}`, desc)) return null;
           if (isClientPurePythonMlOrResearchRole(title, desc)) return null;
           const full = `${title} ${comp} ${loc} ${desc}`;
-          if (CLIENT_FOREIGN_TITLE_REGEX.test(title) || CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) || CLIENT_B2B_NO_PERMIT_REGEX.test(full)) return null;
+          if (
+            CLIENT_FOREIGN_TITLE_REGEX.test(title) ||
+            CLIENT_GERMAN_DUTCH_REQ_REGEX.test(full) ||
+            CLIENT_B2B_COMPANY_REGEX.test(`${comp} ${title}`) ||
+            CLIENT_B2B_CONTRACT_TEXT_REGEX.test(full)
+          ) return null;
           if ((desc.match(CLIENT_FOREIGN_STOPWORDS_REGEX) || []).length >= 6) return null;
           if (trackCode !== "TR" && CLIENT_NO_VISA_REGEX.test(full)) return null;
 
@@ -4031,6 +4088,7 @@
           };
         };
 
+        let arbeitnowCachePromise = null;
         const fetchBrowserSponsorAtsForTrack = async (trackCode) => {
           let rawCount = 0;
           const ageStr = (ms) => {
@@ -4076,7 +4134,7 @@
           };
           const lev = async (slug, company, locRe, badge, fallbackLoc) => {
             try {
-              const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`, { signal: AbortSignal.timeout(7000) });
+              const r = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`, { signal: AbortSignal.timeout(10000) });
               if (!r.ok) return [];
               const arr = await r.json();
               if (!Array.isArray(arr)) return [];
@@ -4175,6 +4233,42 @@
             } catch { return []; }
           };
 
+          const getArbeitnowVisaJobs = async (locRe, fallbackCountryLabel) => {
+            try {
+              if (!arbeitnowCachePromise) {
+                arbeitnowCachePromise = fetch("https://www.arbeitnow.com/api/job-board-api", { signal: AbortSignal.timeout(6500) })
+                  .then(r => r.ok ? r.json() : { data: [] })
+                  .catch(() => ({ data: [] }));
+              }
+              const d = await arbeitnowCachePromise;
+              const arr = d?.data || [];
+              rawCount += arr.length;
+              return arr.filter(j => {
+                if (!j.visa_sponsorship) return false;
+                const ts = Number(j.created_at || 0) * 1000;
+                if (!ts || Date.now() - ts > maxAgeMs) return false;
+                const id = `arb_${String(j.slug || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 48)}`;
+                if (clientMatcher.has(id, j.company_name || "", j.title || "", j.url || "")) return false;
+                const lStr = `${j.location || ""} ${(j.tags || []).join(" ")}`;
+                return locRe.test(lStr) && POS_SW_TITLE_RE.test(j.title || "") && !CLIENT_NON_SOFTWARE_IT_REGEX.test(j.title || "");
+              }).slice(0, 6).map(j => {
+                const ts = Number(j.created_at || 0) * 1000;
+                return {
+                  id: `arb_${String(j.slug || "").replace(/[^a-z0-9_-]/gi, "").slice(0, 48)}`,
+                  title: stripHtmlFast(j.title || ""),
+                  department: "",
+                  company: stripHtmlFast(j.company_name || "Sponsor Company"),
+                  location: `${stripHtmlFast(j.location || fallbackCountryLabel)} (Explicit Visa Sponsor)`,
+                  postedTs: ts,
+                  postedAgo: ageStr(ts),
+                  url: j.url || "https://www.arbeitnow.com/",
+                  description: stripHtmlFast(j.description || ""),
+                  badge: "🛂 Explicit Visa Sponsor"
+                };
+              });
+            } catch { return []; }
+          };
+
           let lists = [];
           if (trackCode === "TR") {
             const trRe = /(?:istanbul|i̇stanbul|gebze|kocaeli|türkiye|turkiye|turkey|\btr\b)/i;
@@ -4201,7 +4295,8 @@
               gh("contentful", "Contentful", deRe, "🇩🇪 EU Blue Card ATS", "Berlin, Germany"),
               gh("datadog", "Datadog Germany", deRe, "🇩🇪 EU Blue Card ATS", "Germany"),
               sr("DeliveryHero", "Delivery Hero SE (Berlin HQ)", "", /berlin|germany/i, "🇩🇪 Berlin Blue Card ATS", "Berlin, Germany"),
-              ash("n8n", "n8n (Berlin HQ)", /berlin|germany/i, "🇩🇪 Sponsors Visa to Germany", "Berlin, Germany (Sponsors DE Relocation Visa)", /sponsor\s+visas?\s+(?:to|for)\s+germany/i)
+              ash("n8n", "n8n (Berlin HQ)", /berlin|germany/i, "🇩🇪 Sponsors Visa to Germany", "Berlin, Germany (Sponsors DE Relocation Visa)", /sponsor\s+visas?\s+(?:to|for)\s+germany/i),
+              getArbeitnowVisaJobs(deRe, "Germany")
             ]);
           } else if (trackCode === "NL") {
             const nlRe = /\b(netherlands|nederland|amsterdam|rotterdam|eindhoven|utrecht|delft|the hague|den haag)\b/i;
@@ -4209,7 +4304,8 @@
               gh("adyen", "Adyen (Amsterdam HQ)", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
               gh("elastic", "Elastic Amsterdam", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
               gh("datadog", "Datadog Amsterdam", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
-              ash("mollie", "Mollie (Amsterdam HQ)", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands")
+              ash("mollie", "Mollie (Amsterdam HQ)", nlRe, "🇳🇱 IND HSM Sponsor ATS", "Amsterdam, Netherlands"),
+              getArbeitnowVisaJobs(nlRe, "Netherlands")
             ]);
           } else if (trackCode === "UK") {
             const ukRe = /\b(london|united kingdom|\buk\b|england|manchester|cambridge|edinburgh|bristol|cardiff)\b/i;
@@ -4218,7 +4314,8 @@
               gh("deliveroo", "Deliveroo", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
               gh("cloudflare", "Cloudflare London", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
               gh("stripe", "Stripe London", ukRe, "🇬🇧 Skilled Worker ATS", "London, UK"),
-              sr("Wise", "Wise (London HQ)", "", /london|united kingdom|\bgb\b|\buk\b/i, "🇬🇧 Wise Skilled Worker ATS", "London, UK")
+              sr("Wise", "Wise (London HQ)", "", /london|united kingdom|\bgb\b|\buk\b/i, "🇬🇧 Wise Skilled Worker ATS", "London, UK"),
+              getArbeitnowVisaJobs(ukRe, "United Kingdom")
             ]);
           }
           const scored = lists.flat().map(r => scoreBrowserAtsJob(r, trackCode)).filter(Boolean);
@@ -4237,12 +4334,18 @@
           if (btn) btn.innerHTML = `⏳ Scanning ${tMeta.flag} ${tMeta.short}${stepLabel}...`;
           document.getElementById("scanStatusText").textContent = `⚡ Wave 1: Scanning ${tMeta.flag} ${tMeta.label}${stepLabel} live (strictly enforcing selected time window)...`;
 
+          const isLastTrack = i === tracksToScan.length - 1;
           const [browserAtsRes, workerRes] = await Promise.all([
             fetchBrowserSponsorAtsForTrack(trackCode),
             fetch(`${CF_WORKER_URL}/api/scan`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ tpr, country: trackCode })
+              body: JSON.stringify({
+                tpr,
+                country: trackCode,
+                skipGithubFallback: !isLastTrack,
+                ghCountryOverride: isAllTracks && isLastTrack ? "ALL" : ""
+              })
             }).then(r => r.ok ? r.json() : { jobs: [] }).catch(() => ({ jobs: [] }))
           ]);
 
@@ -4307,10 +4410,13 @@
           document.getElementById("scanStatusText").textContent = `✅ Wave 1 + 🤖 Wave 2 (${lastProvider}) complete — ${getVisibleRadarPool(tpr).length} unseen roles in selected time window${wave3Note}.`;
         })();
 
-        // WAVE 3 (~18s & ~32s, Non-Blocking Background): Auto-pull full 21-query Fresh-IP GitHub Actions LinkedIn results from D1
+        // WAVE 3 (~25s, ~50s & ~80s, Non-Blocking Background): Auto-pull full Fresh-IP GitHub Actions LinkedIn results from D1
         if (ghBgTriggered) {
-          setTimeout(() => loadCloudFeed(true), 18000);
-          setTimeout(() => loadCloudFeed(true), 32000);
+          setTimeout(() => loadCloudFeed(true), 25000);
+          setTimeout(() => loadCloudFeed(true), 50000);
+          setTimeout(() => { loadCloudFeed(true); loadSystemHealth(false); }, 80000);
+        } else {
+          setTimeout(() => loadSystemHealth(false), 4000);
         }
       }
     }
@@ -4431,7 +4537,7 @@
         panel.innerHTML = `<div class="py-12 text-center text-slate-300">⏳ Fetching full description, 2027 salary band & stack score for #${id}...</div>`;
         const endpoints = IS_LOCAL
           ? [`/api/job/${id}`, `${CF_WORKER_URL}/api/job/${id}`]
-          : [`http://localhost:4545/api/job/${id}`, `${CF_WORKER_URL}/api/job/${id}`];
+          : [`${CF_WORKER_URL}/api/job/${id}`];
         for (const ep of endpoints) {
           try {
             const res = await fetch(ep, { signal: AbortSignal.timeout(8000) });
@@ -6994,7 +7100,7 @@
 
       const apiBases = IS_LOCAL
         ? ["", CF_WORKER_URL]
-        : ["http://localhost:4545", CF_WORKER_URL];
+        : [CF_WORKER_URL];
 
       let replyText = "Could not reach Cloud AI Worker — check internet connection and try again.";
       let copySnippet = "";
@@ -8087,44 +8193,6 @@
         plainEn: "Use Optimistic Concurrency (`RowVersion` / `xmin` timestamp token) for forms like quotes: EF includes `WHERE RowVersion = @OriginalVersion` on `UPDATE`, and if 0 rows match (`DbUpdateConcurrencyException`), we warn the second user cleanly instead of silently overwriting. For high-contention inventory/tickets, use atomic SQL `UPDATE ... SET Remaining = Remaining - 1 WHERE Id = @Id AND Remaining > 0` inside a transaction.",
         plainTr: "Teklif düzenleme gibi ekranlarda Optimistic Concurrency (`RowVersion`) kullanırım; `UPDATE` sırasında versiyon değişmişse ikinci kullanıcının veriyi ezmesini engellerim. Son bilet/stok düşümü gibi yüksek çakışmalı işlemlerde ise atomik `UPDATE ... SET Stok = Stok - 1 WHERE Id = @Id AND Stok > 0` sorgusuyla yarış durumunu (race condition) veritabanı seviyesinde sıfırlarım.",
         pilzProofEn: "Both EvenTracer ticket inventory and PilzPortal multi-engineer quote revisions enforce concurrency tokens so zero edits or seats get overwritten.",
-        pilzProofTr: "EvenTracer bilet kontenjanlarında atomik güncelleme, PilzPortal çoklu mühendis teklif revizyonlarında ise versiyon kontrolü ile veri ezilmesini engelledim."
-      },
-      {
-        id: "da_3", cat: "DATA", catLabel: "🗄️ SQL & Redis",
-        questionEn: "EF Core LINQ vs Dapper / Raw Parameterized SQL — which one do you prefer?",
-        questionTr: "EF Core LINQ mi yoksa Dapper / Ham SQL mi — hangisini ne zaman tercih edersiniz?",
-        plainEn: "Use EF Core for 85–90% of the app: compile-time type safety, migrations, concurrency tokens, and rapid maintainability. Drop down to Dapper or EF Core `SqlQuery<T>` (always parameterized — never string concatenation!) for the 10% heavy financial aggregations, CTEs, window functions (`ROW_NUMBER() OVER`), or bulk operations where hand-tuned SQL shines.",
-        plainTr: "Uygulamanın %85-90'ında tip güvenliği, migration ve bakım hızı için EF Core kullanırım. Ancak karmaşık finansal mutabakatlar, CTE'ler, pencere fonksiyonları (`ROW_NUMBER() OVER`) ve toplu raporlamalarda Dapper veya parametreli `SqlQuery<T>` kullanarak SQL motorunun tam gücünü alırım.",
-        pilzProofEn: "In Pilz's SAP-vs-Portal revenue & invoice reconciliation audits, window-function SQL queries reconcile thousands of line items instantaneously.",
-        pilzProofTr: "Pilz'deki SAP-Portal gelir ve fatura mutabakat ekranlarında pencere fonksiyonlu optimize SQL sorguları kullanıyorum."
-      },
-      {
-        id: "da_4", cat: "DATA", catLabel: "🗄️ SQL & Redis",
-        questionEn: "How do you use Redis caching safely without serving stale financial or user data?",
-        questionTr: "Redis önbelleğini bayat (eski) veri gösterme riskine girmeden nasıl kurgularsınız?",
-        plainEn: "Use the Cache-Aside pattern with explicit versioned keys (e.g., `catalog:v2:tenant:42`), sensible TTLs (e.g., 5–15 min), and event-driven invalidation whenever a write Command mutates that entity. Never cache sensitive unencrypted PII without tenant scoping, and guard hot keys against cache stampede.",
-        plainTr: "Cache-Aside desenini versiyonlu ve kiracı (tenant) bazlı anahtarlarla kurarım; makul TTL süreleri verir ve ilgili yazma (Command) işlemi gerçekleştiğinde önbelleği anında geçersiz kılarım (invalidation). Fiyat/bakiye gibi kritik verilerde kesin tutarlılığı korurum.",
-        pilzProofEn: "EvenTracer caches public event discovery pages and lookup catalogs in Redis while keeping live seat availability strictly transactional.",
-        pilzProofTr: "EvenTracer'da etkinlik vitrinlerini Redis'te önbelleklerken koltuk/bilet stok kontrolünü doğrudan atomik veritabanı katmanında tutuyorum."
-      },
-      {
-        id: "da_5", cat: "DATA", catLabel: "🗄️ SQL & Redis",
-        questionEn: "How do you keep offline/local state, Cloud DB, and Git backups in sync without data loss?",
-        questionTr: "Yerel durum, bulut veritabanı ve yedek depolar arasında veri kaybı olmadan senkronizasyonu nasıl sağlarsınız?",
-        plainEn: "Design deterministic, monotonic merge functions keyed by unique entity IDs instead of blind file overwrites: union append-only sets, merge status progressions monotonically (e.g., `Interview` > `Viewed` > `Applied`), preserve non-empty contact/intel fields from both sides, and use `UPSERT` (`ON CONFLICT DO UPDATE`) in SQL/D1.",
-        plainTr: "Dosyaları körü körüne ezmek yerine benzersiz ID bazlı deterministik birleştirme (merge) ve SQL tarafında `UPSERT` (`ON CONFLICT DO UPDATE`) kullanırım. Durum geçişlerinde her zaman daha ileri aşamayı (`Mülakat` > `Görüntülendi` > `Başvuruldu`) koruyarak çakışmaları sıfır veri kaybıyla çözerim.",
-        pilzProofEn: "JobRadar itself syncs browser localStorage, Cloudflare D1 SQLite at the edge, Telegram bot updates, and GitHub cold backups with lossless conflict-free merging!",
-        pilzProofTr: "Şu an kullandığımız JobRadar bile tarayıcı, Cloudflare D1, Telegram botu ve GitHub yedeklerini sıfır veri kaybıyla birleştiriyor."
-      },
-
-      // --- REACT (5) ---
-      {
-        id: "re_1", cat: "REACT", catLabel: "⚛️ React & TS",
-        questionEn: "useState vs useRef vs useEffect — what is the #1 mistake mid-level devs make with useEffect?",
-        questionTr: "useState, useRef ve useEffect farkı nedir — geliştiricilerin useEffect'te yaptığı en büyük hata nedir?",
-        plainEn: "`useState` holds UI state that triggers a re-render when changed. `useRef` holds mutable values or DOM references that persist across renders WITHOUT triggering re-renders (timers, scroll position, previous value). The #1 `useEffect` bug is using it to compute derived state (`setFilteredList(...)` inside an effect), causing double renders or infinite loops — derived values should be computed inline during render (or `useMemo`), reserving `useEffect` strictly for external synchronization (DOM, WebSockets, subscriptions).",
-        plainTr: "`useState` değiştiğinde ekranı yeniden çizer. `useRef` ise ekranı yeniden çizdirmeden değer veya DOM referansı tutar. En büyük hata, mevcut state'ten türetilebilecek bir listeyi `useEffect` içinde `setState` ile hesaplayıp gereksiz çift render veya sonsuz döngü yaratmaktır; türetilmiş veri doğrudan render sırasında hesaplanmalı, `useEffect` yalnızca dış sistem senkronizasyonu için kullanılmalıdır.",
-        pilzProofEn: "In PilzPortal's complex multi-machine quote builder, keeping derived totals pure during render eliminated cascading state bugs across 50+ line items.",
         pilzProofTr: "PilzPortal'ın çok makineli karmaşık teklif ekranında toplam/kur hesaplarını saf (derived) tutarak 50+ kalemlik tablolarda sıfır takılma sağladım."
       },
       {
@@ -8734,15 +8802,130 @@
       }
     }
 
+    function toggleHealthPopover(e) {
+      if (e) e.stopPropagation();
+      const pop = document.getElementById("healthPopover");
+      if (!pop) return;
+      const willShow = pop.classList.contains("hidden");
+      pop.classList.toggle("hidden", !willShow);
+      if (willShow) loadSystemHealth(false);
+    }
+
+    async function loadSystemHealth(forceRefresh = false) {
+      const dotEl = document.getElementById("healthChipDot");
+      const lblEl = document.getElementById("healthChipLabel");
+      const bodyEl = document.getElementById("healthPopoverBody");
+      const refBtn = document.getElementById("healthRefreshBtn");
+      if (refBtn && forceRefresh) {
+        refBtn.disabled = true;
+        refBtn.textContent = "⏳ Probing...";
+      }
+      try {
+        const res = await fetch(`${CF_WORKER_URL}/api/health${forceRefresh ? "?refresh=1" : ""}`, {
+          cache: "no-store",
+          signal: AbortSignal.timeout(12000)
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const h = await res.json();
+        const ai = h.ai || {};
+        const sc = h.scrapers || {};
+
+        const statusBadge = (st, labelOverride = "") => {
+          if (st === "ok") return `<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-[10px]">${escapeHtmlSafe(labelOverride || "OK")}</span>`;
+          if (st === "running") return `<span class="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold text-[10px]">RUNNING</span>`;
+          if (st === "quota" || st === "throttled") return `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold text-[10px]">${st === "quota" ? "QUOTA" : "429 -> GH"}</span>`;
+          return `<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold text-[10px]">${escapeHtmlSafe((st || "ERR").toUpperCase())}</span>`;
+        };
+
+        const aiOkCount = [ai.anthropic?.status, ai.gemini?.status, ai.openai?.status].filter(s => s === "ok").length;
+        const ghOk = sc.githubRunner?.status === "ok" || sc.githubRunner?.status === "running";
+
+        if (dotEl && lblEl) {
+          dotEl.classList.remove("animate-pulse", "bg-slate-400", "bg-emerald-400", "bg-amber-400", "bg-rose-500");
+          if (aiOkCount === 0) {
+            dotEl.classList.add("bg-rose-500");
+            lblEl.textContent = "⚡ Agents Issue";
+          } else if (aiOkCount === 3 && ghOk) {
+            dotEl.classList.add("bg-emerald-400");
+            lblEl.textContent = "⚡ All Healthy";
+          } else {
+            dotEl.classList.add("bg-amber-400");
+            lblEl.textContent = `⚡ ${aiOkCount}/3 AI · ATS+GH OK`;
+          }
+        }
+
+        if (bodyEl) {
+          const checkedStr = h.checkedAt ? new Date(h.checkedAt).toLocaleTimeString() : "";
+          bodyEl.innerHTML = `
+            <div class="text-[10px] font-bold text-slate-400 tracking-wider pt-0.5">AI PROVIDERS (AUTO-FAILOVER ACTIVE)</div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">Anthropic Claude</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(ai.anthropic?.note || "")}</div></div>
+              ${statusBadge(ai.anthropic?.status)}
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">Google Gemini</strong> <span class="text-[10px] text-cyan-300 font-mono">${escapeHtmlSafe(ai.gemini?.model || "dynamic")}</span><div class="text-[10px] text-slate-400">${escapeHtmlSafe(ai.gemini?.note || "")}</div></div>
+              ${statusBadge(ai.gemini?.status)}
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">OpenAI</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(ai.openai?.note || "")}</div></div>
+              ${statusBadge(ai.openai?.status)}
+            </div>
+            <div class="text-[10px] font-bold text-slate-400 tracking-wider pt-1.5">JOB SCRAPERS &amp; CLOUD D1</div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">Browser Sponsor ATS</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(sc.browserAts?.note || "Active")}</div></div>
+              ${statusBadge("ok")}
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">GitHub Fresh-IP Runner</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(sc.githubRunner?.note || "")}</div></div>
+              ${statusBadge(sc.githubRunner?.status || "ok")}
+            </div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">Worker Edge LinkedIn</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(sc.workerLinkedIn?.note || "Standby")}</div></div>
+              ${statusBadge(sc.workerLinkedIn?.status === "unknown" ? "ok" : sc.workerLinkedIn?.status, sc.workerLinkedIn?.status === "unknown" ? "STANDBY" : "")}
+            </div>
+            <div class="text-[10px] text-slate-400 pt-1 flex items-center justify-between border-t border-slate-800">
+              <span>D1 Unseen Feed: <strong class="text-emerald-300">${sc.d1Feed?.unseenCount ?? 0}</strong></span>
+              <span>Checked: ${escapeHtmlSafe(checkedStr)}</span>
+            </div>
+          `;
+        }
+      } catch (err) {
+        if (dotEl && lblEl) {
+          dotEl.classList.remove("animate-pulse", "bg-slate-400", "bg-emerald-400", "bg-amber-400");
+          dotEl.classList.add("bg-rose-500");
+          lblEl.textContent = "⚡ Worker Offline";
+        }
+        if (bodyEl) {
+          bodyEl.innerHTML = `<div class="text-rose-300">Could not reach Cloudflare Worker /api/health (${escapeHtmlSafe(err.message || "error")}).</div>`;
+        }
+      } finally {
+        if (refBtn) {
+          refBtn.disabled = false;
+          refBtn.textContent = "🔄 Re-check";
+        }
+      }
+    }
+
+    document.addEventListener("click", (e) => {
+      const wrap = document.getElementById("healthChipWrap");
+      const pop = document.getElementById("healthPopover");
+      if (pop && !pop.classList.contains("hidden") && wrap && !wrap.contains(e.target)) {
+        pop.classList.add("hidden");
+      }
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const drawer = document.getElementById("copilotDrawer");
         if (drawer && !drawer.classList.contains("hidden")) closeCopilotDrawer();
+        const pop = document.getElementById("healthPopover");
+        if (pop && !pop.classList.contains("hidden")) pop.classList.add("hidden");
       }
     });
 
     renderCoachTab();
     initApp();
+    setTimeout(() => loadSystemHealth(false), 800);
   </script>
 </body>
 </html>
