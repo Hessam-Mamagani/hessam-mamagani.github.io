@@ -218,7 +218,7 @@
               <option value="UNFINISHED_PORTAL">⏳ Unfinished External Portals</option>
               <option value="FAST_HIRE_DEC31">⚡ Fast 2–3 Wk Sponsors (Beat Dec 31)</option>
               <option value="NEEDS_OUTREACH">📬 Applied — Needs Email / DM</option>
-              <option value="PENDING_EMAIL">📧 Email Queue — Not Emailed Yet</option>
+              <option value="PENDING_EMAIL">📧 Email Queue — Ready to Send (Priority Sorted)</option>
               <option value="TOP_GIANTS">🏢 Top Ranked Giants</option>
               <option value="EMAILED">📧 Emailed</option>
               <option value="DM_SENT">💬 LinkedIn DM Sent</option>
@@ -890,6 +890,8 @@
       if (/\bc\s*teleport\b/.test(s)) return "cteleport";
       if (/\bteleport\b/.test(s)) return "teleport";
       if (/\btcm\b/.test(s)) return "tcm";
+      if (/\bithinka\b/.test(s)) return "ithinka";
+      if (/\bturknet\b/.test(s)) return "turknet";
       if (/\b(bgts|bilge\s*adam)\b/.test(s)) return "bgts";
       const baseWords = s
         .split("(")[0]
@@ -1101,8 +1103,8 @@
         text: `🇮🇪 IRELAND (Critical Skills Employment Permit):\n"I hold an M.Eng. & B.Sc. in Engineering and 5+ years of senior .NET / Cloud / Enterprise AI architecture experience at German multinational Pilz GmbH. My role qualifies directly under Ireland's Critical Skills Employment Permit (Standard ICT SOC 2136 — fast-track processing, no Labour Market Needs Test)."\n\n🇩🇪 GERMANY (EU Blue Card § 18g & § 81a Fast-Track):\n"My university degrees are already verified as H+ in Germany's official ANABIN database, and I serve as Lead Full-Stack & Cloud Architect at German multinational Pilz GmbH (backed by a signed recommendation letter from our General Manager). I qualify immediately for the EU Blue Card (§ 18g AufenthG / § 81a accelerated employer procedure)."\n\n🇳🇱 NETHERLANDS (IND Highly Skilled Migrant + 30% Ruling):\n"With an M.Eng. degree and senior enterprise software architecture track record at Pilz GmbH, I qualify directly for the 2–4 week IND Highly Skilled Migrant (Kennismigrant) fast-track and the 30% tax facility."`
       },
       {
-        title: "Peer-to-Peer Short DM — LinkedIn / WhatsApp (TR & EN)",
-        text: `TR (Direct Company — Name First):\n[İsim] Hanım/Bey merhaba, bağlantımı kabul ettiğiniz için teşekkür ederim.\n\nAlman Pilz GmbH Türkiye'de daha önce Excel ve manuel süreçlerle yürüyen tüm iş akışlarını, sıfırdan kurduğum yapay zeka entegreli modern bir kurumsal sisteme dönüştürdüm. Kariyerimin yeni adımında daha yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; [Şirket] bünyesinde uygun fırsatlar olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.\n\nGüncel CV’m ve Genel Müdürümüzün referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcut).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/\n\n---\nEN (EU / UK / Global Connections):\nHi [Name], thanks for accepting my connection.\n\nAt German multinational Pilz GmbH Türkiye, I transformed operations that previously ran on spreadsheets and manual workflows into a modern, AI-integrated enterprise platform built from scratch. For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable opportunities at [Company], I would appreciate being considered or pointed to the right hiring lead.\n\nMy updated CV and a signed reference letter from our General Manager are attached.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`
+        title: "Peer-to-Peer Gold DM & Email — LinkedIn / WhatsApp (TR & EN)",
+        text: `TR (Gold Global — Unambiguous Kurumsal Portal):\n[İsim] Hanım/Bey merhaba, bağlantımı kabul ettiğiniz için teşekkür ederim.\n\nKurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.\n\nKariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; [Şirket] bünyesinde uygun Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi fırsatları olursa değerlendirilmekten ya da ilgili kişiye yönlendirilmekten memnuniyet duyarım.\n\nGüncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/\n\n---\nEN (EU / UK / Global Connections):\nHi [Name], thanks for accepting my connection.\n\nI am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.\n\nFor my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities at [Company], I would appreciate being considered or pointed to the right hiring lead.\n\nMy updated CV and a signed reference letter from our General Manager are attached.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`
       },
       {
         title: "Links & Direct v2 CV Downloads (Portfolio + JobRadar)",
@@ -1617,9 +1619,9 @@
         match: /adesso/i,
         phone: "+902123462002",
         phoneDisplay: "+90 (212) 346 20 02",
-        email: "info@adesso.com.tr",
+        email: "kariyer@adesso.com.tr",
         badge: "🇩🇪 German Corporate (Matches Pilz GmbH!)",
-        lang: "EN",
+        lang: "TR",
         note: "Since you work at German Pilz GmbH Türkiye, highlight your German corporate engineering standards!"
       },
       {
@@ -2068,45 +2070,7 @@
     }
 
     function buildOutreachEmail(item) {
-      if (
-        item.aiIntel?.styleVersion === 2 &&
-        item.aiIntel?.customEmailSubject &&
-        item.aiIntel?.customEmailBody &&
-        !isLegacyOutreachDraft(item.aiIntel.customEmailBody)
-      ) {
-        return {
-          subject: item.aiIntel.customEmailSubject,
-          body: item.aiIntel.customEmailBody
-        };
-      }
-
-      const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
-      const cleanRole = stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
-
-      if (item.isProactive) {
-        if (item.lang === "EN") {
-          return {
-            subject: `Senior Engineering Introduction — ${cleanComp} — Hessam Barasm Mamagani`,
-            body: `Dear ${cleanComp} Engineering & Hiring Team,\n\nAt German multinational Pilz GmbH Türkiye, I transformed operations that previously ran on spreadsheets and manual workflows into a modern, AI-integrated enterprise platform built from scratch.\n\nFor my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable opportunities (${cleanRole}) at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.\n\nMy updated CV and a signed reference letter from our General Manager Yavuz Çopur are attached (based in Istanbul with an active work permit).\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/`
-          };
-        }
-        return {
-          subject: `Kıdemli Yazılım & Mimari Başvurusu: ${cleanRole} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Sayın ${cleanComp} Teknoloji Yönetimi ve İşe Alım Ekibi,\n\nAlman Pilz GmbH Türkiye'de daha önce Excel ve manuel süreçlerle yürüyen tüm iş akışlarını, sıfırdan kurduğum yapay zeka entegreli modern bir kurumsal sisteme dönüştürdüm.\n\nKariyerimin yeni adımında daha yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde uygun fırsatlar (${cleanRole}) olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.\n\nGüncel CV’m ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcut).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
-        };
-      }
-
-      if (item.lang === "EN") {
-        return {
-          subject: `Application Follow-Up: ${cleanRole} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Dear ${cleanComp} Hiring Team,\n\nAt German multinational Pilz GmbH Türkiye, I transformed operations that previously ran on spreadsheets and manual workflows into a modern, AI-integrated enterprise platform built from scratch.\n\nFor my next chapter, I am actively looking for a high-impact senior engineering team; I recently submitted my application for the ${cleanRole} position at ${cleanComp}, and would appreciate being considered or pointed to the right hiring lead.\n\nMy updated CV and a signed reference letter from our General Manager Yavuz Çopur are attached (based in Istanbul with an active work permit).\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/`
-        };
-      }
-
-      return {
-        subject: `Başvuru Takibi & CV: ${cleanRole} — ${cleanComp} — Hessam Barasm Mamagani`,
-        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\nAlman Pilz GmbH Türkiye'de daha önce Excel ve manuel süreçlerle yürüyen tüm iş akışlarını, sıfırdan kurduğum yapay zeka entegreli modern bir kurumsal sisteme dönüştürdüm.\n\nKariyerimin yeni adımında daha büyük ölçekte değer üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesindeki ${cleanRole} pozisyonunuza da başvurmuştum, uygun fırsatlar için değerlendirilmekten veya ilgili yöneticiye yönlendirilmekten memnuniyet duyarım.\n\nGüncel CV’m ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcut).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
-      };
+      return buildUnifiedEmail(item);
     }
 
     function buildCallScript(item) {
@@ -2728,12 +2692,21 @@
              (typeof getUnifiedPipelineList === "function" ? getUnifiedPipelineList().find(x => String(x.id) === String(idOrIdx)) : null);
     }
 
-    const PUBLIC_BLACKHOLE_EMAIL_CLIENT_RE = /^(info|iletisim|iletişim|destek|support|hello|contact|help|yardim|yardım|musterihizmetleri|press|media|marketing|sales|satis|satış|kvkk|bilgi|trinfo|tr-info|turkey\.info|info\.tr|info_tr|turkey|oracle_tr|noreply|no-reply|donotreply)@/i;
+    const PUBLIC_BLACKHOLE_EMAIL_CLIENT_RE = /^(info|info\.[a-z0-9_-]+|iletisim|iletişim|destek|support|hello|hellouk|contactus|contact|help|yardim|yardım|musterihizmetleri|musteri|fiyatlama|ccc|mobile|ustateam|press|media|marketing|sales|satis|satış|kvkk|bilgi|trinfo|tr-info|turkey\.info|info\.tr|info_tr|turkey|oracle_tr|noreply|no-reply|donotreply)@|@(hotmail|gmail|yahoo|outlook|live|icloud|yandex)\.(com|com\.tr|co\.uk)$/i;
     const BLOCKED_GIANT_EMAIL_CLIENT_RE = /^(hr|jobs|careers|talent)@(amazon|aws|google|microsoft|apple|meta)\.com$|^aws-turkey@amazon\.com$|^google-turkey@google\.com$|^trinfo@microsoft\.com$/i;
+    const GENERIC_HR_MAILBOX_LOCAL_RE = /^(hr|hr\.[a-z0-9_-]+|ik|ik\.[a-z0-9_-]+|[a-z0-9_-]+\.ik|[a-z0-9_-]+\.insankaynaklari|insankaynaklari|insankaynaklari\.[a-z0-9_-]+|kariyer|kariyer-[a-z0-9_-]+|talent|tech\.talent|people|jobs|careers|careers\.[a-z0-9_-]+|[a-z0-9_-]+-careers|[a-z0-9_-]+\.careers|recruitment|recruiting|apply|cv|basvuru|turkishtechnology|accenture\.turkey)$/i;
 
     function isCleanHrEmail(e) {
       const s = String(e || "").trim();
       return !!s && s.includes("@") && !PUBLIC_BLACKHOLE_EMAIL_CLIENT_RE.test(s) && !BLOCKED_GIANT_EMAIL_CLIENT_RE.test(s);
+    }
+
+    function isPersonalRecruiterEmail(emailStr = "") {
+      const s = String(emailStr || "").trim().toLowerCase();
+      if (!isCleanHrEmail(s)) return false;
+      const local = s.split("@")[0] || "";
+      if (!local || local.length < 3 || GENERIC_HR_MAILBOX_LOCAL_RE.test(local)) return false;
+      return /^[a-z]{3,}(?:[._-][a-z]{2,})?$/.test(local);
     }
 
     function stripRoleBadgeClient(roleStr = "") {
@@ -2743,6 +2716,9 @@
     function getDefaultLangForItem(item) {
       if (!item) return "TR";
       if (item.countryGroup && item.countryGroup !== "TR") return "EN";
+      const emailStr = String(item.email || "").toLowerCase();
+      if (/\.(com\.tr|edu\.tr|org\.tr)$/.test(emailStr) || /^(ik|kariyer|insankaynaklari)\b/.test(emailStr)) return "TR";
+      if (/\b(dream games|peak games|ant international|deel|canonical|delivery hero)\b/i.test(item.company || "")) return "EN";
       return "TR";
     }
 
@@ -2807,6 +2783,44 @@
       const isMale = !isFemale && (TR_MALE_FIRST_NAMES.has(lower) || [...TR_MALE_FIRST_NAMES].some(n => n.replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c") === foldAscii));
       const honorific = isFemale ? " Hanım" : isMale ? " Bey" : "";
       return `${clean}${honorific} merhaba,${thanksSuffix}`;
+    }
+
+    function foldTurkishToAscii(str = "") {
+      return String(str || "")
+        .toLocaleLowerCase("tr-TR")
+        .replace(/ı/g, "i")
+        .replace(/ş/g, "s")
+        .replace(/ğ/g, "g")
+        .replace(/ü/g, "u")
+        .replace(/ö/g, "o")
+        .replace(/ç/g, "c");
+    }
+
+    function extractRecipientFirstNameFromEmail(emailStr = "", peopleList = []) {
+      if (!isPersonalRecruiterEmail(emailStr)) return "";
+      const local = String(emailStr || "").trim().toLowerCase().split("@")[0] || "";
+      const token = local.split(/[._-]+/)[0] || "";
+      if (!token || token.length < 3) return "";
+
+      for (const p of (peopleList || [])) {
+        const candidateFirst = extractRealFirstName(p?.name || "");
+        if (!candidateFirst) continue;
+        const candAscii = foldTurkishToAscii(candidateFirst);
+        if (candAscii === token || (token.startsWith(candAscii) && candAscii.length >= 3)) {
+          return candidateFirst;
+        }
+      }
+
+      for (const trName of [...TR_FEMALE_FIRST_NAMES, ...TR_MALE_FIRST_NAMES]) {
+        if (foldTurkishToAscii(trName) === token) {
+          return trName.charAt(0).toLocaleUpperCase("tr-TR") + trName.slice(1);
+        }
+      }
+
+      if (local.includes(".") || local.includes("_") || local.includes("-")) {
+        return token.charAt(0).toLocaleUpperCase("tr-TR") + token.slice(1);
+      }
+      return "";
     }
 
     function isLegacyOutreachDraft(txt = "") {
@@ -3046,12 +3060,10 @@
       if (fetchedIntel?.customExecutiveDm && !US_CELEB_CHECK.test(fetchedIntel.customExecutiveDm) && !isLegacyOutreachDraft(fetchedIntel.customExecutiveDm)) {
         finalIntel.customExecutiveDm = fetchedIntel.customExecutiveDm;
         finalIntel.lang = chosenLang;
-        finalIntel.styleVersion = 2;
       }
       if (fetchedIntel?.customHrDm && !US_CELEB_CHECK.test(fetchedIntel.customHrDm) && !isLegacyOutreachDraft(fetchedIntel.customHrDm)) {
         finalIntel.customHrDm = fetchedIntel.customHrDm;
         finalIntel.lang = chosenLang;
-        finalIntel.styleVersion = 2;
       }
 
       item.aiIntel = finalIntel;
@@ -3227,7 +3239,7 @@
             if (data.ok && (data.body || data.text || data.executiveDm)) {
               if (!item.aiIntel) item.aiIntel = {};
               item.aiIntel.lang = chosenLang;
-              item.aiIntel.styleVersion = 2;
+              item.aiIntel.styleVersion = 3;
               if (data.subject) item.aiIntel.customEmailSubject = data.subject;
               if (data.body) item.aiIntel.customEmailBody = data.body;
               if (data.executiveDm) item.aiIntel.customExecutiveDm = data.executiveDm;
@@ -4459,8 +4471,8 @@
       const pitch = a.aiPitch || d.aiPitch || (
         d.title
           ? (isTrPitch
-              ? `Merhaba, ${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu ilettim. Pilz Türkiye bünyesinde .NET, C#, React/TypeScript, SQL Server ve kurumsal yapay zeka mimarisiyle 5 iş uygulamasını uçtan uca geliştirdim; SAP & GİB e-Fatura süreçlerini %80 hızlandırdım. Güncel özgeçmişimi ve Genel Müdürümüzün referans mektubunu bilgilerinize sunuyorum (İstanbul Kartal'da ikamet ediyorum, aktif çalışma iznim mevcuttur). Uygun görmeniz halinde canlı sistem demosu paylaşmaktan memnuniyet duyarım. (+90 539 229 4251 | https://hessam-mamagani.github.io/)`
-              : `Hi, I recently applied for the ${d.title} role at ${d.company}. I am a Senior Full-Stack & Enterprise AI Engineer (.NET/C#, React/TypeScript, SQL Server, Azure, LLM/RAG) who architected 5 production enterprise platforms end-to-end at Pilz (cutting SAP & e-Invoice processing time by 80%). Portfolio & live production demos: https://hessam-mamagani.github.io/ — happy to share a quick walkthrough with your engineering team!`)
+              ? `Merhabalar,\n\nKurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.\n\n${d.company} bünyesindeki ${d.title} pozisyonunuz için başvurumu ilettim; uygun görmeniz halinde değerlendirilmekten veya ilgili teknik yöneticiye yönlendirilmekten memnuniyet duyarım. Güncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/`
+              : `Hi there,\n\nI am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.\n\nI recently applied for the ${d.title} role at ${d.company} and would appreciate being considered or pointed to the right hiring lead.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`)
           : ""
       );
       const legalNote = buildLegalSponsorSnippet(cg, isTrPitch ? "TR" : "EN");
@@ -5178,7 +5190,7 @@
         role: "Software Developer (.NET) & Senior AI/ML Engineer",
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 Maslak (Olive Plaza Kat:7 · M2 Metro)",
-        email: "recruiting@adesso-group.com",
+        email: "kariyer@adesso.com.tr",
         phone: "+902123462002",
         phoneDisplay: "+90 (212) 346 20 02",
         address: "Olive Plaza, Maslak Mah. Ahi Evran Cad. No:11 Kat:7, Maslak / Sarıyer, İstanbul",
@@ -6145,14 +6157,35 @@
       showToast(`🌐 Outreach language switched to ${cleanLang === "TR" ? "🇹🇷 Türkçe" : "🇬🇧 English"}!`, true);
     }
 
+    function getCompanySynergyBridge(cleanComp = "", lang = "TR") {
+      const c = String(cleanComp || "").toLowerCase();
+      const isGermanPeer = /\b(adesso|siemens|bosch|festo|sap\b|mercedes|allianz|delivery hero)\b/i.test(c);
+      const isFintechOrBank = /\b(btcturk|paytr|papara|midas|iyzico|param|colendi|token|architecht|intertech|veripark|qnb|ibtech|garanti|akbank|yapı kredi|yapi kredi|iş bankası|softtech|stripe|adyen|wise|revolut|mastercard)\b/i.test(c);
+      const isErpOrEnterprise = /\b(logo\b|obase|canias|ias\b|koçsistem|kocsistem|sabancıdx|sabancidx|doğuş|dogus|etiya|enka|lc waikiki|waikiki|hitachi|aras kargo|sompo|turkcell|pegasus|hepsiburada|trendyol|sahibinden|insider|commencis|obss|icterra)\b/i.test(c);
+
+      if (lang === "EN") {
+        if (isGermanPeer) return "Bringing this German corporate engineering discipline, ";
+        if (isFintechOrBank) return "With this background in mission-critical transactional and enterprise systems, ";
+        if (isErpOrEnterprise) return "With this hands-on background in high-scale enterprise platforms and integrations, ";
+        return "For my next chapter, ";
+      }
+      if (isGermanPeer) return "Alman kurumsal mühendislik kültürüyle edindiğim bu uçtan uca mimari tecrübeyle, ";
+      if (isFintechOrBank) return "Yüksek ölçekli ve kritik işlem hacimli yazılım mimarilerine olan ilgim doğrultusunda, ";
+      if (isErpOrEnterprise) return "Kurumsal iş uygulamaları ve uçtan uca sistem entegrasyonlarındaki bu doğrudan saha tecrübemle, ";
+      return "Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ";
+    }
+
     function buildUnifiedEmail(item) {
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
       const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
+      const isAgency = !!(item.isAgency || AGENCY_RE.test(cleanComp));
+      const allPeople = [...(item.aiIntel?.hrAndRecruiters || []), ...(item.aiIntel?.ctoAndEngLeads || [])];
+      const namedEmailFirst = extractRecipientFirstNameFromEmail(item.email || "", allPeople);
 
       if (
-        item.aiIntel?.styleVersion === 2 &&
+        item.aiIntel?.styleVersion === 3 &&
         item.aiIntel?.customEmailSubject &&
         item.aiIntel?.customEmailBody &&
         item.aiIntel?.lang === chosenLang &&
@@ -6165,6 +6198,21 @@
       }
 
       if (chosenLang === "EN") {
+        const emailGreetingEn = namedEmailFirst
+          ? `Hi ${namedEmailFirst},`
+          : `Dear ${cleanComp} Hiring & Engineering Team,`;
+
+        const coreProofEn = `I am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.`;
+
+        const bridgeEn = getCompanySynergyBridge(cleanComp, "EN");
+        const actionLineEn = item.status === "CV Downloaded ⭐"
+          ? `I noticed your team recently reviewed my CV for the ${roleForText} position at ${cleanComp}. I am actively looking for a high-impact senior engineering team and would welcome the opportunity to share a brief live architecture walkthrough or be considered for suitable roles.`
+          : isAgency
+          ? `I am actively looking for a high-impact senior engineering team; if you are recruiting for Senior Software Engineering or Solutions Architecture roles (${roleForText}) across your client portfolio, I would appreciate being considered.`
+          : item.hasAppliedInCrm
+          ? `${bridgeEn}I recently applied for the ${roleForText} position at ${cleanComp}, and would appreciate being considered for this or other suitable Senior Software Engineering / Solutions Architecture opportunities, or pointed to the right hiring lead.`
+          : `${bridgeEn}I am actively looking for a high-impact senior engineering team, and if there are suitable Senior Software Engineering or Solutions Architecture opportunities (${roleForText}) at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.`;
+
         const visaLine = item.countryGroup === "IE"
           ? "I hold an M.Eng. & B.Sc. in Engineering and qualify directly under Ireland's fast-track Critical Skills Employment Permit (Standard ICT SOC 2136)."
           : item.countryGroup === "DE"
@@ -6173,25 +6221,37 @@
           ? "With an M.Eng. degree and senior enterprise architecture track record at Pilz GmbH, I qualify directly for the Netherlands IND Highly Skilled Migrant fast-track."
           : item.countryGroup === "UK"
           ? "I qualify directly for UK Skilled Worker Visa sponsorship and am ready for immediate relocation or remote onboarding."
-          : "I am based in Istanbul with an active work permit (eligible for ÇSGB Bilişim Uzmanı Muafiyeti fast-track transfer).";
-
-        const actionLineEn = item.hasAppliedInCrm
-          ? `For my next chapter, I am actively looking for a high-impact senior engineering team; I recently submitted my application for the ${roleForText} role at ${cleanComp}, and would appreciate being considered or pointed to the right hiring lead.`
-          : `For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable opportunities (${roleForText}) at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.`;
+          : "I am based in Istanbul with an active work permit (eligible for ÇSGB Bilişim Sektörü Muafiyeti fast-track transfer).";
 
         return {
-          subject: `${item.hasAppliedInCrm ? "Application Follow-Up" : "Senior Engineering Introduction"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-          body: `Dear ${cleanComp} Hiring Team,\n\nAt German multinational Pilz GmbH Türkiye, I transformed operations that previously ran on spreadsheets and manual workflows into a modern, AI-integrated enterprise platform built from scratch.\n\n${actionLineEn}\n\nMy updated CV and a signed reference letter from our General Manager Yavuz Çopur are attached. ${visaLine}\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/`
+          subject: `${item.hasAppliedInCrm ? "Application Follow-Up" : "Senior Engineering & Architecture"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+          body: `${emailGreetingEn}\n\n${coreProofEn}\n\n${actionLineEn}\n\nMy updated CV and a signed reference letter from Pilz Türkiye General Manager Ali Yavuz Çopur are attached. ${visaLine}\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nEmail: hessam.mamagani@gmail.com\nPortfolio: https://hessam-mamagani.github.io/`
         };
       }
 
-      const actionLineTr = item.hasAppliedInCrm
-        ? `Kariyerimin yeni adımında daha büyük ölçekte değer üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesindeki ${roleForText} pozisyonunuza da başvurmuştum, uygun fırsatlar için değerlendirilmekten veya ilgili yöneticiye yönlendirilmekten memnuniyet duyarım.`
-        : `Kariyerimin yeni adımında daha yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde uygun fırsatlar (${roleForText}) olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.`;
+      const emailGreetingTr = namedEmailFirst
+        ? formatTurkishNameFirstGreeting(namedEmailFirst, false)
+        : `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,`;
+
+      const coreProofTr = `Kurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.`;
+
+      const bridgeTr = getCompanySynergyBridge(cleanComp, "TR");
+      const hasCustomBridgeTr = !bridgeTr.startsWith("Kariyerimin yeni adımında");
+      const actionLineTr = item.status === "CV Downloaded ⭐"
+        ? `${cleanComp} bünyesinde başvurduğum ${roleForText} pozisyonu için özgeçmişimi incelediğinizi memnuniyetle gördüm. Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; uygun görmeniz halinde teknik ekibinizle canlı sistem demosu paylaşmaktan veya süreç için değerlendirilmekten büyük memnuniyet duyarım.`
+        : isAgency
+        ? `Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir teknoloji ekibinde yer almak için aktif arayıştayım; danışmanlığını yürüttüğünüz firmalarda Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi (${roleForText}) arayışlarınız olursa değerlendirilmekten memnuniyet duyarım.`
+        : item.hasAppliedInCrm
+        ? (hasCustomBridgeTr
+            ? `${bridgeTr}${cleanComp} bünyesinde başvurduğum ${roleForText} pozisyonu başta olmak üzere, ekibinizde uygun Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi fırsatları için değerlendirilmekten ya da ilgili teknik yöneticiye yönlendirilmekten büyük memnuniyet duyarım.`
+            : `${bridgeTr}${cleanComp} bünyesinde başvurduğum ${roleForText} pozisyonu başta olmak üzere, ekibinizde uygun fırsatlar için değerlendirilmekten ya da ilgili teknik yöneticiye yönlendirilmekten büyük memnuniyet duyarım.`)
+        : (hasCustomBridgeTr
+            ? `${bridgeTr}kariyerimin yeni adımında ${cleanComp} bünyesinde Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi (${roleForText}) alanında uygun fırsatlar olursa değerlendirilmekten ya da ilgili teknik yöneticiye yönlendirilmekten büyük memnuniyet duyarım.`
+            : `${bridgeTr}${cleanComp} bünyesinde Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi (${roleForText}) alanında uygun fırsatlar olursa değerlendirilmekten ya da ilgili teknik yöneticiye yönlendirilmekten büyük memnuniyet duyarım.`);
 
       return {
-        subject: `${item.hasAppliedInCrm ? "Başvuru Takibi & Özgeçmiş" : "Kıdemli Yazılım & Mimari Başvurusu"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-        body: `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,\n\nAlman Pilz GmbH Türkiye'de daha önce Excel ve manuel süreçlerle yürüyen tüm iş akışlarını, sıfırdan kurduğum yapay zeka entegreli modern bir kurumsal sisteme dönüştürdüm.\n\n${actionLineTr}\n\nGüncel CV’m ve Genel Müdürümüz Sn. Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcut; ÇSGB Bilişim Sektörü Muafiyeti kapsamındayım).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
+        subject: `${item.hasAppliedInCrm ? "Başvuru Takibi & Özgeçmiş" : "Kıdemli Yazılım & Çözüm Mimarisi"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
+        body: `${emailGreetingTr}\n\n${coreProofTr}\n\n${actionLineTr}\n\nGüncel CV’m ve Pilz Türkiye Genel Müdürü Sn. Ali Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur ve ÇSGB Bilişim Sektörü Muafiyeti kapsamındayım).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
@@ -6200,12 +6260,13 @@
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
+      const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
       const candidatePerson = personObj || (target === "hr" ? item.aiIntel?.hrAndRecruiters?.[0] : item.aiIntel?.ctoAndEngLeads?.[0]) || null;
       const firstName = extractRealFirstName(candidatePerson?.name || "");
       const is1stDeg = /1st-deg|1st degree|connected/i.test(candidatePerson?.title || "");
       const isAgency = !!(item.isAgency || AGENCY_RE.test(cleanComp));
 
-      if (item.aiIntel && item.aiIntel.styleVersion === 2 && item.aiIntel.lang === chosenLang) {
+      if (item.aiIntel && item.aiIntel.styleVersion === 3 && item.aiIntel.lang === chosenLang) {
         const rawCustom = target === "hr"
           ? (item.aiIntel.customHrDm || item.aiIntel.customExecutiveDm)
           : (item.aiIntel.customExecutiveDm || item.aiIntel.customHrDm);
@@ -6230,10 +6291,10 @@
           : `Hi there,`;
 
         const enContextClause = isAgency
-          ? `if there are suitable senior engineering opportunities across the clients you partner with, I would appreciate being considered.`
+          ? `For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities across the clients you partner with, I would appreciate being considered.`
           : item.hasAppliedInCrm
-          ? `I also recently applied to your open position at ${cleanComp}, and if there are suitable opportunities on your team, I would appreciate being considered or pointed to the right hiring lead.`
-          : `if there are suitable opportunities at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.`;
+          ? `For my next chapter, I am actively looking for a high-impact senior engineering team; I recently applied for the ${roleForText} role at ${cleanComp}, and would appreciate being considered or pointed to the right hiring lead.`
+          : `For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.`;
 
         const enPermitNote = item.countryGroup === "IE"
           ? " (eligible for Ireland's Critical Skills Permit)"
@@ -6247,17 +6308,17 @@
           ? " (based in Istanbul with an active work permit)"
           : "";
 
-        return `${enGreeting}\n\nAt German multinational Pilz GmbH Türkiye, I transformed operations that previously ran on spreadsheets and manual workflows into a modern, AI-integrated enterprise platform built from scratch. For my next chapter, I am actively looking for a high-impact senior engineering team; ${enContextClause}\n\nMy updated CV and a signed reference letter from our General Manager are attached${enPermitNote}.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`;
+        return `${enGreeting}\n\nI am a Senior Full-Stack Software Engineer & Solutions Architect (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.\n\n${enContextClause}\n\nMy updated CV and a signed reference letter from our General Manager are attached${enPermitNote}.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`;
       }
 
       const trGreeting = formatTurkishNameFirstGreeting(firstName, is1stDeg);
       const trContextClause = isAgency
-        ? `Kariyerimin yeni adımında güçlü bir teknoloji ekibinde yer almak için aktif arayıştayım; danışmanlığını yürüttüğünüz firmalarda uygun fırsatlar olursa değerlendirilmekten memnuniyet duyarım.`
+        ? `Kariyerimin yeni adımında güçlü bir teknoloji ekibinde yer almak için aktif arayıştayım; danışmanlığını yürüttüğünüz firmalarda Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi alanında uygun fırsatlar olursa değerlendirilmekten memnuniyet duyarım.`
         : item.hasAppliedInCrm
-        ? `Kariyerimin yeni adımında daha büyük ölçekte değer üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesindeki açık pozisyonunuza da başvurmuştum, uygun fırsatlar için değerlendirilmekten veya ilgili yöneticiye yönlendirilmekten memnuniyet duyarım.`
-        : `Kariyerimin yeni adımında daha yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde uygun fırsatlar olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.`;
+        ? `Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde başvurduğum ${roleForText} pozisyonu başta olmak üzere uygun fırsatlar için değerlendirilmekten veya ilgili yöneticiye yönlendirilmekten memnuniyet duyarım.`
+        : `Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi alanında uygun fırsatlar olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.`;
 
-      return `${trGreeting}\n\nAlman Pilz GmbH Türkiye'de daha önce Excel ve manuel süreçlerle yürüyen tüm iş akışlarını, sıfırdan kurduğum yapay zeka entegreli modern bir kurumsal sisteme dönüştürdüm. ${trContextClause}\n\nGüncel CV’m ve Genel Müdürümüzün referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcut).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/`;
+      return `${trGreeting}\n\nKurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.\n\n${trContextClause}\n\nGüncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/`;
     }
     function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
 
@@ -7432,7 +7493,12 @@
         }
         if (filter === "TOP_GIANTS" && !item.giantRank) return false;
         if (filter === "FAST_HIRE_DEC31" && !(item.smartMeta?.isFastSponsor && !item.isAgency)) return false;
-        if (filter === "PENDING_EMAIL" && (ch.email || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail)) return false;
+        if (filter === "PENDING_EMAIL") {
+          const hasValidMail = Boolean(item.email && isCleanHrEmail(item.email));
+          if (!hasValidMail || ch.email || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) {
+            return false;
+          }
+        }
         if (filter === "HOT_SIGNALS" && !["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status)) return false;
         if (filter === "UNFINISHED_PORTAL" && !(item.hasUnfinishedPortal && !ch.applied)) return false;
         if (filter === "NEEDS_OUTREACH" && !(ch.applied && !ch.email && !ch.techDm && !ch.hrDm && !ch.connDm)) return false;
@@ -7464,12 +7530,61 @@
         return;
       }
 
+      if (filter === "PENDING_EMAIL") {
+        const computeEmailQueueScore = (it) => {
+          const cCh = resolveItemChannels(it, checks);
+          const alreadyDmedPenalty = (cCh.hrDm || cCh.techDm || cCh.connDm) ? 14 : 0;
+          const personalMailBonus = isPersonalRecruiterEmail(it.email) ? 18 : 0;
+          const nearCorridorBonus = (it.cluster === "CLUSTER_ASIAN" || it.cluster === "CLUSTER_GEBZE") ? 12 : 0;
+          const trTrackBonus = it.countryGroup === "TR" ? 10 : 0;
+
+          if (it.isAgency || AGENCY_RE.test(it.company || "")) {
+            return 25 + (it.hasAppliedInCrm ? 10 : 0) + personalMailBonus - alreadyDmedPenalty;
+          }
+          if (it.status === "Interview 🎯") return 580 + personalMailBonus + nearCorridorBonus - alreadyDmedPenalty;
+          if (it.status === "CV Downloaded ⭐") return 560 + personalMailBonus + nearCorridorBonus - alreadyDmedPenalty;
+          if (it.status === "Viewed 👀") return 520 + personalMailBonus + nearCorridorBonus - alreadyDmedPenalty;
+
+          if (it.hasAppliedInCrm && isPersonalRecruiterEmail(it.email)) {
+            return 430 + trTrackBonus + nearCorridorBonus - alreadyDmedPenalty;
+          }
+          const isPrioritySponsor = Boolean(
+            it.smartMeta?.isFastSponsor ||
+            /\b(adesso|logo|architecht|obss|intertech|commencis|siemens|hitachi|paytr|token|icterra|enka|sompo|veripark|obase|etiya|qnb|ibtech|lc waikiki)\b/i.test(it.company || "")
+          );
+          if (it.hasAppliedInCrm && isPrioritySponsor) {
+            return 340 + trTrackBonus + nearCorridorBonus - alreadyDmedPenalty;
+          }
+          if (it.hasAppliedInCrm || it.hasUnfinishedPortal) {
+            return 230 + trTrackBonus + nearCorridorBonus - alreadyDmedPenalty;
+          }
+          const rankBoost = Math.max(0, 50 - (it.giantRank || 45));
+          return 110 + rankBoost + nearCorridorBonus - alreadyDmedPenalty;
+        };
+
+        filtered.sort((a, b) => {
+          const diff = computeEmailQueueScore(b) - computeEmailQueueScore(a);
+          if (diff !== 0) return diff;
+          return String(b.appliedAt || "").localeCompare(String(a.appliedAt || ""));
+        });
+      }
+
+      const emailQueueBannerHtml = filter === "PENDING_EMAIL"
+        ? `<div class="glass rounded-xl p-3 border border-emerald-500/40 bg-emerald-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2">
+             <div>
+               <strong class="text-emerald-300">📧 Ready-to-Send Email Queue (${filtered.length} Verified Inboxes)</strong>
+               <span class="text-slate-300 ml-1">— Priority sorted top-to-bottom: <strong>1) 🔥 Hot Signals</strong> &rarr; <strong>2) 👤 Named Recruiter Emails</strong> &rarr; <strong>3) ⚡ Fast Teknopark &amp; German Sponsors</strong> &rarr; <strong>4) 📬 Other Applied</strong> &rarr; <strong>5) 🏢 Proactive Giants</strong> (Agencies last).</span>
+             </div>
+             <span class="text-[11px] text-amber-300 font-semibold">Click ✉️ Email &rarr; Attach v2 CV+Ref PDF &rarr; Tick 📧 Email!</span>
+           </div>`
+        : "";
+
       if (PIPELINE_VIEW_MODE === "cards") {
-        container.className = "grid grid-cols-1 md:grid-cols-2 gap-4";
-        container.innerHTML = filtered.map(item => renderPipelineCard(item, checks)).join("");
+        container.className = "space-y-2";
+        container.innerHTML = `${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
       } else {
         container.className = "space-y-2";
-        container.innerHTML = filtered.map(item => renderPipelineRow(item, checks)).join("");
+        container.innerHTML = emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
       }
     }
     function renderVipChecklist() { renderUnifiedPipeline(); }
@@ -8069,27 +8184,6 @@
         pilzProofTr: "InsightfulAI ve bu sistemdeki Copilot'ta model canlı web araması, DNS kontrolü ve yapılandırılmış veritabanı aksiyonlarını güvenli şemalarla yürütüyor."
       },
       {
-        id: "ai_3", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
-        questionEn: "How do you make Text-to-SQL (NL2SQL) safe against SQL injection, DROP TABLE, or leaking another customer's rows?",
-        questionTr: "Doğal dilden SQL üreten (NL2SQL) bir yapay zekayı veri silme veya başkasının verisini sızdırma riskine karşı nasıl korursunuz?",
-        plainEn: "Never execute LLM-generated SQL on a read-write connection! I enforce 4 hard walls: (1) execute exclusively on a database user granted ONLY `SELECT` on curated views, (2) parse the SQL AST to reject anything except a single `SELECT` (block `DROP/UPDATE/DELETE/EXEC/WAITFOR`), (3) automatically inject mandatory `WHERE TenantId = @CurrentTenant` + `TOP / LIMIT 200`, and (4) enforce a 3-second statement timeout.",
-        plainTr: "Modelin ürettiği SQL asla yazma yetkili bağlantıda çalıştırılmaz! 4 sert güvenlik duvarı kurarım: (1) Sadece izinli view'larda `SELECT` yetkisi olan salt-okunur DB kullanıcısı, (2) Tek bir `SELECT` dışındaki tüm komutları (`UPDATE/DELETE/DROP/EXEC`) reddeden SQL AST doğrulayıcısı, (3) Otomatik `TenantId` filtresi ve satır limiti (`LIMIT 200`), (4) 3 saniyelik sorgu zaman aşımı.",
-        pilzProofEn: "InsightfulAI's NL2SQL engine uses AST validation + read-only roles + row caps so executives query metrics safely in plain English or Turkish.",
-        pilzProofTr: "InsightfulAI'daki NL2SQL motoru AST doğrulaması ve salt-okunur DB rolü sayesinde yöneticilerin sıfır riskle veri sorgulamasını sağlıyor."
-      },
-      {
-        id: "ai_4", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
-        questionEn: "How do you control LLM latency, token cost, and provider outages in production?",
-        questionTr: "Üretim ortamında yapay zeka gecikmesini, token maliyetini ve API kesintilerini nasıl yönetirsiniz?",
-        plainEn: "Route tasks by complexity: use fast lightweight models (`Flash-Lite` / `Haiku`) for classification, scoring, and extraction; use reasoning models (`Gemini 2.5 Pro/Flash`, `Claude Sonnet`, `GPT`) for complex synthesis; enforce strict JSON output schemas; cache embeddings & frequent answers; and build an automatic model fallback chain so a `429` or `503` on Model A seamlessly retries on Model B without failing the user.",
-        plainTr: "Görevleri karmaşıklığa göre yönlendiririm: sınıflandırma ve puanlama için hızlı/ekonomik modeller, derin analiz için güçlü modeller kullanırım. Sıkı JSON şeması, önbellekleme ve otomatik model yedekleme zinciri (Model A `429/503` verirse anında Model B'ye geçiş) kurarak kesintisiz hizmet sağlarım.",
-        pilzProofEn: "Both InsightfulAI and my Cloudflare Workers implement multi-model fallback chains and token-budgeted context windows.",
-        pilzProofTr: "Hem InsightfulAI hem Cloudflare Worker servislerimde çoklu model yedekleme zinciri ve maliyet/token kontrolü aktif çalışıyor."
-      },
-      {
-        id: "ai_5", cat: "AI", catLabel: "🤖 Agentic AI & RAG",
-        questionEn: "They ask: 'Do you rely on AI coding tools? How do we know you understand the code you ship?'",
-        questionTr: "'AI kodlama araçları kullanıyor musunuz; ürettiğiniz koda hakim olduğunuzdan nasıl emin olabiliriz?' sorusuna en güçlü yanıt nedir?",
         plainEn: "Be proud, transparent, and architectural: 'Yes — I use agentic engineering harnesses daily as a force multiplier, which is how one senior engineer was able to architect, deploy, and maintain 5 production platforms with 1,190+ endpoints and zero data-loss incidents at Pilz Türkiye. AI doesn't decide my transaction boundaries, idempotency keys, SQL indexes, or security policies — I design the architecture, review every diff line-by-line, and own production 24/7. Let me share my screen and walk through any file or SQL query live.'",
         plainTr: "Özgüvenli ve şeffaf yanıt verin: 'Evet, modern AI mühendislik araçlarını çarpan etkisi olarak profesyonelce kullanıyorum; Pilz Türkiye'de tek başıma 5 canlı platformu ve 1.190+ API'yi sıfır veri kaybıyla ayağa kaldırıp yönetebilmemin sırrı bu. Ancak transaction sınırlarını, idempotency anahtarlarını, SQL indexlerini ve güvenlik mimarisini ben tasarlarım; her satırı denetler ve canlı sistemin sorumluluğunu taşırım. İsterseniz ekran paylaşıp herhangi bir modülü canlı inceleyebiliriz.'",
         plainEn: "Keep it 100% calm, positive, and executive — zero frustration: 'Over the past 2.5+ years at Pilz Türkiye, I built and launched the company's full-stack digital CRM, quoting, SAP automation, e-Invoice, and AI platforms from scratch, which are now mature and running smoothly in production. Due to year-end organizational budget restructuring, my contract concludes cleanly on December 31, 2026 with full mutual goodwill and a formal signed recommendation letter from our General Manager, Yavuz Çopur. I am ready to bring that exact execution speed to your engineering team.'",
