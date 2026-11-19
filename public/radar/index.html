@@ -8983,20 +8983,22 @@
           return `<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold text-[10px]">${escapeHtmlSafe((st || "ERR").toUpperCase())}</span>`;
         };
 
-        const aiOkCount = [ai.anthropic?.status, ai.gemini?.status, ai.openai?.status].filter(s => s === "ok").length;
+        const aiList = [ai.groq?.status, ai.anthropic?.status, ai.gemini?.status, ai.openai?.status];
+        const aiOkCount = aiList.filter(s => s === "ok").length;
         const ghOk = sc.githubRunner?.status === "ok" || sc.githubRunner?.status === "running";
+        const coreAiReady = ai.anthropic?.status === "ok" && (ai.groq?.status === "ok" || ai.gemini?.status === "ok");
 
         if (dotEl && lblEl) {
           dotEl.classList.remove("animate-pulse", "bg-slate-400", "bg-emerald-400", "bg-amber-400", "bg-rose-500");
           if (aiOkCount === 0) {
             dotEl.classList.add("bg-rose-500");
             lblEl.textContent = "⚡ Agents Issue";
-          } else if (aiOkCount === 3 && ghOk) {
+          } else if (coreAiReady && ghOk) {
             dotEl.classList.add("bg-emerald-400");
-            lblEl.textContent = "⚡ All Healthy";
+            lblEl.textContent = aiOkCount === 4 ? "⚡ All Healthy" : `⚡ Healthy (${aiOkCount}/4 AI)`;
           } else {
             dotEl.classList.add("bg-amber-400");
-            lblEl.textContent = `⚡ ${aiOkCount}/3 AI · ATS+GH OK`;
+            lblEl.textContent = `⚡ ${aiOkCount}/4 AI · ATS+GH OK`;
           }
         }
 
@@ -9004,6 +9006,10 @@
           const checkedStr = h.checkedAt ? new Date(h.checkedAt).toLocaleTimeString() : "";
           bodyEl.innerHTML = `
             <div class="text-[10px] font-bold text-slate-400 tracking-wider pt-0.5">AI PROVIDERS (AUTO-FAILOVER ACTIVE)</div>
+            <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
+              <div><strong class="text-white">Groq (Free Batch)</strong> <span class="text-[10px] text-emerald-300 font-mono">${escapeHtmlSafe(ai.groq?.model || "llama-3.3-70b")}</span><div class="text-[10px] text-slate-400">${escapeHtmlSafe(ai.groq?.note || "")}</div></div>
+              ${statusBadge(ai.groq?.status)}
+            </div>
             <div class="flex items-center justify-between gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded border border-slate-800">
               <div><strong class="text-white">Anthropic Claude</strong><div class="text-[10px] text-slate-400">${escapeHtmlSafe(ai.anthropic?.note || "")}</div></div>
               ${statusBadge(ai.anthropic?.status)}
