@@ -3708,13 +3708,33 @@
 
     async function loadCloudFeed(isAutoPoll = false) {
       try {
+        if (!ALL_SCAN_JOBS.length) {
+          try {
+            const cachedRaw = localStorage.getItem("jr_last_good_feed_v1");
+            if (cachedRaw) {
+              const cached = JSON.parse(cachedRaw);
+              if (Array.isArray(cached?.jobs) && cached.jobs.length) {
+                ALL_SCAN_JOBS = cached.jobs;
+                LAST_SCAN_JOBS = cached.jobs;
+                updateGlobalCountryCounts();
+                renderRadarList();
+              }
+            }
+          } catch {}
+        }
         const prevCount = ALL_SCAN_JOBS.length;
 
         let cfFeed = null;
-        try {
-          const cfr = await fetch(`${CF_WORKER_URL}/api/feed`, { cache: "no-store", signal: AbortSignal.timeout(3500) });
-          if (cfr.ok) cfFeed = await cfr.json();
-        } catch {}
+        for (let attempt = 0; attempt < 2; attempt++) {
+          try {
+            const cfr = await fetch(`${CF_WORKER_URL}/api/feed`, { cache: "no-store", signal: AbortSignal.timeout(15000) });
+            if (cfr.ok) {
+              cfFeed = await cfr.json();
+              break;
+            }
+          } catch {}
+          if (attempt === 0) await new Promise(r => setTimeout(r, 900));
+        }
 
         let localFeed = null;
         if (IS_LOCAL) {
@@ -3722,6 +3742,16 @@
             const lr = await fetch("/api/feed", { signal: AbortSignal.timeout(2500) });
             if (lr.ok) localFeed = await lr.json();
           } catch {}
+        }
+
+        if (!cfFeed && !localFeed) {
+          const stEl = document.getElementById("scanStatusText");
+          if (stEl) stEl.textContent = "⚠️ Cloud feed sync timed out — retrying automatically in 5s...";
+          if (!window.__feedRetryScheduled) {
+            window.__feedRetryScheduled = true;
+            setTimeout(() => { window.__feedRetryScheduled = false; loadCloudFeed(true); }, 5000);
+          }
+          return;
         }
 
         if (Array.isArray(cfFeed?.aiRejectedIds)) {
@@ -3761,8 +3791,21 @@
           .sort((a, b) => (b.score || 0) - (a.score || 0));
         LAST_SCAN_JOBS = ALL_SCAN_JOBS;
 
-        const latestTimeStr = cfFeed?.scannedAt || localFeed?.scannedAt;
-        const scannedTime = latestTimeStr ? new Date(latestTimeStr).toLocaleString() : "Recent";
+        try {
+          if (ALL_SCAN_JOBS.length > 0) {
+            localStorage.setItem("jr_last_good_feed_v1", JSON.stringify({
+              ts: Date.now(),
+              jobs: ALL_SCAN_JOBS.slice(0, 90).map(j => ({ ...j, description: String(j.description || "").slice(0, 2200) }))
+            }));
+          }
+        } catch {}
+
+        let latestTimeStr = String(cfFeed?.scannedAt || localFeed?.scannedAt || "").trim();
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(latestTimeStr)) {
+          latestTimeStr = latestTimeStr.replace(" ", "T") + "Z";
+        }
+        const parsedDt = latestTimeStr ? new Date(latestTimeStr) : null;
+        const scannedTime = (parsedDt && !Number.isNaN(parsedDt.getTime())) ? parsedDt.toLocaleString() : "Just now";
         document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes every 90s across 5 country tracks).`;
         updateGlobalCountryCounts();
         refreshScanButtonLabel();
