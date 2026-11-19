@@ -49,7 +49,7 @@
     html.light-theme button.bg-blue-600, html.light-theme a.bg-blue-600,
     html.light-theme button.bg-emerald-600, html.light-theme a.bg-emerald-600,
     html.light-theme button.bg-indigo-600, html.light-theme button.bg-red-600,
-    html.light-theme button.bg-violet-600, html.light-theme .bg-gradient-to-r.from-emerald-600,
+    html.light-theme button.bg-violet-600, html.light-theme button.bg-teal-600, html.light-theme .bg-gradient-to-r.from-emerald-600,
     html.light-theme #modeBadge { color: #ffffff !important; }
     html.light-theme .text-slate-100, html.light-theme .text-slate-200 { color: #1e293b !important; }
     html.light-theme .text-slate-300 { color: #334155 !important; }
@@ -60,6 +60,7 @@
     html.light-theme .text-cyan-300, html.light-theme .text-cyan-200 { color: #0e7490 !important; }
     html.light-theme .text-purple-300, html.light-theme .text-purple-200 { color: #6d28d9 !important; }
     html.light-theme .text-rose-300, html.light-theme .text-rose-200 { color: #be123c !important; }
+    html.light-theme .text-teal-300, html.light-theme .text-teal-200 { color: #0f766e !important; }
     html.light-theme .bg-slate-950, html.light-theme .bg-slate-950\/90, html.light-theme .bg-slate-950\/95 { background-color: #f8fafc !important; }
     html.light-theme .bg-slate-900, html.light-theme .bg-slate-900\/90, html.light-theme .bg-slate-900\/80, html.light-theme .bg-slate-900\/60, html.light-theme .bg-slate-900\/40 { background-color: #f8fafc !important; }
     html.light-theme .bg-slate-800 { background-color: #e2e8f0 !important; color: #0f172a !important; }
@@ -71,6 +72,7 @@
     html.light-theme .bg-purple-950\/15 { background-color: #f5f3ff !important; }
     html.light-theme .bg-amber-950\/30 { background-color: #fffbeb !important; }
     html.light-theme .bg-rose-950\/25, html.light-theme .bg-rose-900\/40 { background-color: #fff1f2 !important; }
+    html.light-theme .bg-teal-900\/50 { background-color: #f0fdfa !important; }
     html.light-theme ::-webkit-scrollbar-track { background: #e2e8f0; }
     html.light-theme ::-webkit-scrollbar-thumb { background: #94a3b8; }
   </style>
@@ -2320,7 +2322,7 @@
       },
       obss: {
         domain: "obss.tech",
-        emails: ["ik@obss.com.tr", "info@obss.tech"],
+        emails: ["hr@obss.com.tr"],
         phone: "+90 (216) 688 34 36",
         ctoAndEngLeads: [
           { name: "OBSS — Director of Software Engineering (.NET & AI)", title: "Engineering Director — Teknopark İstanbul / Ataşehir", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=OBSS%20Engineering%20Director%20OR%20Software%20Architect&geoUrn=%5B%22102105699%22%5D" }
@@ -2329,7 +2331,7 @@
           { name: "OBSS Talent Acquisition Team", title: "Technical Recruiter — OBSS Teknoloji (Already Messaged 💬)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=OBSS%20Talent%20Acquisition&geoUrn=%5B%22102105699%22%5D" }
         ],
         officeAndMetro: "🚇 Kurtköy M4 Metro (Teknopark İstanbul, Pendik — 15 min from Kartal!)",
-        walkInVerdict: "Applied to AI Software Engineer (#4486431067) & Senior Software Engineer + messaged HR & connections. Follow up via ik@obss.com.tr with TR+EN CV!"
+        walkInVerdict: "Applied to AI Software Engineer (#4486431067) & Senior Software Engineer + messaged HR & connections. Follow up via hr@obss.com.tr with TR+EN CV!"
       },
       adesso: {
         domain: "adesso.com.tr",
@@ -3189,10 +3191,14 @@
       if (!item) return;
       const itemId = item.id || idOrIdx;
       const compKey = item.companyKey || normalizeCompanyKey(item.company);
+      const checksNow = getPipelineCheckState();
+      const ch = resolveItemChannels(item, checksNow);
+      const prevEmail = String(item.email || "").trim().toLowerCase();
+      const blockedAddr = ch.emailBlocked ? String(ch.blockedEmail || item.email || "").trim().toLowerCase() : "";
       const originalHtml = btn ? btn.innerHTML : "";
       if (btn) {
         btn.disabled = true;
-        btn.innerHTML = "⏳ DNS + Web Check...";
+        btn.innerHTML = "⏳ Official Web + MX...";
       }
 
       // Always call Cloudflare Worker first for live DoH DNS MX + Web Search + D1 persistence
@@ -3206,24 +3212,31 @@
             company: item.company,
             role: item.cleanRole || stripRoleBadgeClient(item.role),
             country: item.countryGroup || "TR",
-            currentEmail: isCleanHrEmail(item.email) ? item.email : ""
+            currentEmail: !ch.emailBlocked && isCleanHrEmail(item.email) ? item.email : "",
+            blockedEmail: blockedAddr,
+            forceRefresh: true
           })
         });
         const data = res.ok ? await res.json() : null;
         if (!data || !data.ok) {
           if (btn) {
             btn.disabled = false;
-            btn.innerHTML = originalHtml || "🛡️ Verify Mail";
+            btn.innerHTML = originalHtml || "🛡️ Re-Verify Mail";
           }
           showToast(`⚠️ Could not verify ${item.company} right now — check connection.`, false);
           return;
         }
 
         const vEmail = isCleanHrEmail(data.verifiedEmail) ? data.verifiedEmail.trim() : "";
+        const foundNewAltEmail = Boolean(vEmail && (!blockedAddr || vEmail.toLowerCase() !== blockedAddr));
         const nextIntel = {
           ...(item.aiIntel || {}),
-          bestEmail: vEmail,
-          emailVerification: data.verification || null
+          bestEmail: foundNewAltEmail ? vEmail : (ch.emailBlocked ? item.email : vEmail),
+          emailVerification: foundNewAltEmail
+            ? (data.verification || null)
+            : (ch.emailBlocked
+                ? { ...(item.aiIntel?.emailVerification || {}), bounced: true, bouncedEmail: blockedAddr, reason: data.verification?.reason || `No alternate public HR email found (${blockedAddr} blocked) — use LinkedIn DM.` }
+                : (data.verification || null))
         };
         if (data.recruiterName) {
           const cleanComp = item.company.split("(")[0].trim();
@@ -3240,25 +3253,42 @@
         }
 
         item.aiIntel = nextIntel;
-        item.email = vEmail;
+        if (foundNewAltEmail || !ch.emailBlocked) {
+          item.email = vEmail;
+        }
         try {
           localStorage.setItem(`jr_intel_${itemId}`, JSON.stringify(nextIntel));
         } catch {}
+
+        if (ch.emailBlocked && foundNewAltEmail) {
+          const cKey = `co:${compKey}`;
+          const cleared = { ...ch, emailBlocked: false, blockedEmail: "" };
+          checksNow[cKey] = cleared;
+          checksNow[itemId] = cleared;
+          savePipelineCheckState(checksNow);
+          d1Post("/api/outreach-check", { itemId: cKey, checks: cleared });
+        }
 
         const crmTargetId = item.primaryCrmId || item.id;
         const matchingRows = STATE.applied.filter(
           a => String(a.id) === String(crmTargetId) || normalizeCompanyKey(a.company || "") === compKey
         );
         for (const row of matchingRows) {
-          row.contactEmail = vEmail;
+          if (foundNewAltEmail || !ch.emailBlocked) row.contactEmail = vEmail;
           row.aiIntel = nextIntel;
         }
 
         renderUnifiedPipeline();
 
-        if (vEmail) {
+        if (foundNewAltEmail) {
           const gw = data.verification?.gateway || "Active MX";
-          showToast(`🛡️ Verified ${vEmail} (${gw}) — Saved to D1!`, true);
+          if (prevEmail && vEmail.toLowerCase() !== prevEmail) {
+            showToast(`🔄 Updated ${prevEmail} → ${vEmail} (Official Web + ${gw}) — Saved to D1!`, true);
+          } else if (data.verification?.unconfirmedOnWeb) {
+            showToast(`⚠️ ${vEmail} NOT published on official site (${gw} MX only — generic inbox may bounce; prefer LinkedIn DM).`, false);
+          } else {
+            showToast(`🛡️ Confirmed ${vEmail} (${data.verification?.sourceNote || gw}) — Saved to D1!`, true);
+          }
           if (openGmailAfter) {
             const freshItem = findPipelineItem(itemId) || item;
             const mail = buildUnifiedEmail(freshItem);
@@ -3271,7 +3301,7 @@
       } catch (err) {
         if (btn) {
           btn.disabled = false;
-          btn.innerHTML = originalHtml || "🛡️ Verify Mail";
+          btn.innerHTML = originalHtml || "🛡️ Re-Verify Mail";
         }
         showToast(`⚠️ Verification request failed for ${item.company}.`, false);
       }
@@ -5466,7 +5496,7 @@
         role: "Senior .NET Developer & .NET Full Stack Developer",
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
-        email: "ik@obss.com.tr",
+        email: "hr@obss.com.tr",
         phone: "+902122862400",
         phoneDisplay: "+90 (212) 286 24 00",
         address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent No:4/601, Maslak / Sarıyer, İstanbul",
@@ -7394,14 +7424,17 @@
         const addr = ch?.blockedEmail || ev?.bouncedEmail || item?.email || "";
         return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40" title="${escapeHtmlSafe(ev?.reason || `Blocked/Bounced (${addr}) — use LinkedIn DM instead`)}">🚫 Email Blocked / Bounced</span>`;
       }
+      if (ev?.unconfirmedOnWeb && item?.email) {
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="${escapeHtmlSafe(ev.reason || 'Domain MX is active, but this exact inbox was NOT found published on the official site — may bounce; prefer LinkedIn DM if unsure')}">⚠️ Unconfirmed on Site (${escapeHtmlSafe(ev.gateway || 'MX Only')})</span>`;
+      }
       if (ev?.deliverable && item?.email) {
-        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Live DNS MX Verified: ${escapeHtmlSafe(ev.gateway || 'Active SMTP')} · DMARC: ${escapeHtmlSafe(ev.dmarcPolicy || 'ok')} · ${escapeHtmlSafe(ev.sourceNote || '')}">🛡️ MX OK (${escapeHtmlSafe(ev.gateway || 'SMTP')})</span>`;
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Official Web + Live DNS MX Checked: ${escapeHtmlSafe(ev.gateway || 'Active SMTP')} · DMARC: ${escapeHtmlSafe(ev.dmarcPolicy || 'ok')} · ${escapeHtmlSafe(ev.sourceNote || '')}">🛡️ ${ev.isPersonalRecruiter ? 'Personal + MX' : 'Web + MX'} (${escapeHtmlSafe(ev.gateway || 'SMTP')})</span>`;
       }
       if (ev?.isBlockedGiant || ev?.noPublicHrEmail) {
         return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40" title="${escapeHtmlSafe(ev.reason || 'Use LinkedIn DM + Career Portal')}">⚠️ Portal / LinkedIn DM Only</span>`;
       }
       if (item?.email) {
-        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700" title="Click 🛡️ AI Verify to check live web + DNS MX records">Unchecked MX</span>`;
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700" title="Click 🛡️ Re-Verify Mail to check official site + DNS MX records">Unchecked MX</span>`;
       }
       return "";
     }
@@ -7558,6 +7591,9 @@
                   <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow">
                     ✉️ Open in Gmail Compose
                   </a>
+                  <button type="button" onclick="runAiVerifyEmail('${item.id}', this, false)" class="px-2.5 py-1.5 rounded-lg bg-teal-900/50 hover:bg-teal-700/70 border border-teal-500/40 text-teal-200 font-semibold text-xs transition cursor-pointer" title="Live web search on ${safeCompAttr}'s official site + DNS MX check to verify or replace this saved email">
+                    🛡️ Re-Verify Mail
+                  </button>
                   <button type="button" onclick="markEmailBlocked('${item.id}', true)" class="px-2.5 py-1.5 rounded-lg bg-rose-900/40 hover:bg-rose-700/60 border border-rose-500/40 text-rose-200 font-semibold text-xs transition cursor-pointer" title="Mark this email as blocked/bounced so Radar switches this company to LinkedIn DM">
                     🚫 Mark Blocked
                   </button>
