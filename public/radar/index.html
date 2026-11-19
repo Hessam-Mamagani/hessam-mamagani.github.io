@@ -7,12 +7,74 @@
   <title>JobRadar — Career Command Center</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #0b0f19; color: #e2e8f0; font-family: Inter, system-ui, -apple-system, sans-serif; }
-    .glass { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+    body { background-color: #060a13; color: #e2e8f0; font-family: Inter, system-ui, -apple-system, sans-serif; transition: background-color 0.2s ease, color 0.2s ease; }
+    .glass { background: #111a2e; backdrop-filter: blur(12px); border: 1px solid #263554; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35); }
+    header.glass { background: rgba(11, 18, 34, 0.94); border-bottom-color: #1f2e4a; }
+    .pipe-card-expanded {
+      border: 2px solid #3b82f6 !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), 0 18px 40px rgba(0, 0, 0, 0.55) !important;
+      margin-top: 14px !important;
+      margin-bottom: 14px !important;
+    }
+    .pipe-card-expanded > .pipe-row-header {
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0.16), rgba(17, 26, 46, 0.95));
+      border-bottom: 1px solid rgba(59, 130, 246, 0.35);
+    }
+    .pipe-drawer-body {
+      background: #0b1222;
+    }
+    .pipe-drawer-step {
+      background: #131e35;
+      border-color: #2a3a5c;
+    }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+    /* Crisp Light Mode Theme (Toggled via Header Switch) */
+    html.light-theme body { background-color: #eef2f7; color: #0f172a; }
+    html.light-theme .glass { background: #ffffff; border-color: #cbd5e1; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06); }
+    html.light-theme header.glass { background: rgba(255, 255, 255, 0.96); border-bottom-color: #cbd5e1; }
+    html.light-theme .pipe-card-expanded {
+      border: 2px solid #2563eb !important;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14), 0 14px 32px rgba(15, 23, 42, 0.12) !important;
+    }
+    html.light-theme .pipe-card-expanded > .pipe-row-header {
+      background: linear-gradient(90deg, #eff6ff, #ffffff);
+      border-bottom: 1px solid #bfdbfe;
+    }
+    html.light-theme .pipe-drawer-body { background: #f1f5f9 !important; border-top-color: #cbd5e1 !important; }
+    html.light-theme .pipe-drawer-step { background: #ffffff !important; border-color: #cbd5e1 !important; }
+    html.light-theme .text-white { color: #0f172a !important; }
+    html.light-theme button.bg-blue-600, html.light-theme a.bg-blue-600,
+    html.light-theme button.bg-emerald-600, html.light-theme a.bg-emerald-600,
+    html.light-theme button.bg-indigo-600, html.light-theme button.bg-red-600,
+    html.light-theme button.bg-violet-600, html.light-theme .bg-gradient-to-r.from-emerald-600,
+    html.light-theme #modeBadge { color: #ffffff !important; }
+    html.light-theme .text-slate-100, html.light-theme .text-slate-200 { color: #1e293b !important; }
+    html.light-theme .text-slate-300 { color: #334155 !important; }
+    html.light-theme .text-slate-400 { color: #475569 !important; }
+    html.light-theme .text-emerald-300, html.light-theme .text-emerald-200 { color: #047857 !important; }
+    html.light-theme .text-amber-300, html.light-theme .text-amber-200 { color: #b45309 !important; }
+    html.light-theme .text-blue-300, html.light-theme .text-blue-200, html.light-theme .text-blue-400 { color: #1d4ed8 !important; }
+    html.light-theme .text-cyan-300, html.light-theme .text-cyan-200 { color: #0e7490 !important; }
+    html.light-theme .text-purple-300, html.light-theme .text-purple-200 { color: #6d28d9 !important; }
+    html.light-theme .text-rose-300, html.light-theme .text-rose-200 { color: #be123c !important; }
+    html.light-theme .bg-slate-950, html.light-theme .bg-slate-950\/90, html.light-theme .bg-slate-950\/95 { background-color: #f8fafc !important; }
+    html.light-theme .bg-slate-900, html.light-theme .bg-slate-900\/90, html.light-theme .bg-slate-900\/80, html.light-theme .bg-slate-900\/60, html.light-theme .bg-slate-900\/40 { background-color: #f8fafc !important; }
+    html.light-theme .bg-slate-800 { background-color: #e2e8f0 !important; color: #0f172a !important; }
+    html.light-theme .hover\:bg-slate-700:hover, html.light-theme .hover\:bg-slate-800:hover { background-color: #cbd5e1 !important; }
+    html.light-theme .bg-black\/40, html.light-theme .bg-black\/60, html.light-theme .bg-black\/35 { background-color: #f1f5f9 !important; }
+    html.light-theme .border-slate-800, html.light-theme .border-slate-800\/90, html.light-theme .border-slate-800\/80, html.light-theme .border-slate-700, html.light-theme .border-slate-700\/80 { border-color: #cbd5e1 !important; }
+    html.light-theme .bg-emerald-950\/10, html.light-theme .bg-emerald-950\/15, html.light-theme .bg-emerald-950\/30, html.light-theme .bg-emerald-950\/50 { background-color: #ecfdf5 !important; }
+    html.light-theme .bg-blue-950\/30, html.light-theme .bg-indigo-950\/30 { background-color: #eff6ff !important; }
+    html.light-theme .bg-purple-950\/15 { background-color: #f5f3ff !important; }
+    html.light-theme .bg-amber-950\/30 { background-color: #fffbeb !important; }
+    html.light-theme .bg-rose-950\/25, html.light-theme .bg-rose-900\/40 { background-color: #fff1f2 !important; }
+    html.light-theme ::-webkit-scrollbar-track { background: #e2e8f0; }
+    html.light-theme ::-webkit-scrollbar-thumb { background: #94a3b8; }
   </style>
+  <script>try{if(localStorage.getItem("jr_theme")==="light")document.documentElement.classList.add("light-theme");}catch{}</script>
 </head>
 <body class="min-h-screen pb-16">
   <!-- Cloud Auth Modal (Shown on Phone / Cloud URL until unlocked with 6-Digit Authenticator Code) -->
@@ -77,6 +139,9 @@
             </div>
           </div>
         </div>
+        <button type="button" id="themeToggleBtn" onclick="toggleThemeMode()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Switch Dark / Light Theme">
+          ☀️ Light
+        </button>
         <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v2 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
           📄 My v2 CVs
         </button>
@@ -247,7 +312,7 @@
         </div>
       </div>
 
-      <div id="pipelineContainer" class="space-y-2"></div>
+      <div id="pipelineContainer" class="space-y-3.5"></div>
 
       <!-- Embedded Quick Status Table (Shown when 'Quick Status Table' mode is selected) -->
       <div id="tab-crm" class="hidden space-y-3">
@@ -7333,7 +7398,7 @@
           };
 
       return `
-        <div class="p-4 bg-slate-950/90 border-t border-slate-800/90 space-y-3.5 text-xs">
+        <div class="pipe-drawer-body p-4 border-t border-slate-700/80 space-y-3.5 text-xs">
           <!-- Priority Next-Step Guide Banner -->
           <div class="p-3 rounded-xl border ${nextStepBanner.color} flex flex-wrap items-center justify-between gap-2">
             <div class="space-y-0.5">
@@ -7348,7 +7413,7 @@
           ${renderRolesSummaryHtml(item)}
 
           <!-- STEP 1: FIND OPEN JOB, APPLY & DOWNLOAD RECOMMENDED v2 CV -->
-          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+          <div class="pipe-drawer-step p-3.5 rounded-xl border space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span class="text-xs font-bold text-white block">1️⃣ Step 1 — Find Open Role &amp; Apply (${cMeta.flag} ${countryLabel})</span>
@@ -7379,7 +7444,7 @@
           </div>
 
           <!-- STEP 2: FIND LOCAL PEOPLE & SEND LEARNED PEER-TO-PEER LINKEDIN DM -->
-          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-3">
+          <div class="pipe-drawer-step p-3.5 rounded-xl border space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span class="text-xs font-bold text-white block">2️⃣ Step 2 — Message 1 Tech Lead &amp; 1 Recruiter on LinkedIn (${chosenLang === 'TR' ? '🇹🇷 Türkçe' : '🇬🇧 English'})</span>
@@ -7491,18 +7556,23 @@
         ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">Applied (${doneCount}/6)</span>`
         : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Step 1: Apply (${doneCount}/6)</span>`;
 
-      const rowBorder = item.status === "Interview 🎯"
-        ? "border-purple-500/60 bg-purple-950/15"
+      const isHotCard = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status);
+      const rowBorder = isExpanded
+        ? "pipe-card-expanded"
+        : item.status === "Interview 🎯"
+        ? "border-l-4 border-l-purple-500 border-purple-500/50 bg-purple-950/15"
         : doneCount >= 3
-        ? "border-emerald-500/40 bg-emerald-950/10"
-        : "border-slate-800 hover:border-slate-700";
+        ? "border-l-4 border-l-emerald-500 border-emerald-500/35 bg-emerald-950/10"
+        : isHotCard
+        ? "border-l-4 border-l-amber-400 hover:border-blue-500/50"
+        : "border-l-4 border-l-slate-600 hover:border-blue-500/40";
 
       const locationShort = item.clusterLabel.split("(")[0].replace(/^📍\s*/, "").trim();
 
       return `
         <div id="pipeRow-${item.id}" class="glass rounded-xl border ${rowBorder} transition overflow-hidden">
           <!-- Clean Single-Row Summary Bar -->
-          <div class="p-3.5 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
+          <div class="pipe-row-header p-3.5 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
             <div class="flex items-start gap-2.5 flex-1 min-w-[260px]">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -9117,6 +9187,19 @@
         if (pop && !pop.classList.contains("hidden")) pop.classList.add("hidden");
       }
     });
+
+    function syncThemeButtonLabel() {
+      const btn = document.getElementById("themeToggleBtn");
+      if (!btn) return;
+      const isLight = document.documentElement.classList.contains("light-theme");
+      btn.textContent = isLight ? "🌙 Dark" : "☀️ Light";
+    }
+    function toggleThemeMode() {
+      const isLight = document.documentElement.classList.toggle("light-theme");
+      try { localStorage.setItem("jr_theme", isLight ? "light" : "dark"); } catch {}
+      syncThemeButtonLabel();
+    }
+    syncThemeButtonLabel();
 
     renderCoachTab();
     initApp();
