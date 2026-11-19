@@ -6317,7 +6317,9 @@
         techDm: !!(byCo.techDm || byId.techDm || byVip.techDm || byPrimary.techDm),
         hrDm: !!(hrDmAuto || byCo.hrDm || byId.hrDm || byVip.hrDm || byPrimary.hrDm),
         connDm: !!(connAuto || byCo.connDm || byId.connDm || byVip.connDm || byPrimary.connDm),
-        callWalk: !!(byCo.callWalk || byCo.called || byCo.walked || byId.callWalk || byId.called || byId.walked || byVip.callWalk || byVip.called || byVip.walked)
+        callWalk: !!(byCo.callWalk || byCo.called || byCo.walked || byId.callWalk || byId.called || byId.walked || byVip.callWalk || byVip.called || byVip.walked),
+        emailBlocked: !!(byCo.emailBlocked || byId.emailBlocked || byVip.emailBlocked || byPrimary.emailBlocked || item?.aiIntel?.emailVerification?.bounced),
+        blockedEmail: byCo.blockedEmail || byId.blockedEmail || item?.aiIntel?.emailVerification?.bouncedEmail || ""
       };
     }
 
@@ -6427,6 +6429,52 @@
 
       renderUnifiedPipeline();
       showToast(`✅ Saved ${field} progress for ${escapeHtmlSafe(item?.company || id)}!`, true);
+    }
+
+    function markEmailBlocked(id, isBlocked = true) {
+      const st = getPipelineCheckState();
+      const strId = String(id);
+      const item = findPipelineItem(strId);
+      if (!item) return;
+      const cKey = `co:${item.companyKey || normalizeCompanyKey(item.company)}`;
+      const currentResolved = resolveItemChannels(item, st);
+      const badAddr = String(item.email || currentResolved.blockedEmail || "").trim();
+      const updated = {
+        ...currentResolved,
+        email: isBlocked ? false : currentResolved.email,
+        emailBlocked: !!isBlocked,
+        blockedEmail: isBlocked ? badAddr : ""
+      };
+      st[cKey] = updated;
+      st[strId] = updated;
+      savePipelineCheckState(st);
+      if (IS_LOCAL) {
+        fetch("/api/outreach-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemId: cKey, checks: updated })
+        }).catch(() => {});
+      }
+      d1Post("/api/outreach-check", { itemId: cKey, checks: updated });
+
+      const compKey = item.companyKey || normalizeCompanyKey(item.company || "");
+      const matchingRows = STATE.applied.filter(a => normalizeCompanyKey(a.company || "") === compKey);
+      for (const row of matchingRows) {
+        if (!row.aiIntel || typeof row.aiIntel !== "object") row.aiIntel = {};
+        row.aiIntel.emailVerification = isBlocked
+          ? { deliverable: false, bounced: true, isBlockedGiant: true, noPublicHrEmail: true, bouncedEmail: badAddr, reason: `Blocked/Bounced on send (${badAddr}) — use LinkedIn DM` }
+          : { deliverable: !!row.contactEmail, bounced: false, isBlockedGiant: false, noPublicHrEmail: false, reason: "" };
+        d1Post("/api/apply", row);
+      }
+      if (!IS_LOCAL) ghSaveDb();
+      renderUnifiedPipeline();
+      renderCrm();
+      showToast(
+        isBlocked
+          ? `🚫 Marked ${escapeHtmlSafe(badAddr || item.company)} as Blocked/Bounced — switched to LinkedIn DM!`
+          : `↩️ Unblocked email for ${escapeHtmlSafe(item.company)}.`,
+        !isBlocked
+      );
     }
     function getVipChecklistState() { return getPipelineCheckState(); }
     function saveVipChecklistState(st) { savePipelineCheckState(st); }
@@ -7339,8 +7387,13 @@
       renderUnifiedPipeline();
     }
 
-    function renderEmailVerificationBadgeHtml(item) {
+    function renderEmailVerificationBadgeHtml(item, ch = null) {
       const ev = item?.aiIntel?.emailVerification;
+      const isBlocked = Boolean(ch?.emailBlocked || ev?.bounced);
+      if (isBlocked) {
+        const addr = ch?.blockedEmail || ev?.bouncedEmail || item?.email || "";
+        return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40" title="${escapeHtmlSafe(ev?.reason || `Blocked/Bounced (${addr}) — use LinkedIn DM instead`)}">🚫 Email Blocked / Bounced</span>`;
+      }
       if (ev?.deliverable && item?.email) {
         return `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" title="Live DNS MX Verified: ${escapeHtmlSafe(ev.gateway || 'Active SMTP')} · DMARC: ${escapeHtmlSafe(ev.dmarcPolicy || 'ok')} · ${escapeHtmlSafe(ev.sourceNote || '')}">🛡️ MX OK (${escapeHtmlSafe(ev.gateway || 'SMTP')})</span>`;
       }
@@ -7493,22 +7546,30 @@
           </div>
 
           <!-- STEP 3: DIRECT HR EMAIL (WITH 1-CLICK VERIFY OR GMAIL COMPOSE) -->
-          <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2.5">
+          <div class="pipe-drawer-step p-3.5 rounded-xl border space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs font-bold text-white">3️⃣ Step 3 — Direct Email (${item.email ? `<span class="text-emerald-300 font-mono">${escapeHtmlSafe(item.email)}</span>` : `<span class="text-slate-400 font-normal">No HR email saved yet</span>`})</span>
-                ${renderEmailVerificationBadgeHtml(item)}
+                <span class="text-xs font-bold text-white">3️⃣ Step 3 — Direct Email (${ch.emailBlocked ? `<span class="text-rose-300 line-through font-mono">${escapeHtmlSafe(ch.blockedEmail || item.email || "blocked")}</span>` : item.email ? `<span class="text-emerald-300 font-mono">${escapeHtmlSafe(item.email)}</span>` : `<span class="text-slate-400 font-normal">No HR email saved yet</span>`})</span>
+                ${renderEmailVerificationBadgeHtml(item, ch)}
                 ${item.phone && item.phone !== "Global Remote" ? `<span class="text-slate-500">&middot;</span><a href="tel:${item.phone}" class="text-slate-300 hover:text-white text-[11px]">📞 ${item.phoneDisplay}</a>` : ""}
               </div>
               <div class="flex flex-wrap items-center gap-1.5">
-                ${item.email ? `
+                ${item.email && !ch.emailBlocked ? `
                   <a id="gmailBtn-${item.id}" href="${gmailHref}" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition shadow">
                     ✉️ Open in Gmail Compose
                   </a>
+                  <button type="button" onclick="markEmailBlocked('${item.id}', true)" class="px-2.5 py-1.5 rounded-lg bg-rose-900/40 hover:bg-rose-700/60 border border-rose-500/40 text-rose-200 font-semibold text-xs transition cursor-pointer" title="Mark this email as blocked/bounced so Radar switches this company to LinkedIn DM">
+                    🚫 Mark Blocked
+                  </button>
                 ` : `
                   <button type="button" onclick="runAiVerifyEmail('${item.id}', this, true)" class="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition shadow cursor-pointer" title="AI searches live web for ${safeCompAttr}'s HR email, verifies DNS MX, and opens Gmail">
-                    🛡️ Find HR Email &amp; Open Gmail
+                    🛡️ ${ch.emailBlocked ? 'Find Alt HR Email' : 'Find HR Email &amp; Open Gmail'}
                   </button>
+                  ${ch.emailBlocked ? `
+                    <button type="button" onclick="markEmailBlocked('${item.id}', false)" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs cursor-pointer" title="Undo blocked flag">
+                      ↩️ Unblock
+                    </button>
+                  ` : ""}
                 `}
                 <button type="button" onclick="copyFromStore('${copyFullEmailKey}', this, '📧 Subject + Email copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs transition cursor-pointer">
                   📋 Copy Email
@@ -7602,10 +7663,12 @@
             <!-- Clean Action Buttons -->
             <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
               ${!isExpanded ? `
-                ${item.email ? `
+                ${item.email && !ch.emailBlocked ? `
                   <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="Open Gmail to ${escapeHtmlSafe(item.email)}">
                     ✉️ Email
                   </a>
+                ` : ch.emailBlocked ? `
+                  <span class="px-2 py-1 rounded bg-rose-500/15 border border-rose-500/35 text-rose-300 font-semibold text-[11px]" title="Email bounced/blocked — use LinkedIn DM">🚫 Mail Blocked</span>
                 ` : ""}
                 <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy Peer-to-Peer LinkedIn DM">
                   💬 Copy DM
@@ -7792,7 +7855,7 @@
         if (filter === "FAST_HIRE_DEC31" && !(item.smartMeta?.isFastSponsor && !item.isAgency)) return false;
         if (filter === "PENDING_EMAIL") {
           const hasValidMail = Boolean(item.email && isCleanHrEmail(item.email));
-          if (!hasValidMail || ch.email || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) {
+          if (!hasValidMail || ch.email || ch.emailBlocked || item.aiIntel?.emailVerification?.bounced || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) {
             return false;
           }
         }
