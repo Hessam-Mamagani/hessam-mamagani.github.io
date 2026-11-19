@@ -256,6 +256,7 @@
             <span id="scanCountBadge" class="font-semibold text-emerald-400"></span>
           </div>
           <div id="radarList" class="space-y-2.5"></div>
+          <div id="aiFilteredLogWrap" class="hidden pt-1"></div>
         </div>
 
         <div class="lg:col-span-5">
@@ -3705,6 +3706,8 @@
     }
 
     let CLIENT_AI_REJECTED_IDS = new Set();
+    let CLIENT_AI_REJECTED_LOG = [];
+    let AI_FILTERED_LOG_OPEN = false;
     function isClientAiVerified(job) {
       if (!job) return false;
       if (job.aiEvaluated === true) return true;
@@ -3851,6 +3854,9 @@
 
         if (Array.isArray(cfFeed?.aiRejectedIds)) {
           for (const rid of cfFeed.aiRejectedIds) CLIENT_AI_REJECTED_IDS.add(String(rid));
+        }
+        if (Array.isArray(cfFeed?.aiRejectedLog)) {
+          CLIENT_AI_REJECTED_LOG = cfFeed.aiRejectedLog;
         }
 
         const combinedMap = new Map();
@@ -4636,8 +4642,73 @@
       }
     }
 
+    function toggleAiFilteredLog() {
+      AI_FILTERED_LOG_OPEN = !AI_FILTERED_LOG_OPEN;
+      renderAiFilteredLog();
+    }
+
+    async function unrejectAiFilteredJob(id) {
+      const sid = String(id || "").trim();
+      if (!sid) return;
+      CLIENT_AI_REJECTED_IDS.delete(sid);
+      CLIENT_AI_REJECTED_LOG = (CLIENT_AI_REJECTED_LOG || []).filter(r => String(r.id) !== sid);
+      renderAiFilteredLog();
+      try {
+        await fetch(`${CF_WORKER_URL}/api/unreject-ai`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: sid })
+        });
+      } catch {}
+      showToast("Unblocked job #" + escapeHtmlSafe(sid) + " — open link directly or run a scan to re-evaluate.", true);
+    }
+
+    function renderAiFilteredLog() {
+      const wrap = document.getElementById("aiFilteredLogWrap");
+      if (!wrap) return;
+      const list = (CLIENT_AI_REJECTED_LOG || []).filter(r => {
+        if (!r || !r.id) return false;
+        if (ACTIVE_COUNTRY === "ALL") return true;
+        return String(r.country || "TR").toUpperCase() === ACTIVE_COUNTRY;
+      });
+      if (!list.length) {
+        wrap.classList.add("hidden");
+        wrap.innerHTML = "";
+        return;
+      }
+      wrap.classList.remove("hidden");
+      wrap.innerHTML = `
+        <div class="glass rounded-xl border border-slate-800 overflow-hidden text-xs">
+          <button type="button" onclick="toggleAiFilteredLog()" class="w-full px-3.5 py-2.5 flex items-center justify-between gap-2 text-left hover:bg-slate-800/60 transition cursor-pointer">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-bold text-slate-200">AI Filtered Log (${list.length})</span>
+              <span class="text-[11px] text-slate-400">Automatically filtered out by Midway AI &amp; guards — optional 5s sanity check</span>
+            </div>
+            <span class="text-[11px] font-semibold text-blue-400 shrink-0">${AI_FILTERED_LOG_OPEN ? "Hide" : "Inspect"}</span>
+          </button>
+          ${AI_FILTERED_LOG_OPEN ? `
+            <div class="border-t border-slate-800 divide-y divide-slate-800/80 max-h-72 overflow-y-auto bg-slate-950/60">
+              ${list.map(r => `
+                <div class="px-3.5 py-2 flex flex-wrap items-center justify-between gap-2">
+                  <div class="min-w-0 flex-1">
+                    <div class="font-semibold text-slate-200 truncate"><span class="text-slate-400 font-mono text-[10px] mr-1">[${escapeHtmlSafe(r.country || "TR")}]</span>${escapeHtmlSafe(r.title || r.id)} <span class="text-slate-400 font-normal">&middot; ${escapeHtmlSafe(r.company || "")}</span></div>
+                    <div class="text-[11px] text-amber-300/90 truncate">${escapeHtmlSafe(r.reason || "Filtered by Midway AI")}</div>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-300 text-[11px] font-semibold">Open &nearr;</a>` : ""}
+                    <button type="button" onclick="unrejectAiFilteredJob('${String(r.id).replace(/'/g, "\\'")}')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold cursor-pointer" title="Remove from AI rejection cache">Unblock</button>
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          ` : ""}
+        </div>
+      `;
+    }
+
     function renderRadarList() {
       renderTodayActionStrip();
+      renderAiFilteredLog();
       const container = document.getElementById("radarList");
       if (!container) return;
       const pool = getVisibleRadarPool();
