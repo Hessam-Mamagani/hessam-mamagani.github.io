@@ -144,8 +144,8 @@
         <button type="button" id="themeToggleBtn" onclick="toggleThemeMode()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Switch Dark / Light Theme">
           ☀️ Light
         </button>
-        <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v2 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
-          📄 My v2 CVs
+        <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v3 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
+          📄 My v3 CVs
         </button>
         <button type="button" onclick="openCopilotDrawer(null)" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Open Full-Context Career, Legal, Salary & Interview Copilot (Synced via Cloudflare D1)">
           <span>🤖 Ask Copilot</span>
@@ -262,7 +262,7 @@
         <div class="lg:col-span-5">
           <div id="inspectorPanel" class="glass rounded-xl p-5 sticky top-20 max-h-[82vh] overflow-y-auto">
             <p class="text-sm text-slate-400 text-center py-12">
-              👈 Select <strong>"Inspect"</strong> on any job card to view its full description, 2027 salary band, recommended v2 CV, and AI Copilot.
+              👈 Select <strong>"Inspect"</strong> on any job card to view its full description, 2027 salary band, recommended v3 CV, and AI Copilot.
             </p>
           </div>
         </div>
@@ -364,7 +364,7 @@
       <div class="glass rounded-xl p-3.5 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <button type="button" onclick="setResourceHubSection('cvs')" id="hubBtn-cvs" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition cursor-pointer">
-            📄 My v2 CVs, Kariyer.net &amp; Copy Templates
+            📄 My v3 CVs, Kariyer.net &amp; Copy Templates
           </button>
           <button type="button" onclick="setResourceHubSection('interview')" id="hubBtn-interview" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
             🎤 5-Min Live Demo &amp; 36 Interview Q&amp;As
@@ -375,13 +375,13 @@
         </button>
       </div>
 
-      <!-- Sub-Section A: v2 CVs, Kariyer.net & Copy Templates -->
+      <!-- Sub-Section A: v3 CVs, Kariyer.net & Copy Templates -->
       <div id="tab-vault" class="space-y-5">
         <div id="v2CvKitPanel" class="glass rounded-xl p-5 border border-slate-800"></div>
 
         <div class="glass rounded-xl p-5 border border-slate-800">
           <h2 class="text-sm font-bold text-white mb-1">🚀 Kariyer.net — 1-Click Fresh Searches (Select "Son 3 Gün" in Left Sidebar)</h2>
-          <p class="text-xs text-slate-400 mb-3">Opens directly in your browser — attach your Turkish v2 CV + Pilz GM Reference PDF (`Hessam_Mamagani_CV_TR_ve_Referans.pdf`) on Turkish portals.</p>
+          <p class="text-xs text-slate-400 mb-3">Opens directly in your browser — attach your Turkish v3 CV + Pilz GM Reference PDF (`Hessam_Mamagani_CV_ve_Referans_TR.pdf`) on Turkish portals.</p>
           <div class="flex flex-wrap gap-2">
             <a href="https://www.kariyer.net/is-ilanlari?kw=.net%20core" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 .NET Core</a>
             <a href="https://www.kariyer.net/is-ilanlari?kw=full%20stack%20developer" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium">🔗 Full Stack</a>
@@ -563,13 +563,13 @@
     </div>
   </div>
 
-  <!-- 1-Click v2 Optimized CV Kit Modal (Accessible from any tab on Laptop & Mobile) -->
+  <!-- 1-Click v3 Optimized CV Kit Modal (Accessible from any tab on Laptop & Mobile) -->
   <div id="cvQuickModal" onclick="if(event.target===this)closeCvModal()" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="glass rounded-2xl p-5 md:p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-indigo-500/40 shadow-2xl space-y-4">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">📄 v2 OPTIMIZED CV KIT · VISA &amp; WORK PERMIT FOCUSED</span>
-          <h3 class="text-base md:text-lg font-bold text-white mt-1">Full-Contact v2 CVs + Wet-Ink Signed Pilz GM Reference</h3>
+          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">📄 v3 OPTIMIZED CV KIT · VISA &amp; WORK PERMIT FOCUSED</span>
+          <h3 class="text-base md:text-lg font-bold text-white mt-1">Full-Contact v3 CVs + Wet-Ink Signed Pilz GM Reference</h3>
           <p class="text-xs text-slate-400 mt-0.5">Served privately via JobRadar (includes <code class="text-emerald-300">+90 539 229 4251</code> &amp; signed Pilz GM letters — never exposed publicly on GitHub Pages).</p>
         </div>
         <button type="button" onclick="closeCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/40 text-slate-200 text-xs font-bold cursor-pointer">✕ Close</button>
@@ -1190,8 +1190,8 @@
         text: `TR (Gold Global — Unambiguous Kurumsal Portal):\n[İsim] Hanım/Bey merhaba, bağlantımı kabul ettiğiniz için teşekkür ederim.\n\nKurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.\n\nKariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; [Şirket] bünyesinde uygun Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi fırsatları olursa değerlendirilmekten ya da ilgili kişiye yönlendirilmekten memnuniyet duyarım.\n\nGüncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/\n\n---\nEN (EU / UK / Global Connections):\nHi [Name], thanks for accepting my connection.\n\nI am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.\n\nFor my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities at [Company], I would appreciate being considered or pointed to the right hiring lead.\n\nMy updated CV and a signed reference letter from our General Manager are attached.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`
       },
       {
-        title: "Links & Direct v2 CV Downloads (Portfolio + JobRadar)",
-        text: "GitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/\nPortfolio: https://hessam-mamagani.github.io/\nLive System 1 (PilzPortal): https://pilztr.online/portal\nLive System 2 (EvenTracer): https://eventracer.com/en\nLive System 3 (InsightfulAI): https://insightfulai.online\nPublic Portfolio EN CV (2p, Phone Omitted): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_EN.pdf\nPublic Portfolio TR CV (2p, Phone Omitted): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_TR.pdf\n(Use the '📄 My v2 CVs' bar above to download your Full-Contact 2-page & 3-page + Pilz GM Reference PDFs!)"
+        title: "Links & Direct v3 CV Downloads (Portfolio + JobRadar)",
+        text: "GitHub: https://github.com/Hessam-Mamagani\nLinkedIn: https://www.linkedin.com/in/hessam-mamagani/\nPortfolio: https://hessam-mamagani.github.io/\nLive System 1 (PilzPortal): https://pilztr.online/portal\nLive System 2 (EvenTracer): https://eventracer.com/en\nLive System 3 (InsightfulAI): https://insightfulai.online\nPublic Portfolio EN CV (2p, Phone Omitted): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_EN.pdf\nPublic Portfolio TR CV (2p, Phone Omitted): https://hessam-mamagani.github.io/cv/Hessam_Mamagani_CV_TR.pdf\n(Use the '📄 My v3 CVs' bar above to download your Full-Contact 2-page & 3-page + Pilz GM Reference PDFs!)"
       },
       {
         title: "Production Web App Summary (2–3 Sentences)",
@@ -1217,7 +1217,7 @@
         fileName: "Hessam_Mamagani_CV_ve_Referans_TR.pdf",
         badge: "🇹🇷 PRIMARY TÜRKİYE · 3 PAGES",
         badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-        title: "Turkish v2 CV + Signed Pilz GM Letter",
+        title: "Turkish v3 CV + Signed Pilz GM Letter",
         desc: "Best for Kariyer.net, Turkish R&D/Teknopark portals, HR emails & LinkedIn DMs in Türkiye (includes General Manager Ali Yavuz Çopur's wet-ink Turkish letter).",
       },
       {
@@ -1225,7 +1225,7 @@
         fileName: "Hessam_Mamagani_CV_TR.pdf",
         badge: "🇹🇷 STRICT ATS · 2 PAGES",
         badgeClass: "bg-teal-500/20 text-teal-200 border-teal-500/40",
-        title: "Turkish v2 Standalone ATS CV",
+        title: "Turkish v3 Standalone ATS CV",
         desc: "Clean 2-page single-column Turkish ATS CV (with photo & full contact) for strict Turkish forms that ask for CV without attachments.",
       },
       {
@@ -1233,7 +1233,7 @@
         fileName: "Hessam_Mamagani_CV_and_Reference_EN.pdf",
         badge: "🇬🇧 EU/UK VISA + REF · 3 PAGES",
         badgeClass: "bg-indigo-500/20 text-indigo-200 border-indigo-500/40",
-        title: "English v2 CV + Signed Pilz GM Letter",
+        title: "English v3 CV + Signed Pilz GM Letter",
         desc: "Best for direct emails & LinkedIn DMs to IE/DE/NL/UK visa sponsors & global tech hubs in Istanbul (includes official English Pilz GM recommendation letter).",
       },
       {
@@ -1241,7 +1241,7 @@
         fileName: "Hessam_Mamagani_CV_EN.pdf",
         badge: "🇬🇧 GLOBAL ATS · 2 PAGES",
         badgeClass: "bg-blue-500/20 text-blue-200 border-blue-500/40",
-        title: "English v2 Standalone ATS CV",
+        title: "English v3 Standalone ATS CV",
         desc: "Photo-free, 100% single-column Workday / Greenhouse / Lever / LinkedIn Easy Apply ATS CV with ANABIN H+ & EU Blue Card / Critical Skills readiness.",
       },
     ];
@@ -4033,7 +4033,7 @@
             tag: "⏳ Finish Portal",
             company: item.company,
             role: item.cleanRole || item.role,
-            reason: "External portal opened — complete submission & attach v2 CV",
+            reason: "External portal opened — complete submission & attach v3 CV",
             btnLabel: "↗ Finish Portal",
             href: item.jobUrl,
             itemId: item.id
@@ -4888,7 +4888,7 @@
           <div class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5 text-xs">
             <div><strong class="text-slate-300">🏛️ Company Tier:</strong> <span class="text-cyan-300 font-semibold">${escapeHtmlSafe(smartMeta.tierLabel)}</span> <span class="text-slate-400">(${escapeHtmlSafe(smartMeta.hiringSpeed)})</span></div>
             <div class="flex flex-wrap items-center gap-2">
-              <span><strong class="text-slate-300">📄 Recommended v2 CV:</strong> <span class="text-emerald-300 font-semibold">${escapeHtmlSafe(recommendedCvFile)}</span></span>
+              <span><strong class="text-slate-300">📄 Recommended v3 CV:</strong> <span class="text-emerald-300 font-semibold">${escapeHtmlSafe(recommendedCvFile)}</span></span>
               <a href="${getCvUrl(isTrPitch ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px]">📥 Download ${isTrPitch ? 'TR+Ref (3p)' : 'EN ATS (2p)'}</a>
               <a href="${getCvUrl(isTrPitch ? 'tr' : 'en_ref', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-[11px]">📥 ${isTrPitch ? 'TR Only (2p)' : 'EN+Ref (3p)'}</a>
             </div>
@@ -5357,8 +5357,8 @@
         kitEl.innerHTML = `
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
             <div>
-              <h2 class="text-base font-bold text-white">📄 My v2 Optimized CVs — Full Contact + Signed Pilz GM Letter (Laptop &amp; Mobile)</h2>
-              <p class="text-xs text-slate-400">Your v1 originals are safely archived in <code class="text-slate-300">documents_v1_backup/</code>. No-visa remote contractor CVs are removed so every application targets real Work Permit / Visa sponsors.</p>
+              <h2 class="text-base font-bold text-white">📄 My v3 Optimized CVs — Full Contact + Signed Pilz GM Letter (Laptop &amp; Mobile)</h2>
+              <p class="text-xs text-slate-400">Your v1 &amp; v2 archives are safely preserved in <code class="text-slate-300">documents_v1_backup/</code> and <code class="text-slate-300">documents_v2_backup/</code>. No-visa remote contractor CVs are removed so every application targets real Work Permit / Visa sponsors.</p>
             </div>
           </div>
           ${renderV2CvCardsHtml()}
@@ -7534,7 +7534,7 @@
         ? {
             badge: "STEP 1 OF 3 · APPLY FIRST",
             color: "border-blue-500/40 bg-blue-950/30 text-blue-200",
-            text: `You haven't applied to an open role at ${cleanComp} yet. Click "🔍 Find Open Jobs on LinkedIn (${countryLabel})" below, apply with your recommended v2 CV, and check "🌐 Apply" above.`
+            text: `You haven't applied to an open role at ${cleanComp} yet. Click "🔍 Find Open Jobs on LinkedIn (${countryLabel})" below, apply with your recommended v3 CV, and check "🌐 Apply" above.`
           }
         : (!ch.techDm && !ch.hrDm)
         ? {
@@ -7569,13 +7569,13 @@
 
           ${renderRolesSummaryHtml(item)}
 
-          <!-- STEP 1: FIND OPEN JOB, APPLY & DOWNLOAD RECOMMENDED v2 CV -->
+          <!-- STEP 1: FIND OPEN JOB, APPLY & DOWNLOAD RECOMMENDED v3 CV -->
           <div class="pipe-drawer-step p-3.5 rounded-xl border space-y-2.5">
             <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span class="text-xs font-bold text-white block">1️⃣ Step 1 — Find Open Role &amp; Apply (${cMeta.flag} ${countryLabel})</span>
                 <span class="text-[11px] text-slate-400">
-                  Recommended CV: <strong class="text-emerald-300">${smart.cvCode === 'TR' ? 'Turkish v2 + Pilz GM Letter (3p)' : 'English v2 ATS CV (2p)'}</strong>
+                  Recommended CV: <strong class="text-emerald-300">${smart.cvCode === 'TR' ? 'Turkish v3 + Pilz GM Letter (3p)' : 'English v3 ATS CV (2p)'}</strong>
                   &middot; Quote: <strong class="text-amber-300">${escapeHtmlSafe(smart.salaryBand)}</strong>
                 </span>
               </div>
@@ -8042,7 +8042,7 @@
                <strong class="text-emerald-300">📧 Ready-to-Send Email Queue (${filtered.length} Verified Inboxes)</strong>
                <span class="text-slate-300 ml-1">— Priority sorted top-to-bottom: <strong>1) 🔥 Hot Signals</strong> &rarr; <strong>2) 👤 Named Recruiter Emails</strong> &rarr; <strong>3) ⚡ Fast Teknopark &amp; German Sponsors</strong> &rarr; <strong>4) 📬 Other Applied</strong> &rarr; <strong>5) 🏢 Proactive Giants</strong> (Agencies last).</span>
              </div>
-             <span class="text-[11px] text-amber-300 font-semibold">Click ✉️ Email &rarr; Attach v2 CV+Ref PDF &rarr; Tick 📧 Email!</span>
+             <span class="text-[11px] text-amber-300 font-semibold">Click ✉️ Email &rarr; Attach v3 CV+Ref PDF &rarr; Tick 📧 Email!</span>
            </div>`
         : "";
 
@@ -9041,7 +9041,7 @@
       if (subEl) {
         const baseSub = ctx
           ? (ctx.subtitle || "")
-          : "Knows your v1 vs v2 CVs, 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas & live D1 CRM.";
+          : "Knows your v3 CVs (and v1/v2 archives), 5 live platforms, Dec 31 permit & Pilz payout math, 2027 140K+ floor, ÇSGB Muafiyeti, EU visas & live D1 CRM.";
         subEl.textContent = `${baseSub} · 🧠 Thread Memory: ${history.length} turn(s) synced`;
       }
       if (!history.length) {
@@ -9050,7 +9050,7 @@
             <div class="font-bold text-emerald-300 text-sm">👋 Multi-Agent Orchestrator Ready, Hessam.</div>
             <div class="flex flex-wrap gap-1.5 text-[10px]">
               <span class="px-2 py-0.5 rounded bg-slate-950 border border-cyan-500/40 text-cyan-300 font-semibold">🧠 Main Orchestrator (Full Thread Memory)</span>
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-emerald-500/40 text-emerald-300 font-semibold">📂 v2 CV &amp; Codebase Vault Agent</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-emerald-500/40 text-emerald-300 font-semibold">📂 v3 CV &amp; Codebase Vault Agent</span>
               <span class="px-2 py-0.5 rounded bg-slate-950 border border-amber-500/40 text-amber-300 font-semibold">🗄️ D1 CRM &amp; Live DNS Tool Agent</span>
               <span class="px-2 py-0.5 rounded bg-slate-950 border border-indigo-500/40 text-indigo-300 font-semibold">🌐 Live Web &amp; LinkedIn Research Subagent</span>
             </div>
@@ -9058,7 +9058,7 @@
             <ul class="list-disc pl-5 space-y-1 text-slate-400">
               <li>Paste a job description or tough application portal question for a ready-to-copy answer</li>
               <li>Ask follow-up edits (<code class="text-slate-200">"make it shorter"</code>, <code class="text-slate-200">"translate that to Turkish"</code>, <code class="text-slate-200">"check their CTO on the net"</code>)</li>
-              <li>Ask which exact <code class="text-slate-200">v2</code> CV file &amp; 2027 salary band to use for any country</li>
+              <li>Ask which exact <code class="text-slate-200">v3</code> CV file &amp; 2027 salary band to use for any country</li>
               <li>Practice any C#/.NET, SQL, React, or System Design interview topic interactively</li>
             </ul>
           </div>
@@ -9122,7 +9122,7 @@
           `<div id="copilotOrchestratorPending" class="p-3 rounded-xl bg-slate-900/95 border border-cyan-500/40 mr-3 space-y-1.5 animate-pulse">
             <div class="text-[11px] font-bold text-cyan-300">🧠 Main Orchestrator active (${priorHistory.length} prior turns in memory)...</div>
             <div class="flex flex-wrap gap-1.5 text-[10px] text-slate-300">
-              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">📂 Checking v2 CV &amp; Codebase Vault</span>
+              <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">📂 Checking v3 CV &amp; Codebase Vault</span>
               <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🗄️ Querying D1 CRM &amp; DNS</span>
               <span class="px-2 py-0.5 rounded bg-slate-950 border border-slate-700">🌐 Running Web &amp; LinkedIn Research Subagent</span>
             </div>
