@@ -1,5 +1,5 @@
 import React from "react";
-import { Mail, Github, Linkedin, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Github, Linkedin, MapPin, Globe, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
@@ -30,10 +30,10 @@ export default function Contact() {
     {
       icon: MessageCircle,
       label: "WhatsApp",
-      value: "+90 539 229 4251",
-      href: "https://wa.me/905392294251?text=Hi%20Hessam%2C%20I%20found%20your%20portfolio%20and%20would%20like%20to%20connect.",
+      value: "@hessam.mamagani",
+      href: "https://wa.me/hessam.mamagani",
       color: "bg-green-50 text-green-600 hover:bg-green-100",
-      description: "Quick response guaranteed",
+      description: "@hessam.mamagani · Quick response",
     },
     {
       icon: Linkedin,
@@ -54,8 +54,8 @@ export default function Contact() {
   ];
 
   const infoItems = [
-    { icon: MapPin, text: "Istanbul, Turkey" },
-    { icon: MapPin, text: "Istanbul, Türkiye · Open to Remote & Relocation" },
+    { icon: MapPin, text: "Istanbul, Türkiye" },
+    { icon: Globe, text: "Open to Remote & Relocation" },
   ];
 
   return (
@@ -107,7 +107,7 @@ export default function Contact() {
         </div>
 
         <motion.div
-          className="flex justify-center gap-6 text-sm text-gray-500"
+          className="flex flex-wrap justify-center gap-6 text-sm text-gray-500"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
