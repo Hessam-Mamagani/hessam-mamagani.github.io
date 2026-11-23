@@ -291,6 +291,9 @@
             </p>
           </div>
           <div class="flex flex-wrap items-center gap-2 shrink-0">
+            <button type="button" onclick="openCallPriorityQueue()" id="openCallQueueQuickBtn" class="px-3 py-1.5 rounded-lg text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow transition cursor-pointer" title="Open 35 Pure-Software Call Targets sorted by Priority & Uncalled First">
+              📞 Call Queue (35)
+            </button>
             <div class="flex items-center bg-slate-900 border border-slate-700 rounded-lg p-0.5">
               <button onclick="setPipelineViewMode('compact')" id="pipelineViewBtn-compact" class="px-2.5 py-1 rounded text-xs font-semibold bg-emerald-600 text-white transition cursor-pointer">
                 📋 Outreach List
@@ -302,9 +305,10 @@
                 🃏 Cards
               </button>
             </div>
-            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, location..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
+            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, HR, notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
             <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
               <option value="ALL">All Companies (Top Sponsors First)</option>
+              <option value="CALL_PRIORITY">📞 Call Priority Queue — 35 Pure-Tech Sponsors (Uncalled First)</option>
               <option value="HOT_SIGNALS">🔥 Hot Signals (Invite / CV Downloaded / Viewed)</option>
               <option value="UNFINISHED_PORTAL">⏳ Unfinished External Portals</option>
               <option value="FAST_HIRE_DEC31">⚡ Fast 2–3 Wk Sponsors (Beat Dec 31)</option>
@@ -518,6 +522,14 @@
           <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/analytics/profile-views/')" class="px-3.5 py-2.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-200 font-bold text-xs flex items-center justify-between transition">
             <span>👀 4. Unblurred Recruiter &amp; Profile Views</span>
             <span>↗</span>
+          </button>
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/jobs/search/?f_TPR=r604800&geoId=102424322&keywords=(Sovos%20OR%20VeriPark%20OR%20Softtech%20OR%20%22NTT%20DATA%22%20OR%20Innova%20OR%20SabanciDx%20OR%20%22Do%C4%9Fu%C5%9F%20Teknoloji%22%20OR%20%22Orion%20Innovation%22)%20AND%20(Software%20OR%20Yaz%C4%B1l%C4%B1m%20OR%20.NET%20OR%20Full%20Stack%20OR%20Architect%20OR%20AI)&sortBy=DD')" class="px-3.5 py-2.5 rounded-xl bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-500/50 text-emerald-200 font-bold text-xs flex items-center justify-between transition text-left">
+            <span>🎯 5. Missing Pure-Tech A (Sovos, VeriPark, Softtech, NTT DATA, İnnova, SabancıDx, Doğuş, Orion)</span>
+            <span class="shrink-0 ml-2">↗</span>
+          </button>
+          <button type="button" onclick="launchPremiumTab('https://www.linkedin.com/jobs/search/?f_TPR=r604800&geoId=102424322&keywords=(Hitit%20OR%20Obase%20OR%20Amadeus%20OR%20iyzico%20OR%20PayCore%20OR%20Fineksus%20OR%20%22Mikro%20Yaz%C4%B1l%C4%B1m%22%20OR%20Bimser)%20AND%20(Software%20OR%20Yaz%C4%B1l%C4%B1m%20OR%20.NET%20OR%20Full%20Stack%20OR%20Architect%20OR%20AI)&sortBy=DD')" class="px-3.5 py-2.5 rounded-xl bg-teal-600/25 hover:bg-teal-600/40 border border-teal-500/50 text-teal-200 font-bold text-xs flex items-center justify-between transition text-left">
+            <span>🎯 6. Missing Pure-Tech B (Hitit, Obase, Amadeus, iyzico, PayCore, Fineksus, Mikro, Bimser)</span>
+            <span class="shrink-0 ml-2">↗</span>
           </button>
         </div>
       </div>
@@ -988,6 +1000,25 @@
       if (/\bithinka\b/.test(s)) return "ithinka";
       if (/\bturknet\b/.test(s)) return "turknet";
       if (/\b(bgts|bilge\s*adam)\b/.test(s)) return "bgts";
+      if (/\b(sovos|foriba)\b/.test(s)) return "sovos";
+      if (/\bsofttech\b/.test(s)) return "softtech";
+      if (/\b(innova|i̇nnova|i\u0307nnova)\b/.test(s)) return "innova";
+      if (/\bhitit\b/.test(s)) return "hitit";
+      if (/\bpaycore\b/.test(s)) return "paycore";
+      if (/\bfineksus\b/.test(s)) return "fineksus";
+      if (/\b(mikro yaz\u0131l\u0131m|mikro yazilim|teamsystem)\b/.test(s)) return "mikro";
+      if (/\bbimser\b/.test(s)) return "bimser";
+      if (/\bpeakup\b/.test(s)) return "peakup";
+      if (/\btalentown\b/.test(s)) return "talentown";
+      if (/\bzen\s*talent\b/.test(s)) return "zentalent";
+      if (/\bicterra\b/.test(s)) return "icterra";
+      if (/\b(atp|tradesoft)\b/.test(s)) return "atp";
+      if (/\bagito\b/.test(s)) return "agito";
+      if (/^path(\s|$)|\bpath\s+product|\bpath\s+software/.test(s.trim())) return "path";
+      if (/\b(ntt\s*data|nttdata)\b/.test(s)) return "nttdata";
+      if (/\b(do\u011fu\u015f teknoloji|dogus teknoloji)\b/.test(s)) return "dogus";
+      if (/\b(orion innovation|orioninc|orion\s+turkey)\b/.test(s)) return "orion";
+      if (/\betiya\b/.test(s)) return "etiya";
       const baseWords = s
         .split("(")[0]
         .replace(/\./g, "")
@@ -1070,8 +1101,311 @@
       // UK Skilled Worker Sponsors (#1 - #2)
       wise: 1,
       revolut: 2,
+      // Additional Pure-Software & Teknopark Sponsors
+      sovos: 19,
+      softtech: 21,
+      nttdata: 22,
+      innova: 23,
+      dogus: 25,
+      orion: 26,
+      hitit: 27,
+      bgts: 31,
+      peakup: 32,
+      icterra: 34,
+      atp: 35,
+      tcm: 36,
+      agito: 37,
+      path: 38,
+      paycore: 39,
+      fineksus: 40,
+      mikro: 41,
+      bimser: 42,
       // Turkish EOR Sponsor Only
       deel: 50
+    };
+
+    // 35 Pure-Software / Bank-Tech / FinTech / Teknopark Call Priority Targets (Ranked by Foreign-Hiring Strength & Pure-Tech Fit — Distance Ignored)
+    const CALL_PRIORITY_DIRECTORY = {
+      accenture: {
+        callRank: 1, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902166252000", phoneDisplay: "+90 (216) 625 20 00 / (212) 386 60 00",
+        askFor: "Kübra Turyan (Country HR Mgr) / Esra Aydoğan (IT Recruiter)",
+        askForFirstName: "Kübra Hanım", askForIsPoster: false,
+        whyStrong: "Global MNC + Teknopark İstanbul — routine e-İzin transfers & international software teams",
+        customHook: "Alman Pilz GmbH Türkiye'de sıfırdan kurumsal .NET/React ve AI sistemleri geliştirdim."
+      },
+      adesso: {
+        callRank: 2, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902123462002", phoneDisplay: "+90 (212) 346 20 02",
+        askFor: "Aslı Akyol (People & Culture Leader) / Yazılım İşe Alım",
+        askForFirstName: "Aslı Hanım", askForIsPoster: false,
+        whyStrong: "German enterprise software powerhouse (direct Pilz GmbH synergy) — pure .NET & AI teams",
+        customHook: "Alman Pilz GmbH Türkiye bünyesinde kıdemli .NET ve React mimarı olarak görev yapıyorum; Alman kurumsal yazılım kültürüne tam hakimim."
+      },
+      obss: {
+        callRank: 3, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902166883436", phoneDisplay: "+90 (216) 688 34 36",
+        askFor: "Buket Karakuş (HR Sr Assoc) / Nilay Turgut (HR)",
+        askForFirstName: "Buket Hanım", askForIsPoster: false,
+        whyStrong: "Pure-software İTÜ Teknokent giant (800+ engineers, ÇSGB 5746 quota-exempt permit transfer)",
+        customHook: "İTÜ Teknokent ekibinizdeki .NET Full Stack başvurumla ilgili görüşmek istedim."
+      },
+      architecht: {
+        callRank: 4, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902165859970", phoneDisplay: "+90 (216) 585 99 70",
+        askFor: "Şule Hatun Avşaroğlu (CHRO) / Yazılım İşe Alım",
+        askForFirstName: "Şule Hanım", askForIsPoster: false,
+        whyStrong: "Teknopark İstanbul bank-tech (.NET Core + GenAI) — email bounced, phone call is essential!",
+        customHook: "Teknopark İstanbul'daki Kıdemli .NET/React ve Üretken Yapay Zeka başvurularım için aradım."
+      },
+      logoyazilim: {
+        callRank: 5, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902626798000", phoneDisplay: "+90 (262) 679 80 00",
+        askFor: "Aslıhan Yılmazer (HR Manager) / Yazılım İşe Alım",
+        askForFirstName: "Aslıhan Hanım", askForIsPoster: false,
+        whyStrong: "GOSB Teknopark #1 Turkish ERP & e-Invoice software company — exact SAP/e-Fatura match",
+        customHook: "Pilz Türkiye'de SAP ERP ve GİB e-Fatura entegrasyonlarını sıfırdan .NET ile geliştirdim; Logo'nun ürün mimarisiyle birebir örtüşüyor."
+      },
+      intertech: {
+        callRank: 6, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902166642000", phoneDisplay: "+90 (216) 664 20 00 / (262) 754 14 14",
+        askFor: "Alev Ertürk [Job Poster · HR Asst Mgr] / Yakup Arslan (Sr HRBP)",
+        askForFirstName: "Alev Hanım", askForIsPoster: true,
+        whyStrong: "Teknopark İstanbul 1,500+ bank-tech engineers, heavy .NET Core stack, 3 active applications",
+        customHook: "Alev Hanım'ın paylaştığı Kıdemli Yazılım Mühendisi ilanına başvurumu ilettim; kısa bir değerlendirme için görüşmek isterim."
+      },
+      kocsistem: {
+        callRank: 7, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902165561000", phoneDisplay: "+90 (216) 556 10 00",
+        askFor: "Asena Akbalcılar Aşkın (CHRO) / Teknoloji İşe Alım",
+        askForFirstName: "Asena Hanım", askForIsPoster: false,
+        whyStrong: "Koç Holding pure-tech arm — certified R&D center, massive .NET/Azure/AI engineering teams",
+        customHook: "Kurumsal .NET, Azure ve yapay zeka çözümleri mimarisi başvurum için arıyorum."
+      },
+      peakup: {
+        callRank: 8, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902122660365", phoneDisplay: "+90 (212) 266 03 65",
+        askFor: "Sevdiye Baran Demirci (HR Director) / Teknoloji İşe Alım",
+        askForFirstName: "Sevdiye Hanım", askForIsPoster: false,
+        whyStrong: "Microsoft Solutions Partner (.NET + Azure + AI) — fast pure-software hiring decisions",
+        customHook: "Microsoft .NET, React ve Azure AI stack'iyle kurumsal projeler teslim eden kıdemli bir yazılım mühendisi olarak başvurum için aradım."
+      },
+      bgts: {
+        callRank: 9, wave: "W1", waveLabel: "W1 · Applied Top Sponsor",
+        phone: "+902122859977", phoneDisplay: "+90 (212) 285 99 77 / 444 33 26",
+        askFor: "Simge Güner [Job Poster] / Müjde Kano (HR Mgr · 1st-Deg)",
+        askForFirstName: "Simge Hanım", askForIsPoster: true,
+        whyStrong: "İTÜ Teknokent 1,500+ pure-software delivery center — active .NET Full Stack role + 1st-deg HR",
+        customHook: "Simge Hanım'ın LinkedIn'de yayınladığı Full Stack .NET/React ilanına başvurumla ilgili arıyorum."
+      },
+      talentown: {
+        callRank: 10, wave: "W1", waveLabel: "W1 · IT Recruiter Multiplier",
+        phone: "+902129428210", phoneDisplay: "+90 (212) 942 82 10",
+        askFor: "Neval Toydemir (IT Recruitment Lead) / Mervenur Koç (HRBP)",
+        askForFirstName: "Neval Hanım", askForIsPoster: false,
+        whyStrong: "Specialized IT tech recruiter placing Senior .NET/AI engineers at foreign-friendly tech firms",
+        customHook: "Yabancı uyruklu kıdemli mühendisleri hızlı yerleştirebilen teknoloji müşterilerinizdeki .NET/React/AI rolleri için görüşmek isterim."
+      },
+      zentalent: {
+        callRank: 11, wave: "W1", waveLabel: "W1 · IT Recruiter Multiplier",
+        phone: "+905305165013", phoneDisplay: "+90 (530) 516 50 13",
+        askFor: "Ahmet Utku Yavuz [Job Poster · IT Tech Recruiter]",
+        askForFirstName: "Utku Bey", askForIsPoster: true,
+        whyStrong: "Direct mobile to specialized IT tech recruiter placing into global/Istanbul engineering teams",
+        customHook: "LinkedIn'de paylaştığınız kıdemli yazılım ilanınızla ilgili doğrudan aradım; aktif çalışma iznimle hızlı geçiş yapabilirim."
+      },
+      commencis: {
+        callRank: 12, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902122761040", phoneDisplay: "+90 (212) 276 10 40",
+        askFor: "Sena Altıner [Job Poster · Lead TA] / Eda Nur Sakallı (HRBP)",
+        askForFirstName: "Sena Hanım", askForIsPoster: true,
+        whyStrong: "İTÜ Teknokent elite engineering house building global banking & aviation cloud platforms",
+        customHook: "Sena Hanım'ın yayınladığı kıdemli yazılım ilanıyla ilgili arıyorum."
+      },
+      token: {
+        callRank: 13, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902129428888", phoneDisplay: "+90 (212) 942 88 88",
+        askFor: "Şule Bayındır [Job Poster] / Gamze Demir (HRBP)",
+        askForFirstName: "Şule Hanım", askForIsPoster: true,
+        whyStrong: "Koç Holding global fintech expanding across Europe — modern high-scale payment teams",
+        customHook: "Şule Hanım'ın LinkedIn'de paylaştığı yazılım ilanına yaptığım başvuru hakkında aradım."
+      },
+      icterra: {
+        callRank: 14, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902162253345", phoneDisplay: "+90 (216) 225 33 45",
+        askFor: "Aslı Aygün Vardar [Job Poster · 3 roles] / Merve Savan Öztürk [Job Poster · AI]",
+        askForFirstName: "Aslı Hanım", askForIsPoster: true,
+        whyStrong: "International R&D software house (ex-Siemens roots, European engineering standards)",
+        customHook: "Aslı Hanım'ın paylaştığı Full-Stack ve Yapay Zeka mühendisliği ilanlarınız için aradım."
+      },
+      atp: {
+        callRank: 15, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902123106500", phoneDisplay: "+90 (212) 310 65 00",
+        askFor: "İrem Şengün Akdoğan (Senior IT Recruiter)",
+        askForFirstName: "İrem Hanım", askForIsPoster: false,
+        whyStrong: "BIST-listed pure-software company (fintech, capital markets & global enterprise cloud)",
+        customHook: "Kıdemli .NET/React ve kurumsal yazılım mimarisi başvurum hakkında görüşmek istedim."
+      },
+      hepsiburada: {
+        callRank: 16, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902123555050", phoneDisplay: "+90 (212) 355 50 50 / (212) 381 52 00",
+        askFor: "Burcu Bağ Tuğ [Job Poster] / Zeynep Tuba Şen (TA Mgr)",
+        askForFirstName: "Burcu Hanım", askForIsPoster: true,
+        whyStrong: "NASDAQ tech giant with international CTO (proves foreign hiring!) — email bounced, call!",
+        customHook: "Burcu Hanım'ın paylaştığı Kıdemli .NET / Platform Mühendisliği ilanına başvurumu ilettim."
+      },
+      tcm: {
+        callRank: 17, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902165742250", phoneDisplay: "+90 (216) 574 22 50",
+        askFor: "Bülent Sözge [Job Poster · AI] / Gizemnur Masalı (HR) / Dilara Dağdelen Gezer (1st-Deg)",
+        askForFirstName: "Gizemnur Hanım", askForIsPoster: true,
+        whyStrong: "Certified R&D software house (.NET + AI/LLM) with 1st-degree HRBP connection",
+        customHook: "Bülent Bey'in AI/LLM ilanına ve .NET yazılım rollerinize yaptığım başvuru için aradım."
+      },
+      agito: {
+        callRank: 18, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+902122869969", phoneDisplay: "+90 (212) 286 99 69",
+        askFor: "İlayda Altındal [Job Poster · Sr HR] / Sebahat Babataş (HR Mgr)",
+        askForFirstName: "İlayda Hanım", askForIsPoster: true,
+        whyStrong: "Pure-software insurtech/fintech leader in Maslak with heavy .NET Core product stack",
+        customHook: "İlayda Hanım'ın paylaştığı kıdemli yazılım ilanına yaptığım başvuru hakkında aradım."
+      },
+      path: {
+        callRank: 19, wave: "W2", waveLabel: "W2 · Applied Pure-Tech",
+        phone: "+905362402424", phoneDisplay: "+90 (536) 240 24 24",
+        askFor: "Aydan Ece Hatipoğlu (People Experience Lead)",
+        askForFirstName: "Aydan Hanım", askForIsPoster: false,
+        whyStrong: "Modern pure-software product studio with direct People Lead phone contact",
+        customHook: "Kıdemli Full-Stack (.NET/React/AI) yazılım başvurumla ilgili kısa bir ön görüşme rica ediyorum."
+      },
+      sovos: {
+        callRank: 20, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902129090700", phoneDisplay: "+90 (212) 909 07 00",
+        askFor: "İnsan Kaynakları — Yazılım İşe Alım Ekibi (People & Culture)",
+        askForFirstName: "", askForIsPoster: false,
+        whyStrong: "US global tax/e-Invoice SaaS leader (ex-Foriba) — you literally built Sovos API integrations at Pilz!",
+        customHook: "Alman Pilz Türkiye'de Sovos e-Fatura ve SAP entegrasyonlarını .NET ile bizzat geliştirdim; İstanbul yazılım ekibinizdeki kıdemli pozisyonlar için görüşmek isterim."
+      },
+      veripark: {
+        callRank: 21, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902122852234", phoneDisplay: "+90 (212) 285 22 34",
+        askFor: "Dilan Barutçuoğlu (Head of People & Culture) / .NET İşe Alım",
+        askForFirstName: "Dilan Hanım", askForIsPoster: false,
+        whyStrong: "Global Microsoft/.NET financial software leader in İTÜ Teknokent (offices in UK, DE, NL)",
+        customHook: "İTÜ Teknokent ekibinizdeki kıdemli .NET, Azure ve kurumsal çözüm mimarisi pozisyonları hakkında bilgi almak için aradım."
+      },
+      softtech: {
+        callRank: 22, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+908502906000", phoneDisplay: "0850 290 60 00 / (216) 316 30 00",
+        askFor: "Aslı Abacı (HR Director) / Teknoloji İşe Alım Ekibi",
+        askForFirstName: "Aslı Hanım", askForIsPoster: false,
+        whyStrong: "İş Bankası pure-tech giant (1,600+ engineers, US/EU offices) — top enterprise engineering culture",
+        customHook: "Kıdemli .NET, React ve kurumsal yapay zeka mimarı olarak Softtech yazılım ekiplerindeki açık roller için aradım."
+      },
+      nttdata: {
+        callRank: 23, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902166000500", phoneDisplay: "+90 (216) 600 05 00",
+        askFor: "Selin Bakaçhan (TR & MENA People & Culture Dir) / Teknoloji İşe Alım",
+        askForFirstName: "Selin Hanım", askForIsPoster: false,
+        whyStrong: "Global Japanese-German SAP & Microsoft enterprise tech giant — direct Pilz SAP synergy",
+        customHook: "Alman Pilz Türkiye'de SAP entegrasyonlu kurumsal .NET/React platformları geliştirdim; teknoloji ekiplerinizdeki kıdemli roller için görüşmek isterim."
+      },
+      innova: {
+        callRank: 24, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902123297000", phoneDisplay: "+90 (212) 329 70 00 / (216) 364 73 73",
+        askFor: "Merve Bayülgen (İK Grup Yöneticisi) / Yazılım İşe Alım",
+        askForFirstName: "Merve Hanım", askForIsPoster: false,
+        whyStrong: "1,500+ pure-software engineers, certified R&D centers (Maslak & Ümraniye), .NET & fintech",
+        customHook: "Ar-Ge merkezlerinizdeki kıdemli .NET, React ve kurumsal yazılım mimarisi pozisyonları için aradım."
+      },
+      sabancidx: {
+        callRank: 25, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902165387800", phoneDisplay: "+90 (216) 538 78 00",
+        askFor: "Semin Köseoğlu (CHRO) / İnsan ve Kültür — Teknoloji İşe Alım",
+        askForFirstName: "Semin Hanım", askForIsPoster: false,
+        whyStrong: "Sabancı Holding B2B SaaS, Cloud, SAP & AI powerhouse — high enterprise engineering standards",
+        customHook: "Kurumsal B2B SaaS, .NET/React ve SAP/AI entegrasyon projelerimle SabancıDx yazılım ekiplerindeki kıdemli roller için aradım."
+      },
+      dogus: {
+        callRank: 26, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902123353232", phoneDisplay: "+90 (212) 335 32 32 / (212) 335 48 00",
+        askFor: "Aslı Barış (İK GMY) / Teknoloji İşe Alım Ekibi",
+        askForFirstName: "Aslı Hanım", askForIsPoster: false,
+        whyStrong: "Certified R&D pure-software arm of Doğuş Group (.NET, Azure, SAP & GenAI products)",
+        customHook: "Ar-Ge merkezinizdeki kıdemli .NET, React ve yapay zeka geliştirme pozisyonları için aradım."
+      },
+      orion: {
+        callRank: 27, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902165222100", phoneDisplay: "+90 (216) 522 21 00",
+        askFor: "Özge Günesen (HR Manager) / Talent Acquisition",
+        askForFirstName: "Özge Hanım", askForIsPoster: false,
+        whyStrong: "US global engineering R&D hub in Pendik Teknopark — Greenhouse ATS now auto-tracked!",
+        customHook: "Pendik Ar-Ge merkezinizdeki kıdemli Full-Stack (.NET/React) ve çözüm mimarisi rolleri için aradım."
+      },
+      hitit: {
+        callRank: 28, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902122761500", phoneDisplay: "+90 (212) 276 15 00",
+        askFor: "Figen Dönder (HR Director) / Yazılım İşe Alım",
+        askForFirstName: "Figen Hanım", askForIsPoster: false,
+        whyStrong: "Global aviation SaaS powerhouse in İTÜ Teknokent serving 70+ airlines — international English-first culture",
+        customHook: "İTÜ Teknokent ekibinizdeki kıdemli yazılım mühendisliği ve kurumsal mimari pozisyonları için aradım."
+      },
+      obase: {
+        callRank: 29, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902165273000", phoneDisplay: "+90 (216) 527 30 00 / (212) 328 37 37",
+        askFor: "Emel Güney (HR Director) / Yazılım İşe Alım",
+        askForFirstName: "Emel Hanım", askForIsPoster: false,
+        whyStrong: "İTÜ Teknokent & Ümraniye R&D pure-software house (.NET, BI, enterprise retail & ERP)",
+        customHook: "Kıdemli .NET, SQL ve kurumsal iş zekası / yazılım mimarisi pozisyonlarınız için aradım."
+      },
+      amadeus: {
+        callRank: 30, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902123100700", phoneDisplay: "+90 (212) 310 07 00",
+        askFor: "Istanbul R&D Talent Acquisition / People & Culture",
+        askForFirstName: "", askForIsPoster: false,
+        whyStrong: "450+ international engineers in Torun Center — one of Istanbul's strongest foreign-permit sponsors",
+        customHook: "Istanbul R&D merkezinizdeki kıdemli Full-Stack ve yazılım mimarisi pozisyonları hakkında Talent Acquisition ekibinizle görüşmek isterim."
+      },
+      iyzico: {
+        callRank: 31, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902165990100", phoneDisplay: "+90 (216) 599 01 00",
+        askFor: "Seda Birinci Karatekin (CHRO) / Tech Talent Acquisition",
+        askForFirstName: "Seda Hanım", askForIsPoster: false,
+        whyStrong: "Prosus-owned international payments fintech (Lever ATS auto-tracked!) — global engineering culture",
+        customHook: "Ödeme sistemleri ve yüksek ölçekli kurumsal yazılım ekiplerinizdeki kıdemli mühendislik rolleri için aradım."
+      },
+      paycore: {
+        callRank: 32, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902123283331", phoneDisplay: "+90 (212) 328 33 31",
+        askFor: "İnsan Kaynakları — İTÜ Teknokent Yazılım İşe Alım",
+        askForFirstName: "", askForIsPoster: false,
+        whyStrong: "İTÜ Teknokent global payment-systems software company exporting to 35+ countries",
+        customHook: "İTÜ Teknokent yazılım ekibinizdeki kıdemli backend / full-stack ve finansal yazılım pozisyonları için aradım."
+      },
+      fineksus: {
+        callRank: 33, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902122869870", phoneDisplay: "+90 (212) 286 98 70",
+        askFor: "İnsan Kaynakları — İTÜ Teknokent Yazılım İşe Alım",
+        askForFirstName: "", askForIsPoster: false,
+        whyStrong: "İTÜ Teknokent SWIFT & AML compliance fintech software leader (.NET / enterprise)",
+        customHook: "İTÜ Teknokent'teki kıdemli .NET ve finansal yazılım geliştirme pozisyonlarınız için aradım."
+      },
+      mikro: {
+        callRank: 34, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+908502251010", phoneDisplay: "0850 225 10 10",
+        askFor: "Gökçe Yargan (HR Group Manager) / Yazılım İşe Alım",
+        askForFirstName: "Gökçe Hanım", askForIsPoster: false,
+        whyStrong: "Italian TeamSystem-owned Turkish ERP & e-Fatura software powerhouse — exact .NET/ERP stack!",
+        customHook: "Pilz Türkiye'de SAP ve e-Fatura entegrasyonlu kurumsal .NET/React platformları kurdum; Mikro Yazılım'ın ürün ekiplerindeki kıdemli roller için aradım."
+      },
+      bimser: {
+        callRank: 35, wave: "W3", waveLabel: "W3 · Missing Pure-Tech",
+        phone: "+902623414314", phoneDisplay: "+90 (262) 341 43 14",
+        askFor: "İnsan Kaynakları — Ar-Ge Yazılım İşe Alım Ekibi",
+        askForFirstName: "", askForIsPoster: false,
+        whyStrong: "Certified Teknopark enterprise workflow & ERP software company (.NET + React + AI)",
+        customHook: "Kurumsal iş akışı, .NET ve React mimarisi deneyimiyle Ar-Ge ekibinizdeki kıdemli yazılım pozisyonları için aradım."
+      }
     };
 
     function updateGlobalCountryCounts() {
@@ -2735,6 +3069,175 @@
         officeAndMetro: "📍 İstanbul Merkez Ofis (+90 212 629 60 60)",
         walkInVerdict: "🔥 HOT LEAD: They already downloaded your CV! Call +90 212 629 60 60 tomorrow morning, ask for İnsan Kaynakları (Sema Tongur / Ezgi Eröz), and mention they downloaded your CV for 'İş Uygulamaları Müdürü'."
       },
+      sovos: {
+        domain: "sovos.com",
+        emails: ["careers@sovos.com"],
+        phone: "+90 (212) 909 07 00",
+        ctoAndEngLeads: [
+          { name: "Sovos Türkiye Engineering Leadership", title: "Software Engineering Manager / Architect (.NET & Tax SaaS)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Sovos%20Engineering%20Manager%20Turkey" }
+        ],
+        hrAndRecruiters: [
+          { name: "Sovos Türkiye People & Culture", title: "Talent Acquisition — Istanbul R&D (Ask on Call!)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Sovos%20Talent%20Acquisition%20Turkey" }
+        ],
+        officeAndMetro: "📍 Maslak / İTÜ Teknokent (+90 212 909 07 00)",
+        walkInVerdict: "US multinational e-Invoice/tax-tech giant — pitch that you engineered Pilz Türkiye's Sovos e-Invoice + SAP automation directly!"
+      },
+      veripark: {
+        domain: "veripark.com",
+        emails: ["ik@veripark.com"],
+        phone: "+90 (212) 285 22 34",
+        ctoAndEngLeads: [
+          { name: "VeriPark .NET / Banking Architecture Leadership", title: "Software Development Manager / Solutions Architect", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=VeriPark%20Software%20Development%20Manager%20Istanbul" }
+        ],
+        hrAndRecruiters: [
+          { name: "Dilan Barutçuoğlu", title: "Head of People & Culture — VeriPark", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Dilan%20Barutcuoglu%20VeriPark" }
+        ],
+        officeAndMetro: "🚇 İTÜ-Ayazağa M2 Metro (İTÜ Arı 3 Teknokent, Maslak)",
+        walkInVerdict: "Global Microsoft/.NET financial software leader with UK/DE/NL offices + Teknopark quota-exempt e-İzin."
+      },
+      softtech: {
+        domain: "softtech.com.tr",
+        emails: ["ik@softtech.com.tr"],
+        phone: "0850 290 60 00",
+        ctoAndEngLeads: [
+          { name: "Softtech Software Engineering Leadership", title: "Software Development Director / Architect (İş Bankası Tech)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Softtech%20Yazilim%20Direktoru" }
+        ],
+        hrAndRecruiters: [
+          { name: "Aslı Abacı", title: "İnsan Kaynakları Direktörü — Softtech", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Asli%20Abaci%20Softtech" }
+        ],
+        officeAndMetro: "📍 İTÜ Teknokent / Tuzla Tutum İş Kuleleri (0850 290 60 00)",
+        walkInVerdict: "1,600+ pure-software engineers (İş Bankası Tech) with global hubs in San Francisco & Istanbul."
+      },
+      nttdata: {
+        domain: "nttdata-solutions.com",
+        emails: ["kariyer-tr@nttdata.com"],
+        phone: "+90 (216) 600 05 00",
+        ctoAndEngLeads: [
+          { name: "NTT DATA TR Technology & SAP Leadership", title: "Software & SAP Integration Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=NTT%20DATA%20Business%20Solutions%20Turkey%20Director" }
+        ],
+        hrAndRecruiters: [
+          { name: "Selin Bakaçhan", title: "TR & MENA People & Culture Director — NTT DATA", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Selin%20Bakachan%20NTT%20DATA" }
+        ],
+        officeAndMetro: "📍 Nidakule Ataşehir Kuzey (+90 216 600 05 00)",
+        walkInVerdict: "Global SAP & Microsoft enterprise tech giant — direct synergy with your Pilz GmbH SAP + .NET architecture."
+      },
+      innova: {
+        domain: "innova.com.tr",
+        emails: ["ik@innova.com.tr"],
+        phone: "+90 (212) 329 70 00",
+        ctoAndEngLeads: [
+          { name: "İnnova Yazılım Geliştirme Direktörlüğü", title: "Yazılım Geliştirme & FinTech Direktörü", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Innova%20Bilisim%20Yazilim%20Direktoru" }
+        ],
+        hrAndRecruiters: [
+          { name: "Merve Bayülgen", title: "İnsan Kaynakları Grup Yöneticisi — İnnova Bilişim", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Merve%20Bayulgen%20Innova" }
+        ],
+        officeAndMetro: "📍 Maslak İTÜ Teknokent & Ümraniye Ar-Ge Merkezi (+90 212 329 70 00)",
+        walkInVerdict: "1,500+ pure-software engineers across Maslak & Ümraniye certified R&D centers."
+      },
+      sabancidx: {
+        domain: "sabancidx.com",
+        emails: ["ik@sabancidx.com"],
+        phone: "+90 (216) 538 78 00",
+        ctoAndEngLeads: [
+          { name: "SabancıDx Technology & Cloud Leadership", title: "CTO / Software Engineering Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=SabanciDx%20CTO%20Engineering" }
+        ],
+        hrAndRecruiters: [
+          { name: "Semin Köseoğlu", title: "CHRO — SabancıDx", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Semin%20Koseoglu%20SabanciDx" }
+        ],
+        officeAndMetro: "📍 Üsküdar / Küçük Çamlıca (+90 216 538 78 00)",
+        walkInVerdict: "Sabancı Holding B2B SaaS, Cloud, SAP & AI powerhouse — call and ask for Teknoloji İşe Alım."
+      },
+      dogus: {
+        domain: "d-teknoloji.com.tr",
+        emails: ["ik@d-teknoloji.com.tr"],
+        phone: "+90 (212) 335 32 32",
+        ctoAndEngLeads: [
+          { name: "Doğuş Teknoloji Engineering Leadership", title: "Software Engineering & AI Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Dogus%20Teknoloji%20Software%20Director" }
+        ],
+        hrAndRecruiters: [
+          { name: "Aslı Barış", title: "İnsan Kaynakları GMY — Doğuş Teknoloji", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Asli%20Baris%20Dogus%20Teknoloji" }
+        ],
+        officeAndMetro: "📍 Maslak (Doğuş Center Maslak · +90 212 335 32 32)",
+        walkInVerdict: "Certified R&D pure-software arm of Doğuş Group (.NET, Azure, SAP & GenAI products)."
+      },
+      orion: {
+        domain: "orioninc.com",
+        emails: ["turkey.careers@orioninc.com"],
+        phone: "+90 (216) 522 21 00",
+        ctoAndEngLeads: [
+          { name: "Orion Innovation TR Engineering Leadership", title: "VP / Engineering Director (Pendik R&D)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Orion%20Innovation%20Engineering%20Director%20Turkey" }
+        ],
+        hrAndRecruiters: [
+          { name: "Özge Günesen", title: "HR Manager — Orion Innovation Türkiye", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Ozge%20Gunesen%20Orion%20Innovation" }
+        ],
+        officeAndMetro: "📍 Pendik / Kurtköy Teknopark (+90 216 522 21 00)",
+        walkInVerdict: "US global software R&D center in Teknopark — Greenhouse ATS (orioninnovation) is live-tracked in Radar!"
+      },
+      hitit: {
+        domain: "hititcs.com",
+        emails: ["kariyer@hititcs.com"],
+        phone: "+90 (212) 276 15 00",
+        ctoAndEngLeads: [
+          { name: "Hitit Computer Services Engineering Leadership", title: "VP Engineering / Software Development Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Hitit%20Computer%20Services%20Software%20Director" }
+        ],
+        hrAndRecruiters: [
+          { name: "Figen Dönder", title: "HR Director — Hitit Computer Services", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Figen%20Donder%20Hitit" }
+        ],
+        officeAndMetro: "🚇 İTÜ-Ayazağa M2 Metro (İTÜ Teknokent Arı 2 · +90 212 276 15 00)",
+        walkInVerdict: "Global aviation SaaS exporter (70+ airlines) in İTÜ Teknokent — English-first international teams."
+      },
+      obase: {
+        domain: "obase.com",
+        emails: ["ik@obase.com"],
+        phone: "+90 (216) 527 30 00",
+        ctoAndEngLeads: [
+          { name: "Obase Software & BI Leadership", title: "Software Development Director (.NET / BI)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Obase%20Software%20Development%20Director" }
+        ],
+        hrAndRecruiters: [
+          { name: "Emel Güney", title: "HR Director — Obase", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Emel%20Guney%20Obase" }
+        ],
+        officeAndMetro: "📍 Ümraniye Ar-Ge & İTÜ Teknokent (+90 216 527 30 00)",
+        walkInVerdict: "Pure-software İTÜ Teknokent & Ümraniye R&D (.NET, BI, enterprise retail/ERP)."
+      },
+      iyzico: {
+        domain: "iyzico.com",
+        emails: ["hr@iyzico.com"],
+        phone: "+90 (216) 599 01 00",
+        ctoAndEngLeads: [
+          { name: "iyzico Engineering Leadership", title: "VP of Engineering / CTO", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=iyzico%20VP%20Engineering%20CTO" }
+        ],
+        hrAndRecruiters: [
+          { name: "Seda Birinci Karatekin", title: "CHRO — iyzico (Prosus / PayU)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Seda%20Birinci%20Karatekin%20iyzico" }
+        ],
+        officeAndMetro: "🚇 Altunizade M5 Metro (+90 216 599 01 00)",
+        walkInVerdict: "Prosus-owned global payments fintech — Lever ATS auto-tracked in Radar!"
+      },
+      mikro: {
+        domain: "mikro.com.tr",
+        emails: ["ik@mikro.com.tr"],
+        phone: "0850 225 10 10",
+        ctoAndEngLeads: [
+          { name: "Alpaslan Tomruk", title: "CTO — Mikro Yazılım (TeamSystem TR)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Alpaslan%20Tomruk%20Mikro" }
+        ],
+        hrAndRecruiters: [
+          { name: "Gökçe Yargan", title: "HR Group Manager — Mikro Yazılım", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Gokce%20Yargan%20Mikro" }
+        ],
+        officeAndMetro: "📍 Ataşehir / Küçükbakkalköy (0850 225 10 10)",
+        walkInVerdict: "Italian TeamSystem-owned ERP & e-Fatura software powerhouse (.NET stack!)."
+      },
+      peakup: {
+        domain: "peakup.org",
+        emails: ["ik@peakup.org"],
+        phone: "+90 (212) 266 03 65",
+        ctoAndEngLeads: [
+          { name: "PEAKUP Technology Leadership", title: "CTO / Software Development Lead (.NET & Azure)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=PEAKUP%20Software%20Manager" }
+        ],
+        hrAndRecruiters: [
+          { name: "Sevdiye Baran Demirci", title: "HR Director — PEAKUP", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Sevdiye%20Baran%20Demirci%20PEAKUP" }
+        ],
+        officeAndMetro: "📍 Beşiktaş / Levent (+90 212 266 03 65)",
+        walkInVerdict: "Microsoft Solutions Partner (.NET + Azure + AI) — fast technical hiring."
+      },
       "lc waikiki": {
         domain: "lcwaikiki.com",
         emails: ["hr@lcwaikiki.com", "ik@lcwaikiki.com"],
@@ -3706,7 +4209,8 @@
     function parseClientJobAgeHours(job) {
       if (!job) return 9999;
       const idStr = String(job.id || "").trim();
-      if (/^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
+      const isPrem = /premium|👑/i.test(String(job.postedAgo || "")) || (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("Top Applicant")));
+      if (!isPrem && /^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
       if (job.postedTs && Number(job.postedTs) > 1000000000000) {
         return Math.max(0, (Date.now() - Number(job.postedTs)) / 3600000);
       }
@@ -3776,8 +4280,8 @@
     function isClientAiVerified(job) {
       if (!job) return false;
       if (job.aiEvaluated === true) return true;
-      if (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("AI Matched"))) return true;
-      if (typeof job.aiVerdict === "string" && job.aiVerdict.startsWith("🤖")) return true;
+      if (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("AI Matched") || String(t).includes("Top Applicant"))) return true;
+      if (typeof job.aiVerdict === "string" && (job.aiVerdict.startsWith("🤖") || job.aiVerdict.startsWith("👑"))) return true;
       return false;
     }
 
@@ -4141,7 +4645,9 @@
             <h2 class="text-sm font-bold text-white">☀️ Today's Priority Actions (Next ${actions.length} Concrete Steps)</h2>
             <p class="text-xs text-slate-400">Auto-prioritized from your live D1 applications, hot signals, and fast work-permit sponsors.</p>
           </div>
-          <div class="flex items-center gap-2 text-xs">
+          <div class="flex items-center gap-2 text-xs flex-wrap">
+            <button type="button" onclick="openCallPriorityQueue()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/40 text-amber-200 font-bold cursor-pointer transition">📞 Pure-Tech Call Queue (35)</button>
+            <span class="text-slate-700">&middot;</span>
             <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='UNFINISHED_PORTAL'; renderUnifiedPipeline();" class="text-slate-300 hover:text-white cursor-pointer">⏳ Unfinished Portals</button>
             <span class="text-slate-700">&middot;</span>
             <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='FAST_HIRE_DEC31'; renderUnifiedPipeline();" class="text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">⚡ All Fast Sponsors →</button>
@@ -4532,6 +5038,7 @@
           if (trackCode === "TR") {
             const trRe = /(?:istanbul|i̇stanbul|gebze|kocaeli|türkiye|turkiye|turkey|\btr\b)/i;
             lists = await Promise.all([
+              gh("orioninnovation", "Orion Innovation Turkey", trRe, "🛂 Teknopark Global ATS", "Istanbul, Türkiye"),
               lev("getmidas", "Midas", trRe, "🇹🇷 Tier-1 FinTech ATS", "Istanbul, Türkiye"),
               lev("commencis", "Commencis (İTÜ Teknokent)", trRe, "🛂 Teknokent e-İzin ATS", "Istanbul, Türkiye"),
               lev("iyzico", "iyzico", trRe, "🇹🇷 Tier-1 FinTech ATS", "Istanbul, Türkiye"),
@@ -5227,7 +5734,12 @@
         cvUsed: job.recommendedCvCode || smartMeta.cvCode,
         salaryQuote: job.recommendedSalary || smartMeta.salaryBand,
         url: job.url || `https://www.linkedin.com/jobs/view/${job.id}/`,
-        notes: ""
+        notes: job.hiringPoster ? `Job Poster: ${job.hiringPoster}` : "",
+        ...(job.hiringPoster ? {
+          aiIntel: {
+            hrAndRecruiters: [{ name: job.hiringPoster, title: "LinkedIn Job Poster", linkedinUrl: job.hiringPosterUrl || "" }]
+          }
+        } : {})
       };
 
       if (IS_LOCAL) {
@@ -5643,8 +6155,8 @@
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
         email: "hr@obss.com.tr",
-        phone: "+902122862400",
-        phoneDisplay: "+90 (212) 286 24 00",
+        phone: "+902166883436",
+        phoneDisplay: "+90 (216) 688 34 36",
         address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent No:4/601, Maslak / Sarıyer, İstanbul",
         mapQuery: "İTÜ ARI 3 Teknokent Maslak Sarıyer İstanbul",
         jobUrl: "https://tr.linkedin.com/jobs/view/net-full-stack-developer-at-obss-4431928975",
@@ -5691,8 +6203,8 @@
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Pendik (Teknopark İstanbul)",
         email: "ik@intertech.com.tr",
-        phone: "+902169995000",
-        phoneDisplay: "+90 (216) 999 50 00",
+        phone: "+902166642000",
+        phoneDisplay: "+90 (216) 664 20 00",
         address: "Teknopark İstanbul, Sanayi Mah. Teknopark Bulvarı No:1/1C, Pendik, İstanbul",
         mapQuery: "Intertech Teknopark İstanbul Pendik",
         jobUrl: "https://www.intertech.com.tr/tr-TR/Kariyer",
@@ -5722,9 +6234,9 @@
         role: "Senior Software Architect / Principal Full-Stack Engineer",
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
-        email: "careers@commencis.com",
-        phone: "+902122864400",
-        phoneDisplay: "+90 (212) 286 44 00",
+        email: "hr@commencis.com",
+        phone: "+902122761040",
+        phoneDisplay: "+90 (212) 276 10 40",
         address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent Binası, Maslak / Sarıyer, İstanbul",
         mapQuery: "Commencis İTÜ ARI 3 Maslak Sarıyer İstanbul",
         jobUrl: "https://www.commencis.com/careers/",
@@ -5754,8 +6266,8 @@
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Pendik / Kurtköy (Nidakule / Teknopark)",
         email: "turkey.careers@orioninc.com",
-        phone: "+902165718000",
-        phoneDisplay: "+90 (216) 571 80 00",
+        phone: "+902165222100",
+        phoneDisplay: "+90 (216) 522 21 00",
         address: "Nidakule Kurtköy / Teknopark Bölgesi, Pendik / Kurtköy, İstanbul",
         mapQuery: "Orion Innovation Pendik Kurtköy İstanbul",
         jobUrl: "https://www.orioninc.com/careers/",
@@ -5769,8 +6281,8 @@
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 Maslak (Doğuş Center Maslak)",
         email: "ik@d-teknoloji.com.tr",
-        phone: "+902123354800",
-        phoneDisplay: "+90 (212) 335 48 00",
+        phone: "+902123353232",
+        phoneDisplay: "+90 (212) 335 32 32 / (212) 335 48 00",
         address: "Doğuş Center Maslak, Maslak Mah. Ahi Evran Cad. No:4, Maslak / Sarıyer, İstanbul",
         mapQuery: "Doğuş Center Maslak Sarıyer İstanbul",
         jobUrl: "https://www.dogusteknoloji.com/",
@@ -5784,8 +6296,8 @@
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Üsküdar (Küçük Çamlıca)",
         email: "ik@sabancidx.com",
-        phone: "+902165587700",
-        phoneDisplay: "+90 (216) 558 77 00",
+        phone: "+902165387800",
+        phoneDisplay: "+90 (216) 538 78 00",
         address: "Küçük Çamlıca Mah. Kısıklı Cad. No:56, Üsküdar, İstanbul",
         mapQuery: "SabancıDx Küçük Çamlıca Üsküdar İstanbul",
         jobUrl: "https://www.sabancidx.com/tr/kariyer",
@@ -5829,8 +6341,8 @@
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Ataşehir (Nidakule Ataşehir Kuzey)",
         email: "kariyer-tr@nttdata.com",
-        phone: "+902165473800",
-        phoneDisplay: "+90 (216) 547 38 00",
+        phone: "+902166000500",
+        phoneDisplay: "+90 (216) 600 05 00",
         address: "Nidakule Ataşehir Kuzey, Barbaros Mah. Begonya Sok. No:3, Ataşehir, İstanbul",
         mapQuery: "Nidakule Ataşehir Kuzey Barbaros İstanbul",
         jobUrl: "https://nttdata-solutions.com/tr/kariyer/",
@@ -6038,9 +6550,9 @@
         role: "Lead Software Test Automation / Full-Stack Solutions Engineer",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Pendik (Teknopark İstanbul) / Ataşehir",
-        email: "accenture.turkey@accenture.com",
-        phone: "+902165707000",
-        phoneDisplay: "+90 (216) 570 70 00",
+        email: "kubra.turyan@accenture.com",
+        phone: "+902166252000",
+        phoneDisplay: "+90 (216) 625 20 00 / (212) 386 60 00",
         address: "Teknopark İstanbul, Sanayi Mah., Pendik / Ataşehir Nidakule, İstanbul",
         mapQuery: "Accenture Teknopark İstanbul Pendik",
         jobUrl: "https://www.accenture.com/tr-tr/careers",
@@ -6164,8 +6676,8 @@
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 Maslak (İTÜ Arı 3 Teknokent · M2 Metro)",
         email: "ik@veripark.com",
-        phone: "+902122852290",
-        phoneDisplay: "+90 (212) 285 22 90",
+        phone: "+902122852234",
+        phoneDisplay: "+90 (212) 285 22 34",
         address: "İTÜ Ayazağa Kampüsü Arı 3 Binası, Maslak / Sarıyer, İstanbul",
         mapQuery: "Veripark İTÜ Arı 3 Teknokent Maslak İstanbul",
         jobUrl: "https://www.veripark.com/careers",
@@ -6178,15 +6690,144 @@
         company: "Obase (İTÜ Teknokent)",
         role: "Senior .NET / BI & Enterprise Integration Developer",
         cluster: "CLUSTER_MASLAK",
-        clusterLabel: "📍 Maslak (İTÜ Arı 2 Teknokent · M2 Metro)",
+        clusterLabel: "📍 Ümraniye Ar-Ge / İTÜ Arı 2 Teknokent",
         email: "ik@obase.com",
-        phone: "+902123283737",
-        phoneDisplay: "+90 (212) 328 37 37",
-        address: "İTÜ Ayazağa Kampüsü Arı 2 Binası, Maslak / Sarıyer, İstanbul",
-        mapQuery: "Obase İTÜ Arı 2 Teknokent Maslak İstanbul",
+        phone: "+902165273000",
+        phoneDisplay: "+90 (216) 527 30 00 / (212) 328 37 37",
+        address: "Ümraniye Ar-Ge & İTÜ Ayazağa Kampüsü Arı 2 Binası, İstanbul",
+        mapQuery: "Obase Ümraniye İstanbul",
         jobUrl: "https://www.obase.com/kariyer",
         vipBadge: "⚡ Teknopark R&D · Fast 2-3w Hiring",
         summary: "Enterprise B2B, ERP, and BI analytics software company on .NET, C#, SQL Server, and React in İTÜ Teknokent."
+      },
+      // === 8 ADDED MISSING PURE-SOFTWARE & TEKNOPARK POWERHOUSES ===
+      {
+        rank: 19,
+        id: "VIP-SOVOS",
+        company: "Sovos Türkiye (Foriba)",
+        role: "Senior .NET / e-Invoice & Tax Compliance Software Architect",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak / İTÜ Teknokent (US Global Tax SaaS)",
+        email: "",
+        phone: "+902129090700",
+        phoneDisplay: "+90 (212) 909 07 00",
+        address: "İTÜ Ayazağa Kampüsü / Maslak, Sarıyer, İstanbul",
+        mapQuery: "Sovos Türkiye Maslak İstanbul",
+        jobUrl: "https://www.linkedin.com/jobs/search/?keywords=Sovos&location=Istanbul%2C%20T%C3%BCrkiye",
+        vipBadge: "🌍 US Multinational · Direct Pilz Sovos API Match!",
+        summary: "US global tax/e-Invoice SaaS leader (formerly Foriba). You literally engineered Pilz Türkiye's Sovos e-Invoice + SAP automation from scratch!"
+      },
+      {
+        rank: 21,
+        id: "VIP-SOFTTECH",
+        company: "Softtech (İş Bankası Teknoloji)",
+        role: "Senior Full-Stack (.NET / React) & AI Solutions Architect",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent / Tuzla İş Kuleleri (1,600+ Engineers)",
+        email: "ik@softtech.com.tr",
+        phone: "+908502906000",
+        phoneDisplay: "0850 290 60 00 / (216) 316 30 00",
+        address: "İTÜ Arı Teknokent, Maslak & Tuzla Teknoloji Operasyon Merkezi, İstanbul",
+        mapQuery: "Softtech İTÜ Teknokent İstanbul",
+        jobUrl: "https://softtech.com.tr/kariyer/",
+        vipBadge: "🏦 1,600+ Pure-Software Engineers · Global Hubs",
+        summary: "İş Bankası's pure-software subsidiary with global hubs in San Francisco & Istanbul. Top-tier engineering teams & certified R&D permit support."
+      },
+      {
+        rank: 23,
+        id: "VIP-INNOVA",
+        company: "İnnova Bilişim (Türk Telekom Tech)",
+        role: "Senior .NET / FinTech & Enterprise Solutions Architect",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 Maslak İTÜ Teknokent & Ümraniye Ar-Ge",
+        email: "ik@innova.com.tr",
+        phone: "+902123297000",
+        phoneDisplay: "+90 (212) 329 70 00 / (216) 364 73 73",
+        address: "İTÜ Ayazağa Kampüsü Teknokent, Maslak & Ümraniye Ar-Ge Merkezi, İstanbul",
+        mapQuery: "İnnova Bilişim İTÜ Teknokent İstanbul",
+        jobUrl: "https://www.innova.com.tr/kariyer",
+        vipBadge: "⚡ 1,500+ Engineers · Certified R&D Centers",
+        summary: "1,500+ pure-software engineers building fintech, telecom, and enterprise .NET/cloud platforms across Maslak & Ümraniye R&D centers."
+      },
+      {
+        rank: 27,
+        id: "VIP-HITIT",
+        company: "Hitit Computer Services",
+        role: "Senior Software Engineer / Enterprise Aviation SaaS Architect",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent Arı 2 (Global Aviation SaaS)",
+        email: "kariyer@hititcs.com",
+        phone: "+902122761500",
+        phoneDisplay: "+90 (212) 276 15 00",
+        address: "İTÜ Ayazağa Kampüsü Arı 2 Binası, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Hitit Computer Services İTÜ Teknokent İstanbul",
+        jobUrl: "https://www.hitit.com/careers",
+        vipBadge: "✈️ 70+ Global Airlines · İTÜ Teknokent English-First",
+        summary: "BIST-listed aviation SaaS exporter in İTÜ Teknokent serving 70+ international airlines — strong international English-first engineering culture."
+      },
+      {
+        rank: 39,
+        id: "VIP-PAYCORE",
+        company: "PayCore",
+        role: "Senior Software Engineer / Payment Systems Architect",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (Global Payments Software)",
+        email: "",
+        phone: "+902123283331",
+        phoneDisplay: "+90 (212) 328 33 31",
+        address: "İTÜ Ayazağa Kampüsü Arı Teknokent, Maslak / Sarıyer, İstanbul",
+        mapQuery: "PayCore İTÜ Teknokent Maslak İstanbul",
+        jobUrl: "https://www.linkedin.com/jobs/search/?keywords=PayCore&location=Istanbul%2C%20T%C3%BCrkiye",
+        vipBadge: "💳 İTÜ Teknokent FinTech · 35+ Countries",
+        summary: "Pure-software payment systems provider in İTÜ Teknokent (quota-exempt e-İzin) exporting card & digital payment platforms to 35+ countries."
+      },
+      {
+        rank: 40,
+        id: "VIP-FINEKSUS",
+        company: "Fineksus",
+        role: "Senior .NET / SWIFT & AML FinTech Software Engineer",
+        cluster: "CLUSTER_MASLAK",
+        clusterLabel: "📍 İTÜ Teknokent (SWIFT & AML FinTech)",
+        email: "",
+        phone: "+902122869870",
+        phoneDisplay: "+90 (212) 286 98 70",
+        address: "İTÜ Ayazağa Kampüsü Arı Teknokent, Maslak / Sarıyer, İstanbul",
+        mapQuery: "Fineksus İTÜ Teknokent Maslak İstanbul",
+        jobUrl: "https://www.linkedin.com/jobs/search/?keywords=Fineksus&location=Istanbul%2C%20T%C3%BCrkiye",
+        vipBadge: "🏦 İTÜ Teknokent · SWIFT & AML .NET Stack",
+        summary: "Pure-software SWIFT messaging and anti-money-laundering fintech house in İTÜ Teknokent with strong .NET & international banking clients."
+      },
+      {
+        rank: 41,
+        id: "VIP-MIKRO",
+        company: "Mikro Yazılım (TeamSystem TR)",
+        role: "Senior .NET / ERP & e-Invoice Platform Architect",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Ataşehir (Italian TeamSystem ERP Group)",
+        email: "ik@mikro.com.tr",
+        phone: "+908502251010",
+        phoneDisplay: "0850 225 10 10",
+        address: "Küçükbakkalköy Mah., Ataşehir, İstanbul",
+        mapQuery: "Mikro Yazılım Ataşehir İstanbul",
+        jobUrl: "https://www.linkedin.com/jobs/search/?keywords=%22Mikro%20Yaz%C4%B1l%C4%B1m%22&location=Istanbul%2C%20T%C3%BCrkiye",
+        vipBadge: "🇮🇹 TeamSystem Owned · Exact .NET ERP/e-Fatura Fit",
+        summary: "Acquired by European software giant TeamSystem (Italy). Builds commercial ERP & e-Invoice platforms on .NET — exact fit for your Pilz stack."
+      },
+      {
+        rank: 42,
+        id: "VIP-BIMSER",
+        company: "Bimser",
+        role: "Senior .NET / React Enterprise Workflow & AI Architect",
+        cluster: "CLUSTER_GEBZE",
+        clusterLabel: "📍 Kocaeli Teknopark / Maltepe (Enterprise SaaS)",
+        email: "",
+        phone: "+902623414314",
+        phoneDisplay: "+90 (262) 341 43 14",
+        address: "Kocaeli Üniversitesi Teknopark & Maltepe İstanbul Ofis",
+        mapQuery: "Bimser Teknopark Kocaeli",
+        jobUrl: "https://www.linkedin.com/jobs/search/?keywords=Bimser&location=Istanbul%2C%20T%C3%BCrkiye",
+        vipBadge: "⚡ Teknopark R&D · .NET + React + Enterprise AI",
+        summary: "Certified Teknopark enterprise low-code, workflow, and ERP SaaS vendor exporting globally with heavy .NET Core, React, and AI engineering teams."
       },
       // === 🇮🇪 IRELAND CRITICAL SKILLS VISA SPONSORS (ENGLISH EU · 2YR PR) ===
       {
@@ -6494,9 +7135,110 @@
         hrDm: !!(hrDmAuto || byCo.hrDm || byId.hrDm || byVip.hrDm || byPrimary.hrDm),
         connDm: !!(connAuto || byCo.connDm || byId.connDm || byVip.connDm || byPrimary.connDm),
         callWalk: !!(byCo.callWalk || byCo.called || byCo.walked || byId.callWalk || byId.called || byId.walked || byVip.callWalk || byVip.called || byVip.walked),
+        callDate: byCo.callDate || byId.callDate || byVip.callDate || "",
+        callNote: byCo.callNote || byId.callNote || byVip.callNote || byPrimary.callNote || "",
+        callNoteUpdatedAt: byCo.callNoteUpdatedAt || byId.callNoteUpdatedAt || "",
         emailBlocked: !!(byCo.emailBlocked || byId.emailBlocked || byVip.emailBlocked || byPrimary.emailBlocked || item?.aiIntel?.emailVerification?.bounced),
         blockedEmail: byCo.blockedEmail || byId.blockedEmail || item?.aiIntel?.emailVerification?.bouncedEmail || ""
       };
+    }
+
+    function openCallPriorityQueue() {
+      if (ACTIVE_COUNTRY !== "TR" && ACTIVE_COUNTRY !== "ALL") {
+        setActiveCountry("TR");
+      }
+      switchTab("pipeline");
+      const sel = document.getElementById("pipelineFilter");
+      if (sel) sel.value = "CALL_PRIORITY";
+      if (PIPELINE_VIEW_MODE === "table") {
+        setPipelineViewMode("compact");
+      } else {
+        renderUnifiedPipeline();
+      }
+    }
+
+    function saveCallNote(id, alsoMarkCalled = false) {
+      const strId = String(id);
+      const item = findPipelineItem(strId);
+      if (!item) return;
+      const inputEl = document.getElementById(`callNoteInput-${item.id}`);
+      const noteText = (inputEl ? inputEl.value : "").trim();
+      const st = getPipelineCheckState();
+      const cKey = `co:${item.companyKey || normalizeCompanyKey(item.company)}`;
+      const cur = resolveItemChannels(item, st);
+      const today = new Date().toISOString().slice(0, 10);
+      const updated = {
+        ...cur,
+        callNote: noteText,
+        callNoteUpdatedAt: today,
+        ...(alsoMarkCalled ? { callWalk: true, callDate: cur.callDate || today } : {})
+      };
+      st[cKey] = updated;
+      st[strId] = updated;
+      savePipelineCheckState(st);
+
+      if (IS_LOCAL) {
+        fetch("/api/outreach-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ itemId: cKey, checks: updated })
+        }).catch(() => {});
+      }
+      d1Post("/api/outreach-check", { itemId: cKey, checks: updated });
+
+      // Mirror call note onto primary CRM application row if this company is already in STATE.applied
+      const crmItem = item.primaryCrmId
+        ? STATE.applied.find(a => String(a.id) === String(item.primaryCrmId))
+        : null;
+      if (crmItem) {
+        const cleanedBase = String(crmItem.notes || "").replace(/\s*\|\s*📞 Call Note[^|]*/g, "").replace(/^📞 Call Note[^|]*(\s*\|\s*)?/g, "").trim();
+        const combinedNote = noteText
+          ? (cleanedBase ? `${cleanedBase} | 📞 Call Note (${today}): ${noteText}` : `📞 Call Note (${today}): ${noteText}`)
+          : cleanedBase;
+        crmItem.notes = combinedNote;
+        if (alsoMarkCalled && crmItem.status === "Applied") {
+          crmItem.status = "HR Messaged 💬";
+        }
+        if (IS_LOCAL) {
+          fetch("/api/status", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: crmItem.id, status: crmItem.status, notes: combinedNote })
+          }).catch(() => {});
+        }
+        d1Post("/api/status", { id: crmItem.id, status: crmItem.status, notes: combinedNote });
+        renderCrm();
+      }
+
+      showToast(alsoMarkCalled ? `📞 Marked called & saved note for ${item.company} to D1!` : `📝 Call note saved for ${item.company} to D1!`, true);
+      renderUnifiedPipeline();
+    }
+
+    function buildTurkishCallScript(item) {
+      const cleanComp = item.company.split("(")[0].trim();
+      const cp = item.callPriority || {};
+      const askFirst = cp.askForFirstName || "";
+      const isApplied = item.category === "APPLIED" || item.hasAppliedInCrm;
+      const roleShort = (item.cleanRole || item.role || "Kıdemli Yazılım Mühendisi").split("&")[0].trim();
+
+      const operatorLine = askFirst
+        ? `"Merhaba, iyi günler. Ben Hessam Mamagani. İnsan Kaynakları ekibinden ${askFirst} ile görüşebilir miyim, yoksa teknik işe alım birimine bağlayabilir misiniz?"`
+        : `"Merhaba, iyi günler. Ben Hessam Mamagani. İnsan Kaynakları — yazılım işe alım ekibine bağlayabilir misiniz?"`;
+
+      const hrGreeting = askFirst ? `${askFirst} merhaba, iyi günler.` : `Merhaba, iyi günler.`;
+      const opener = isApplied
+        ? `Ben Hessam Mamagani. ${cleanComp} bünyesindeki ${roleShort} pozisyonunuza başvurumu iletmiştim; 30 saniyenizi alabilir miyim?`
+        : `Ben Hessam Mamagani. ${cleanComp} yazılım ekiplerindeki kıdemli .NET, React ve yapay zeka pozisyonları hakkında 30 saniyenizi alabilir miyim?`;
+      const pitchLine = cp.customHook || `Alman Pilz GmbH Türkiye'de sıfırdan kurumsal .NET, React, SAP ve yapay zeka sistemleri geliştirdim. İstanbul'da yaşıyorum, aktif çalışma iznim mevcut (Teknopark / Ar-Ge geçişi çok hızlı yapılıyor).`;
+      const closeLine = `Müsaitseniz güncel CV'mi ve Genel Müdürümüzün referans mektubunu doğrudan e-posta adresinize iletip 10 dakikalık kısa bir ön görüşme planlayabilir miyiz?`;
+
+      return `1) SANTRAL (Operator):
+${operatorLine}
+
+2) İK / İŞE ALIM (HR / Job Poster — 30 sec):
+"${hrGreeting} ${opener}
+${pitchLine}
+${closeLine}"`;
     }
 
     function togglePipelineCheck(id, field, value) {
@@ -6509,7 +7251,11 @@
         ? resolveItemChannels(item, st)
         : (st[cKey] || { applied: false, email: false, techDm: false, hrDm: false, connDm: false, callWalk: false });
 
-      const updated = { ...currentResolved, [field]: !!value };
+      const updated = {
+        ...currentResolved,
+        [field]: !!value,
+        ...(field === "callWalk" && value ? { callDate: new Date().toISOString().slice(0, 10) } : {})
+      };
       st[cKey] = updated;
       st[strId] = updated;
       savePipelineCheckState(st);
@@ -7001,9 +7747,13 @@
              (isCleanHrEmail(vip?.email) ? vip.email.trim() : "") || "");
         const email = verifiedIntelEmail || crmDirectEmail || savedBestEmail || staticFallbackEmail;
 
-        const rawPhoneDisp = (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
+        const callPriority = countryGroup === "TR" ? (CALL_PRIORITY_DIRECTORY[companyKey] || null) : null;
+        const scrapedPoster = (mergedIntel?.hrAndRecruiters || []).find(p => /poster/i.test(p?.title || ""));
+        const topHrPerson = scrapedPoster || (mergedIntel?.hrAndRecruiters || []).find(p => p?.name && !/recruitment|talent acquisition|insan kaynaklar/i.test(p.name));
+        const derivedAskFor = callPriority?.askFor || (topHrPerson ? `${topHrPerson.name}${topHrPerson.title ? ` (${topHrPerson.title})` : ""}` : "");
+        const rawPhoneDisp = callPriority?.phoneDisplay || (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
         const phoneDisplay = rawPhoneDisp;
-        const phone = primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
+        const phone = callPriority?.phone || primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
         const address = kb?.officeAndMetro || vip?.address || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
         const mapQuery = vip?.mapQuery || `${displayCompany.split("(")[0].trim()} ${address}`;
 
@@ -7060,6 +7810,8 @@
           email,
           phone,
           phoneDisplay,
+          callPriority,
+          askForContact: derivedAskFor,
           address,
           mapQuery,
           jobUrl: (primaryApp?.url && primaryApp.url !== "#") ? primaryApp.url : (vip?.jobUrl || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(displayCompany)}`),
@@ -7627,6 +8379,9 @@
       const copyAcceptedDmKey = registerCopyPayload(`drawer_acc_dm_${item.id}`, acceptedDmText);
       const inviteNoteText = buildUnifiedInviteNote(item, "cto", null);
       const copyInviteNoteKey = registerCopyPayload(`drawer_invite_${item.id}`, inviteNoteText);
+      const showCallPanel = item.countryGroup === "TR" && Boolean(item.callPriority || (item.phone && item.phone !== "Global Remote"));
+      const callScriptText = showCallPanel ? buildTurkishCallScript(item) : "";
+      const copyCallScriptKey = showCallPanel ? registerCopyPayload(`drawer_call_script_${item.id}`, callScriptText) : "";
 
       const nextStepBanner = !ch.applied
         ? {
@@ -7666,6 +8421,59 @@
           </div>
 
           ${renderRolesSummaryHtml(item)}
+
+          ${showCallPanel ? `
+            <!-- STEP 0: DIRECT PHONE CALL, WHO TO ASK FOR & SYNCED CALL NOTES -->
+            <div class="p-3.5 rounded-xl border ${ch.callWalk ? 'border-emerald-500/45 bg-emerald-950/20' : 'border-amber-500/45 bg-amber-950/20'} space-y-3">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs font-extrabold text-amber-300">📞 Direct Call &amp; Switchboard Tracker</span>
+                    ${item.callPriority ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/25 text-amber-200 border border-amber-400/40">Priority #${item.callPriority.callRank} · ${escapeHtmlSafe(item.callPriority.waveLabel)}</span>` : ""}
+                    ${ch.callWalk ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/25 text-emerald-200 border border-emerald-400/40">✅ Called${ch.callDate ? ` (${escapeHtmlSafe(ch.callDate)})` : ""}</span>` : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Not Called Yet</span>`}
+                  </div>
+                  ${item.callPriority?.whyStrong ? `<div class="text-[11px] text-slate-300">${escapeHtmlSafe(item.callPriority.whyStrong)}</div>` : ""}
+                </div>
+                <div class="flex flex-wrap items-center gap-1.5">
+                  ${item.phone ? `<a href="tel:${item.phone}" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs shadow transition">📞 Call ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a>` : ""}
+                  <button type="button" onclick="copyFromStore('${copyCallScriptKey}', this, '📞 Turkish call script copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 font-semibold text-xs cursor-pointer transition">
+                    📋 Copy Call Script
+                  </button>
+                  <button type="button" onclick="togglePipelineCheck('${item.id}', 'callWalk', ${!ch.callWalk})" class="px-3 py-1.5 rounded-lg ${ch.callWalk ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} font-bold text-xs cursor-pointer transition">
+                    ${ch.callWalk ? '↩️ Undo Called' : '✅ Mark Called'}
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                <div class="p-2.5 rounded-lg bg-slate-950/90 border border-slate-800 space-y-1.5">
+                  <div class="text-[11px] font-bold ${item.callPriority?.askForIsPoster ? 'text-amber-300' : 'text-cyan-300'}">
+                    ${item.callPriority?.askForIsPoster ? '🎯 Ask Operator For (LinkedIn Job Poster / HR):' : '👤 Ask Operator For (HR / Talent Acquisition):'}
+                  </div>
+                  <div class="text-xs font-bold text-white">${escapeHtmlSafe(item.askForContact || 'İnsan Kaynakları — Yazılım İşe Alım Ekibi')}</div>
+                  <pre class="text-[11px] text-slate-300 whitespace-pre-wrap font-sans leading-relaxed pt-1 border-t border-slate-800/80">${escapeHtmlSafe(callScriptText)}</pre>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-slate-950/90 border border-slate-800 flex flex-col justify-between gap-2">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between gap-2">
+                      <span class="text-[11px] font-bold text-emerald-300">📝 Call Outcome &amp; Notes (Synced to Cloudflare D1)</span>
+                      ${ch.callNoteUpdatedAt ? `<span class="text-[10px] text-slate-400">Saved ${escapeHtmlSafe(ch.callNoteUpdatedAt)}</span>` : ""}
+                    </div>
+                    <textarea id="callNoteInput-${item.id}" rows="4" placeholder="Example: Operator gave HR ext 214, spoke with Simge Hanım, asked me to email CV to simge@..., callback Friday 14:00..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500">${escapeHtmlSafe(ch.callNote || "")}</textarea>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-1.5 justify-end">
+                    <button type="button" onclick="saveCallNote('${item.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-100 font-bold text-xs cursor-pointer transition">
+                      💾 Save Note
+                    </button>
+                    <button type="button" onclick="saveCallNote('${item.id}', true)" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer transition">
+                      📞 Save Note &amp; Mark Called
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ` : ""}
 
           <!-- STEP 1: FIND OPEN JOB, APPLY & DOWNLOAD RECOMMENDED v3 CV -->
           <div class="pipe-drawer-step p-3.5 rounded-xl border space-y-2.5">
@@ -7845,17 +8653,20 @@
             <div class="flex items-start gap-2.5 flex-1 min-w-[260px]">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
+                  ${item.callPriority ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${item.callPriority.wave === 'W1' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : item.callPriority.wave === 'W2' ? 'bg-blue-500/20 text-blue-200 border border-blue-400/40' : 'bg-teal-500/20 text-teal-200 border border-teal-400/40'}">📞 #${item.callPriority.callRank} · ${item.callPriority.wave === 'W3' ? 'Missing Tech' : item.callPriority.wave}</span>` : ""}
                   <span class="text-sm font-bold text-white hover:text-blue-300 transition">${cMeta.flag} ${item.company}</span>
                   ${statusBadgeHtml}
                   ${item.giantRank ? `<span class="text-[11px] text-amber-300/90 font-semibold">#${item.giantRank} Sponsor</span>` : ""}
                 </div>
                 <p class="text-xs text-slate-300 font-medium truncate max-w-xl mt-0.5">${item.role}</p>
-                <p class="text-[11px] text-slate-400 mt-0.5">
+                <p class="text-[11px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                  ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" onclick="event.stopPropagation()" class="text-amber-300 hover:text-amber-200 font-bold">📞 ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a><span class="text-slate-600">&middot;</span>` : ""}
+                  ${item.askForContact ? `<span class="${item.callPriority?.askForIsPoster ? 'text-amber-200 font-semibold' : 'text-cyan-300 font-medium'}">${item.callPriority?.askForIsPoster ? '🎯 Ask (Job Poster):' : '👤 Ask HR:'} ${escapeHtmlSafe(item.askForContact)}</span><span class="text-slate-600">&middot;</span>` : ""}
                   <span>📍 ${escapeHtmlSafe(locationShort)}</span>
-                  <span class="text-slate-600 mx-1">&middot;</span>
+                  <span class="text-slate-600">&middot;</span>
                   <span>Quote: <strong class="text-amber-300/90 font-medium">${escapeHtmlSafe(smart.salaryBand)}</strong></span>
-                  ${smart.isFastSponsor && !item.isAgency ? `<span class="text-slate-600 mx-1">&middot;</span><span class="text-cyan-300/90">${escapeHtmlSafe(smart.hiringSpeed)}</span>` : ""}
                 </p>
+                ${ch.callNote ? `<p class="text-[11px] text-emerald-300 mt-0.5 truncate max-w-2xl" title="${escapeHtmlSafe(ch.callNote)}">📝 Call Note${ch.callNoteUpdatedAt ? ` (${escapeHtmlSafe(ch.callNoteUpdatedAt)})` : ""}: ${escapeHtmlSafe(ch.callNote)}</p>` : ""}
               </div>
             </div>
 
@@ -8059,6 +8870,7 @@
         } else if (!item.activeRoles?.length && !item.unfinishedPortals?.length && item.rejectedRoles?.length && !item.giantRank) {
           return false;
         }
+        if (filter === "CALL_PRIORITY" && !item.callPriority) return false;
         if (filter === "TOP_GIANTS" && !item.giantRank) return false;
         if (filter === "FAST_HIRE_DEC31" && !(item.smartMeta?.isFastSponsor && !item.isAgency)) return false;
         if (filter === "PENDING_EMAIL") {
@@ -8086,7 +8898,7 @@
           const roleTitles = [...(item.activeRoles || []), ...(item.unfinishedPortals || []), ...(item.rejectedRoles || [])]
             .map(r => `${r.title} ${r.notes || ""}`)
             .join(" ");
-          const haystack = `${item.company} ${item.role} ${roleTitles} ${item.email} ${item.phoneDisplay} ${item.address} ${item.clusterLabel} ${item.summary} ${item.vipBadge || ""} ${leadNames}`.toLowerCase();
+          const haystack = `${item.company} ${item.role} ${roleTitles} ${item.email} ${item.phoneDisplay} ${item.askForContact || ""} ${ch.callNote || ""} ${item.callPriority?.whyStrong || ""} ${item.address} ${item.clusterLabel} ${item.summary} ${item.vipBadge || ""} ${leadNames}`.toLowerCase();
           if (!haystack.includes(q)) return false;
         }
         return true;
@@ -8137,6 +8949,28 @@
         });
       }
 
+      if (filter === "CALL_PRIORITY") {
+        filtered.sort((a, b) => {
+          const aCalled = resolveItemChannels(a, checks).callWalk ? 1 : 0;
+          const bCalled = resolveItemChannels(b, checks).callWalk ? 1 : 0;
+          if (aCalled !== bCalled) return aCalled - bCalled;
+          return (a.callPriority?.callRank || 999) - (b.callPriority?.callRank || 999);
+        });
+      }
+
+      const calledPureTechCount = filter === "CALL_PRIORITY"
+        ? filtered.filter(it => resolveItemChannels(it, checks).callWalk).length
+        : 0;
+      const callQueueBannerHtml = filter === "CALL_PRIORITY"
+        ? `<div class="glass rounded-xl p-3.5 border border-amber-500/45 bg-amber-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2">
+             <div>
+               <strong class="text-amber-300">📞 Pure-Software Call Priority Queue (${filtered.length} Targets · ✅ ${calledPureTechCount} Called · ⏳ ${filtered.length - calledPureTechCount} Left)</strong>
+               <span class="text-slate-300 ml-1">— Distance ignored; ranked strictly by <strong>foreign-hiring strength + pure-software engineering teams</strong>: <strong>W1 (#1–#11 Applied Top Sponsors)</strong> &rarr; <strong>W2 (#12–#19 Applied Pure-Tech)</strong> &rarr; <strong>W3 (#20–#35 Missing Pure-Tech)</strong>.</span>
+             </div>
+             <span class="text-[11px] text-emerald-300 font-semibold">Click any row for Turkish Call Script + D1 Call Notes!</span>
+           </div>`
+        : "";
+
       const emailQueueBannerHtml = filter === "PENDING_EMAIL"
         ? `<div class="glass rounded-xl p-3 border border-emerald-500/40 bg-emerald-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2">
              <div>
@@ -8149,10 +8983,10 @@
 
       if (PIPELINE_VIEW_MODE === "cards") {
         container.className = "space-y-2";
-        container.innerHTML = `${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
+        container.innerHTML = `${callQueueBannerHtml}${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
       } else {
         container.className = "space-y-2";
-        container.innerHTML = emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
+        container.innerHTML = callQueueBannerHtml + emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
       }
     }
     function renderVipChecklist() { renderUnifiedPipeline(); }
@@ -8231,7 +9065,7 @@
       const bmLink = document.getElementById("premiumBookmarkletLink");
       if (!bmLink) return;
       const radarUrl = IS_LOCAL ? location.origin + location.pathname : "https://hessam-mamagani.github.io/radar/";
-      const bmCode = `(function(){try{var sc=document.querySelector('.jobs-search-results-list,.scaffold-layout__list > div');if(sc)sc.scrollTo(0,sc.scrollHeight);setTimeout(function(){var cards=document.querySelectorAll('[data-job-id],[data-occludable-job-id]');var map={};var add=function(id,t,c,l,txt,hp,hpu){id=String(id||'').replace(/\\D/g,'');if(!id||map[id])return;t=String(t||'').replace(/\\s+with verification$/i,'').trim();if(t.length>14&&t.slice(0,t.length/2).trim()===t.slice(t.length/2).trim())t=t.slice(0,t.length/2).trim();map[id]={id:id,title:t||'Software Engineer',company:String(c||'Company').trim(),location:String(l||'Istanbul, Türkiye').trim(),easyApply:/Easy Apply|Kolay Ba/i.test(txt),activelyReviewing:/Actively reviewing|Aktif olarak/i.test(txt),alreadyApplied:/\\bApplied\\b|\\bBa\\u015fvuruldu\\b/i.test(txt),hiringPoster:hp||'',hiringPosterUrl:hpu||''};};cards.forEach(function(el){var id=el.getAttribute('data-job-id')||el.getAttribute('data-occludable-job-id');var a=el.querySelector('a[href*="/jobs/view/"]');if(!id&&a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(m)id=m[1];}var tEl=el.querySelector('.job-card-list__title--link strong,.artdeco-entity-lockup__title strong,.artdeco-entity-lockup__title a');var cEl=el.querySelector('.artdeco-entity-lockup__subtitle,.job-card-container__primary-description');var lEl=el.querySelector('.artdeco-entity-lockup__caption li,.job-card-container__metadata-item');add(id,tEl?tEl.innerText:(a?a.innerText:''),cEl?cEl.innerText:'',lEl?lEl.innerText:'',el.innerText||'','','');});if(!Object.keys(map).length){document.querySelectorAll('a[href*="/jobs/view/"]').forEach(function(a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(!m)return;var box=a.closest('li,div[data-job-id]')||a.parentElement;add(m[1],a.innerText,'','Istanbul, Türkiye',box?box.innerText:'','','');});}var list=Object.values(map);if(!list.length){alert('Open a LinkedIn Jobs / Top Applicant page first!');return;}var b64=btoa(unescape(encodeURIComponent(JSON.stringify(list))));window.open('${radarUrl}#premium_import='+encodeURIComponent(b64),'_blank');},600);}catch(e){alert('Premium Sync Error: '+e.message);}})();`;
+      const bmCode = `(function(){try{var sc=document.querySelector('.jobs-search-results-list,.scaffold-layout__list > div');if(sc)sc.scrollTo(0,sc.scrollHeight);setTimeout(function(){var curId=(location.search.match(/currentJobId=(\\d+)/)||location.pathname.match(/\\/jobs\\/view\\/(\\d+)/)||[])[1]||'';var hpEl=document.querySelector('.hirer-card__hirer-information a,.jobs-poster__name a,.jobs-poster__name');var curHp=hpEl?(hpEl.innerText||'').replace(/\\s+/g,' ').trim():'';var curHpu=hpEl&&hpEl.href?hpEl.href:'';var cards=document.querySelectorAll('[data-job-id],[data-occludable-job-id]');var map={};var add=function(id,t,c,l,txt,hp,hpu){id=String(id||'').replace(/\\D/g,'');if(!id||map[id])return;t=String(t||'').replace(/\\s+with verification$/i,'').trim();if(t.length>14&&t.slice(0,t.length/2).trim()===t.slice(t.length/2).trim())t=t.slice(0,t.length/2).trim();map[id]={id:id,title:t||'Software Engineer',company:String(c||'Company').trim(),location:String(l||'Istanbul, Türkiye').trim(),easyApply:/Easy Apply|Kolay Ba/i.test(txt),activelyReviewing:/Actively reviewing|Aktif olarak/i.test(txt),alreadyApplied:/\\bApplied\\b|\\bBa\\u015fvuruldu\\b/i.test(txt),hiringPoster:(id===curId&&curHp)?curHp:(hp||''),hiringPosterUrl:(id===curId&&curHpu)?curHpu:(hpu||'')};};cards.forEach(function(el){var id=el.getAttribute('data-job-id')||el.getAttribute('data-occludable-job-id');var a=el.querySelector('a[href*="/jobs/view/"]');if(!id&&a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(m)id=m[1];}var tEl=el.querySelector('.job-card-list__title--link strong,.artdeco-entity-lockup__title strong,.artdeco-entity-lockup__title a');var cEl=el.querySelector('.artdeco-entity-lockup__subtitle,.job-card-container__primary-description');var lEl=el.querySelector('.artdeco-entity-lockup__caption li,.job-card-container__metadata-item');add(id,tEl?tEl.innerText:(a?a.innerText:''),cEl?cEl.innerText:'',lEl?lEl.innerText:'',el.innerText||'','','');});if(!Object.keys(map).length){document.querySelectorAll('a[href*="/jobs/view/"]').forEach(function(a){var m=a.href.match(/\\/jobs\\/view\\/(\\d+)/);if(!m)return;var box=a.closest('li,div[data-job-id]')||a.parentElement;add(m[1],a.innerText,'','Istanbul, Türkiye',box?box.innerText:'','','');});}var list=Object.values(map);if(!list.length){alert('Open a LinkedIn Jobs / Top Applicant page first!');return;}var b64=btoa(unescape(encodeURIComponent(JSON.stringify(list))));window.open('${radarUrl}#premium_import='+encodeURIComponent(b64),'_blank');},600);}catch(e){alert('Premium Sync Error: '+e.message);}})();`;
       bmLink.setAttribute("href", "javascript:" + bmCode);
     }
 
