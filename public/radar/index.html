@@ -1477,6 +1477,15 @@
           : `<span>🔍 Scan ${meta.flag} ${meta.label} Now</span>`;
       }
 
+      const callQueueBtn = document.getElementById("openCallQueueQuickBtn");
+      if (callQueueBtn) {
+        callQueueBtn.classList.toggle("hidden", ACTIVE_COUNTRY !== "TR");
+      }
+      const pipeFilterEl = document.getElementById("pipelineFilter");
+      if (pipeFilterEl && ACTIVE_COUNTRY !== "TR" && pipeFilterEl.value === "CALL_PRIORITY") {
+        pipeFilterEl.value = "ALL";
+      }
+
       renderRadarList();
       renderUnifiedPipeline();
       renderCrm();
@@ -4648,8 +4657,7 @@
             <p class="text-xs text-slate-400">Auto-prioritized from your live D1 applications, hot signals, and fast work-permit sponsors.</p>
           </div>
           <div class="flex items-center gap-2 text-xs flex-wrap">
-            <button type="button" onclick="openCallPriorityQueue()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/40 text-amber-200 font-bold cursor-pointer transition">📞 Pure-Tech Call Queue (35)</button>
-            <span class="text-slate-700">&middot;</span>
+            ${ACTIVE_COUNTRY === "TR" ? `<button type="button" onclick="openCallPriorityQueue()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/40 text-amber-200 font-bold cursor-pointer transition">📞 Pure-Tech Call Queue (35)</button><span class="text-slate-700">&middot;</span>` : ""}
             <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='UNFINISHED_PORTAL'; renderUnifiedPipeline();" class="text-slate-300 hover:text-white cursor-pointer">⏳ Unfinished Portals</button>
             <span class="text-slate-700">&middot;</span>
             <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='FAST_HIRE_DEC31'; renderUnifiedPipeline();" class="text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer">⚡ All Fast Sponsors →</button>
@@ -8831,6 +8839,10 @@ ${closeLine}"`;
     function renderUnifiedPipeline() {
       const container = document.getElementById("pipelineContainer");
       if (!container) return;
+      const callQueueBtn = document.getElementById("openCallQueueQuickBtn");
+      if (callQueueBtn) {
+        callQueueBtn.classList.toggle("hidden", ACTIVE_COUNTRY !== "TR");
+      }
       const q = (document.getElementById("pipelineSearch")?.value || "").toLowerCase().trim();
       const filter = document.getElementById("pipelineFilter")?.value || "ALL";
       const checks = getPipelineCheckState();
