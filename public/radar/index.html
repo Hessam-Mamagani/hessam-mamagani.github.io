@@ -279,9 +279,9 @@
 
     <!-- VIEW 2: MY APPLICATIONS & OUTREACH (Unified Outreach List + Quick Status Table) -->
     <section id="tab-pipeline" class="mt-4 hidden space-y-4">
-      <div class="glass rounded-xl p-4 border border-slate-800">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div>
+      <div class="glass rounded-xl p-4 border border-slate-800 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="min-w-[260px] flex-1">
             <div class="flex items-center gap-2.5 flex-wrap">
               <h2 class="text-base font-bold text-white">🎯 My Applications &amp; Sponsor Outreach</h2>
               <span id="pipelineProgressBadge" class="text-xs text-slate-400">Loading...</span>
@@ -305,8 +305,11 @@
                 🃏 Cards
               </button>
             </div>
-            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, HR, notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 w-full sm:w-48 focus:outline-none focus:border-emerald-500" />
-            <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2.5 border-t border-slate-800/80">
+          <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, HR, job poster, or call notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 flex-1 focus:outline-none focus:border-emerald-500" />
+          <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 w-full sm:w-80 md:w-96 focus:outline-none focus:border-emerald-500">
               <option value="ALL">All Companies (Top Sponsors First)</option>
               <option value="CALL_PRIORITY">📞 Call Priority Queue — 35 Pure-Tech Sponsors (Uncalled First)</option>
               <option value="HOT_SIGNALS">🔥 Hot Signals (Invite / CV Downloaded / Viewed)</option>
@@ -322,8 +325,7 @@
               <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla</option>
               <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
               <option value="CLUSTER_MASLAK">📍 Maslak &amp; İTÜ Teknokent</option>
-            </select>
-          </div>
+          </select>
         </div>
       </div>
 
