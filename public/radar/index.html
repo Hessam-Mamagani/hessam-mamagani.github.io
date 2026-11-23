@@ -2858,8 +2858,8 @@
 
     function formatTurkishNameFirstGreeting(firstName = "", isConnected = false) {
       const clean = extractRealFirstName(firstName);
-      const thanksSuffix = isConnected ? " bağlantımı kabul ettiğiniz için teşekkür ederim." : "";
-      if (!clean) return "Merhabalar,";
+      const thanksSuffix = isConnected ? " bağlantıyı kabul ettiğiniz için teşekkür ederim." : "";
+      if (!clean) return isConnected ? "Merhabalar, bağlantıyı kabul ettiğiniz için teşekkür ederim." : "Merhabalar,";
       const lower = clean.toLocaleLowerCase("tr-TR");
       const foldAscii = lower.replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c");
       const isFemale = TR_FEMALE_FIRST_NAMES.has(lower) || [...TR_FEMALE_FIRST_NAMES].some(n => n.replace(/ı/g, "i").replace(/ş/g, "s").replace(/ğ/g, "g").replace(/ü/g, "u").replace(/ö/g, "o").replace(/ç/g, "c") === foldAscii);
@@ -2931,8 +2931,17 @@
       if (!item) return;
       const list = group === "hr" ? (item.aiIntel?.hrAndRecruiters || []) : (item.aiIntel?.ctoAndEngLeads || []);
       const person = list[personIdx];
-      const baseText = buildUnifiedDm(item, group === "hr" ? "hr" : "cto", person);
-      copyTextSafe(baseText, btn, `📋 Copied personalized DM for ${person?.name || "contact"}!`);
+      const baseText = buildUnifiedDm(item, group === "hr" ? "hr" : "cto", person, true);
+      copyTextSafe(baseText, btn, `📋 Copied short Accepted DM for ${person?.name || "contact"}!`);
+    }
+
+    function copyPersonInvite(idOrIdx, group, personIdx, btn) {
+      const item = findPipelineItem(idOrIdx);
+      if (!item) return;
+      const list = group === "hr" ? (item.aiIntel?.hrAndRecruiters || []) : (item.aiIntel?.ctoAndEngLeads || []);
+      const person = list[personIdx];
+      const noteText = buildUnifiedInviteNote(item, group === "hr" ? "hr" : "cto", person);
+      copyTextSafe(noteText, btn, `🤝 Copied <300ch Invite Note for ${person?.name || "contact"} (${noteText.length} chars)!`);
     }
 
     function renderAiIntelHtml(intel, item, idOrIdx) {
@@ -2969,7 +2978,8 @@
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="copyPersonDm('${itemId}', 'cto', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold cursor-pointer transition">📋 Copy DM</button>
+                    <button type="button" onclick="copyPersonInvite('${itemId}', 'cto', ${pIdx}, this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-200 text-[11px] font-semibold cursor-pointer transition" title="Copy <300-char LinkedIn Connection Request Note">🤝 Invite</button>
+                    <button type="button" onclick="copyPersonDm('${itemId}', 'cto', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold cursor-pointer transition" title="Copy short post-connection DM">📋 Accepted DM</button>
                     ${renderProfileLink(p.linkedinUrl)}
                   </div>
                 </div>
@@ -2989,7 +2999,8 @@
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
-                    <button type="button" onclick="copyPersonDm('${itemId}', 'hr', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold cursor-pointer transition">📋 Copy DM</button>
+                    <button type="button" onclick="copyPersonInvite('${itemId}', 'hr', ${pIdx}, this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-200 text-[11px] font-semibold cursor-pointer transition" title="Copy <300-char LinkedIn Connection Request Note">🤝 Invite</button>
+                    <button type="button" onclick="copyPersonDm('${itemId}', 'hr', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold cursor-pointer transition" title="Copy short post-connection DM">📋 Accepted DM</button>
                     ${renderProfileLink(p.linkedinUrl)}
                   </div>
                 </div>
@@ -3350,7 +3361,7 @@
             if (data.ok && (data.body || data.text || data.executiveDm)) {
               if (!item.aiIntel) item.aiIntel = {};
               item.aiIntel.lang = chosenLang;
-              item.aiIntel.styleVersion = 3;
+              item.aiIntel.styleVersion = 4;
               if (data.subject) item.aiIntel.customEmailSubject = data.subject;
               if (data.body) item.aiIntel.customEmailBody = data.body;
               if (data.executiveDm) item.aiIntel.customExecutiveDm = data.executiveDm;
@@ -6626,7 +6637,7 @@
       const namedEmailFirst = extractRecipientFirstNameFromEmail(item.email || "", allPeople);
 
       if (
-        item.aiIntel?.styleVersion === 3 &&
+        item.aiIntel?.styleVersion >= 3 &&
         item.aiIntel?.customEmailSubject &&
         item.aiIntel?.customEmailBody &&
         item.aiIntel?.lang === chosenLang &&
@@ -6643,7 +6654,7 @@
           ? `Hi ${namedEmailFirst},`
           : `Dear ${cleanComp} Hiring & Engineering Team,`;
 
-        const coreProofEn = `I am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.`;
+        const coreProofEn = `I am a Senior Full-Stack Software Engineer & Solutions Architect specializing in enterprise software architecture (.NET, React, SQL, Azure, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.`;
 
         const bridgeEn = getCompanySynergyBridge(cleanComp, "EN");
         const actionLineEn = item.status === "CV Downloaded ⭐"
@@ -6674,7 +6685,7 @@
         ? formatTurkishNameFirstGreeting(namedEmailFirst, false)
         : `Sayın ${cleanComp} İşe Alım ve Teknik Yönetim Ekibi,`;
 
-      const coreProofTr = `Kurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.`;
+      const coreProofTr = `Kurumsal yazılım mimarisi (.NET, React, SQL, Azure ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.`;
 
       const bridgeTr = getCompanySynergyBridge(cleanComp, "TR");
       const hasCustomBridgeTr = !bridgeTr.startsWith("Kariyerimin yeni adımında");
@@ -6692,33 +6703,52 @@
 
       return {
         subject: `${item.hasAppliedInCrm ? "Başvuru Takibi & Özgeçmiş" : "Kıdemli Yazılım & Çözüm Mimarisi"}: ${roleForText} — ${cleanComp} — Hessam Barasm Mamagani`,
-        body: `${emailGreetingTr}\n\n${coreProofTr}\n\n${actionLineTr}\n\nGüncel CV’m ve Pilz Türkiye Genel Müdürü Sn. Ali Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur ve ÇSGB Bilişim Sektörü Muafiyeti kapsamındayım).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
+        body: `${emailGreetingTr}\n\n${coreProofTr}\n\n${actionLineTr}\n\nGüncel CV’m ve Pilz Türkiye Genel Müdürü Sn. Ali Yavuz Çopur'un imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur ve ÇSGB Bilişim Sektörü Muafiyeti kapsamındayım).\n\nSaygılarımla,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nE-posta: hessam.mamagani@gmail.com\nPortfolyo: https://hessam-mamagani.github.io/`
       };
     }
     function buildVipEmail(item) { return buildUnifiedEmail(item); }
 
-    function buildUnifiedDm(item, target = "cto", personObj = null) {
+    function buildUnifiedInviteNote(item, target = "cto", personObj = null) {
+      const defaultLang = getDefaultLangForItem(item);
+      const chosenLang = getPreferredLang(item.id, defaultLang);
+      const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
+      const candidatePerson = personObj || (target === "hr" ? item.aiIntel?.hrAndRecruiters?.[0] : item.aiIntel?.ctoAndEngLeads?.[0]) || null;
+      const firstName = extractRealFirstName(candidatePerson?.name || "");
+
+      if (chosenLang === "EN") {
+        const greet = firstName ? `Hi ${firstName},` : "Hi there,";
+        const raw = `${greet} I'm a Senior Full-Stack & AI Architect (.NET, React, Azure) at German multinational Pilz GmbH Türkiye. I'd like to connect regarding Senior Engineering opportunities at ${cleanComp}. Best regards.`;
+        return raw.length <= 295 ? raw : `${greet} Senior Full-Stack & AI Architect (.NET, React, Azure) at Pilz GmbH Türkiye. Would love to connect regarding Senior Engineering roles at ${cleanComp}. Best regards.`.slice(0, 295);
+      }
+      const trGreet = formatTurkishNameFirstGreeting(firstName, false);
+      const rawTr = `${trGreet} Alman Pilz Türkiye'de Kıdemli Full-Stack Yazılım Mühendisi ve Çözüm Mimarı (.NET, React, Azure, AI) olarak çalışıyorum. ${cleanComp} bünyesindeki yazılım fırsatlarıyla ilgili bağlantı kurmak istedim. Saygılarımla.`;
+      return rawTr.length <= 295 ? rawTr : `${trGreet} Alman Pilz Türkiye'de Kıdemli Full-Stack & AI Mimarı (.NET, React, Azure) olarak çalışıyorum. ${cleanComp} fırsatlarıyla ilgili bağlantı kurmak istedim. Saygılarımla.`.slice(0, 295);
+    }
+
+    function buildUnifiedDm(item, target = "cto", personObj = null, isConnectedOverride = null) {
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const cleanComp = (item.company || "").split("(")[0].trim() || item.company;
       const roleForText = item.cleanRole || stripRoleBadgeClient(item.role) || "Senior Software Engineer & Solutions Architect";
       const candidatePerson = personObj || (target === "hr" ? item.aiIntel?.hrAndRecruiters?.[0] : item.aiIntel?.ctoAndEngLeads?.[0]) || null;
       const firstName = extractRealFirstName(candidatePerson?.name || "");
-      const is1stDeg = /1st-deg|1st degree|connected/i.test(candidatePerson?.title || "");
+      const is1stDeg = typeof isConnectedOverride === "boolean"
+        ? isConnectedOverride
+        : /1st-deg|1st degree|connected/i.test(candidatePerson?.title || "");
       const isAgency = !!(item.isAgency || AGENCY_RE.test(cleanComp));
 
-      if (item.aiIntel && item.aiIntel.styleVersion === 3 && item.aiIntel.lang === chosenLang) {
+      if (item.aiIntel && item.aiIntel.styleVersion >= 4 && item.aiIntel.lang === chosenLang) {
         const rawCustom = target === "hr"
           ? (item.aiIntel.customHrDm || item.aiIntel.customExecutiveDm)
           : (item.aiIntel.customExecutiveDm || item.aiIntel.customHrDm);
-        if (rawCustom && !isLegacyOutreachDraft(rawCustom)) {
+        if (rawCustom && !isLegacyOutreachDraft(rawCustom) && rawCustom.length <= 680) {
           let tailored = stripRoleBadgeClient(rawCustom);
           if (firstName) {
             if (chosenLang === "TR") {
               const trGreet = formatTurkishNameFirstGreeting(firstName, is1stDeg);
               tailored = tailored.replace(/^[^\n]+/, trGreet);
             } else {
-              const enGreet = is1stDeg ? `Hi ${firstName}, thanks for accepting my connection.` : `Hi ${firstName},`;
+              const enGreet = is1stDeg ? `Hi ${firstName}, thanks for connecting.` : `Hi ${firstName},`;
               tailored = tailored.replace(/^[^\n]+/, enGreet);
             }
           }
@@ -6728,40 +6758,40 @@
 
       if (chosenLang === "EN") {
         const enGreeting = firstName
-          ? (is1stDeg ? `Hi ${firstName}, thanks for accepting my connection.` : `Hi ${firstName},`)
-          : `Hi there,`;
+          ? (is1stDeg ? `Hi ${firstName}, thanks for connecting.` : `Hi ${firstName},`)
+          : (is1stDeg ? `Hi there, thanks for connecting.` : `Hi there,`);
 
         const enContextClause = isAgency
-          ? `For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities across the clients you partner with, I would appreciate being considered.`
+          ? `If there are suitable Senior Engineering or Solutions Architecture roles across your client portfolio, I'd appreciate being considered.`
           : item.hasAppliedInCrm
-          ? `For my next chapter, I am actively looking for a high-impact senior engineering team; I recently applied for the ${roleForText} role at ${cleanComp}, and would appreciate being considered or pointed to the right hiring lead.`
-          : `For my next chapter, I am actively looking for a high-impact senior engineering team; if there are suitable Senior Software Engineering or Solutions Architecture opportunities at ${cleanComp}, I would appreciate being considered or pointed to the right hiring lead.`;
+          ? `I recently applied for ${roleForText} at ${cleanComp} and would appreciate being considered or pointed to the right lead for suitable roles on your team.`
+          : `If there are suitable Senior Engineering or Solutions Architecture roles on your team or network at ${cleanComp}, I'd appreciate being considered or pointed to the right lead.`;
 
         const enPermitNote = item.countryGroup === "IE"
-          ? " (eligible for Ireland's Critical Skills Permit)"
+          ? " (eligible for Ireland Critical Skills Permit)"
           : item.countryGroup === "DE"
-          ? " (ANABIN H+ M.Eng., eligible for the EU Blue Card)"
+          ? " (ANABIN H+ M.Eng., EU Blue Card eligible)"
           : item.countryGroup === "NL"
-          ? " (eligible for the Netherlands IND Highly Skilled Migrant fast-track)"
+          ? " (eligible for NL IND Highly Skilled Migrant)"
           : item.countryGroup === "UK"
-          ? " (eligible for UK Skilled Worker sponsorship)"
+          ? " (UK Skilled Worker eligible)"
           : item.countryGroup === "TR"
           ? " (based in Istanbul with an active work permit)"
           : "";
 
-        return `${enGreeting}\n\nI am a Senior Full-Stack Software Engineer & Solutions Architect (.NET, React, SQL, and AI). Most recently at German multinational Pilz GmbH Türkiye, I digitized operations that previously ran entirely on Excel sheets and manual workflows—architecting and building custom CRM, SAP ERP integration, automated e-Invoicing, and AI/LLM analytics modules from scratch within a unified Enterprise Portal.\n\n${enContextClause}\n\nMy updated CV and a signed reference letter from our General Manager are attached${enPermitNote}.\n\nBest regards,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolio: https://hessam-mamagani.github.io/`;
+        return `${enGreeting}\n\nI'm a Senior Full-Stack Engineer & Solutions Architect (.NET, React, SQL, Azure, AI) at German multinational Pilz GmbH Türkiye, where I turned manual Excel workflows into an AI-integrated Enterprise Portal built from scratch.\n\n${enContextClause} My updated CV and General Manager's signed reference letter are attached${enPermitNote}.\n\nBest regards,\nHessam Barasm Mamagani\n+90 539 229 4251 | https://hessam-mamagani.github.io/`;
       }
 
       const trGreeting = formatTurkishNameFirstGreeting(firstName, is1stDeg);
       const trContextClause = isAgency
-        ? `Kariyerimin yeni adımında güçlü bir teknoloji ekibinde yer almak için aktif arayıştayım; danışmanlığını yürüttüğünüz firmalarda Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi alanında uygun fırsatlar olursa değerlendirilmekten memnuniyet duyarım.`
+        ? `Danışmanlığını yürüttüğünüz firmalarda Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi fırsatları olursa değerlendirilmekten memnuniyet duyarım.`
         : item.hasAppliedInCrm
-        ? `Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde başvurduğum ${roleForText} pozisyonu başta olmak üzere uygun fırsatlar için değerlendirilmekten veya ilgili yöneticiye yönlendirilmekten memnuniyet duyarım.`
-        : `Kariyerimin yeni adımında yüksek etki üretebileceğim güçlü bir ekipte yer almak için aktif arayıştayım; ${cleanComp} bünyesinde Kıdemli Yazılım Mühendisliği veya Çözüm Mimarisi alanında uygun fırsatlar olursa değerlendirilmekten veya ilgili kişiye yönlendirilmekten memnuniyet duyarım.`;
+        ? `${cleanComp} bünyesindeki ${roleForText} başvurum veya ekibinizdeki uygun fırsatlar için değerlendirilmekten ya da ilgili kişiye yönlendirilmekten memnuniyet duyarım.`
+        : `Ekibinizde veya ağınızda Kıdemli Yazılım Mühendisliği ya da Çözüm Mimarisi alanında uygun fırsatlar olursa değerlendirilmekten ya da ilgili kişiye yönlendirilmekten memnuniyet duyarım.`;
 
-      return `${trGreeting}\n\nKurumsal yazılım mimarisi (.NET, React, SQL ve Yapay Zeka) alanında çalışan kıdemli bir Full-Stack Yazılım Mühendisiyim. Son olarak Alman Pilz GmbH Türkiye bünyesinde, daha önce tamamen Excel ve manuel süreçlerle yürüyen operasyonları uçtan uca dijitalleştirerek; CRM, SAP ERP entegrasyonu, e-Fatura otomasyonu ve AI/LLM analitik modüllerini sıfırdan geliştirip tek bir kapsamlı Kurumsal Portal çatısı altında canlıya aldım.\n\n${trContextClause}\n\nGüncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur).\n\nİyi çalışmalar dilerim,\nHessam Barasm Mamagani\nTel: +90 539 229 4251\nPortfolyo: https://hessam-mamagani.github.io/`;
+      return `${trGreeting}\n\nAlman Pilz GmbH Türkiye'de .NET, React, SQL, Azure ve AI üzerine çalışan Kıdemli Full-Stack Yazılım Mühendisi ve Çözüm Mimarıyım; daha önce Excel ve manuel süreçlerle yürüyen operasyonları sıfırdan yapay zeka entegreli bir Kurumsal Portal'a dönüştürdüm.\n\n${trContextClause} Güncel CV’m ve Genel Müdürümüzün imzalı referans mektubu ektedir (İstanbul'dayım, aktif çalışma iznim mevcut).\n\nSaygılarımla,\nHessam Barasm Mamagani\nTel: +90 539 229 4251 | Portfolyo: https://hessam-mamagani.github.io/`;
     }
-    function buildVipDm(item) { return buildUnifiedDm(item, "cto"); }
+    function buildVipDm(item) { return buildUnifiedDm(item, "cto", null, true); }
 
     let UNIFIED_PIPELINE_ITEMS = [];
 
@@ -7529,6 +7559,10 @@
 
       const copyFullEmailKey = registerCopyPayload(`drawer_full_email_${item.id}`, `${item.email ? `To: ${item.email}\n` : ""}Subject: ${mail.subject}\n\n${mail.body}`);
       const copyCtoDmKey = registerCopyPayload(`drawer_cto_dm_${item.id}`, dmText);
+      const acceptedDmText = buildUnifiedDm(item, "cto", null, true);
+      const copyAcceptedDmKey = registerCopyPayload(`drawer_acc_dm_${item.id}`, acceptedDmText);
+      const inviteNoteText = buildUnifiedInviteNote(item, "cto", null);
+      const copyInviteNoteKey = registerCopyPayload(`drawer_invite_${item.id}`, inviteNoteText);
 
       const nextStepBanner = !ch.applied
         ? {
@@ -7640,12 +7674,15 @@
                   <button type="button" onclick="runAiRewriteTextOnly('${item.id}', this)" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-purple-300 text-[11px] font-semibold transition cursor-pointer">
                     ✍️ AI Tailor (${chosenLang})
                   </button>
-                  <button type="button" onclick="copyFromStore('${copyCtoDmKey}', this, '💬 LinkedIn DM copied!')" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition cursor-pointer">
-                    📋 Copy LinkedIn DM
+                  <button type="button" onclick="copyFromStore('${copyInviteNoteKey}', this, '🤝 <300ch Invite Note copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-cyan-200 text-[11px] font-semibold transition cursor-pointer" title="Short <300-char LinkedIn Connection Request Note">
+                    🤝 Invite (${inviteNoteText.length}ch)
+                  </button>
+                  <button type="button" onclick="copyFromStore('${copyAcceptedDmKey}', this, '💬 Short Accepted DM copied!')" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold transition cursor-pointer">
+                    📋 Copy Accepted DM
                   </button>
                 </div>
               </div>
-              <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">${dmText}</pre>
+              <pre class="text-[11px] text-slate-200 whitespace-pre-wrap font-sans leading-relaxed">${acceptedDmText}</pre>
             </div>
           </div>
 
@@ -7704,7 +7741,7 @@
       const mail = buildUnifiedEmail(item);
       const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
       const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
-      const dmText = buildUnifiedDm(item, "cto");
+      const dmText = buildUnifiedDm(item, "cto", null, true);
       const cleanComp = item.company.split("(")[0].trim();
       const geoParam = getGeoParamForCountry(item.countryGroup);
       const cMeta = COUNTRY_DISPLAY_META[item.countryGroup] || COUNTRY_DISPLAY_META.TR;
@@ -7804,8 +7841,8 @@
       const mail = buildUnifiedEmail(item);
       const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
       const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
-      const dmText = buildUnifiedDm(item, "cto");
-      const hrDmText = buildUnifiedDm(item, "hr");
+      const dmText = buildUnifiedDm(item, "cto", null, true);
+      const hrDmText = buildUnifiedDm(item, "hr", null, true);
       const cleanComp = item.company.split("(")[0].trim();
       const geoParam = getGeoParamForCountry(item.countryGroup);
       const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(cleanComp)}${geoParam}`;
