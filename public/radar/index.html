@@ -27,6 +27,11 @@
       background: #131e35;
       border-color: #2a3a5c;
     }
+    .cpb-item > summary { list-style: none; }
+    .cpb-item > summary::-webkit-details-marker { display: none; }
+    .cpb-item[open] { border-color: rgba(245, 158, 11, 0.45); }
+    .cpb-item[open] .cpb-chevron { transform: rotate(90deg); }
+    html.light-theme .cpb-item[open] { border-color: #f59e0b !important; }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
     ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -146,6 +151,9 @@
         </button>
         <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v3 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
           📄 My v3 CVs
+        </button>
+        <button type="button" onclick="openCallPlaybook(null)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow transition cursor-pointer" title="Phone call scripts for every scenario (TR to say + EN meaning)">
+          📞 Call Playbook
         </button>
         <button type="button" onclick="openCopilotDrawer(null)" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-extrabold shadow-lg transition flex items-center gap-1.5 cursor-pointer" title="Open Full-Context Career, Legal, Salary & Interview Copilot (Synced via Cloudflare D1)">
           <span>🤖 Ask Copilot</span>
@@ -604,6 +612,35 @@
       </div>
       <div id="cvQuickModalBody"></div>
     </div>
+  </div>
+
+  <!-- Call Playbook Slide-Over Drawer (phone scenario scripts for live calls) -->
+  <div id="callPlaybookDrawer" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeCallPlaybook()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <aside class="relative ml-auto h-full w-full max-w-2xl glass border-l border-amber-500/40 shadow-2xl flex flex-col">
+      <div class="p-4 border-b border-slate-800 bg-slate-950/90 space-y-2.5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <span class="px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-amber-500/20 border border-amber-500/40 text-amber-300">📞 Call Playbook</span>
+            <h3 class="text-sm md:text-base font-bold text-white mt-1">What to say on the phone — every scenario</h3>
+            <div id="callPlaybookContext" class="text-[11px] text-slate-400 mt-0.5 leading-snug"></div>
+          </div>
+          <button type="button" onclick="closeCallPlaybook()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/40 text-slate-200 text-xs font-bold cursor-pointer shrink-0">✕ Close</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="callPlaybookSearch" type="search" oninput="filterCallPlaybook()" placeholder="Search: maaş, izin, mail, müsait, recruiter, demo..." class="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+          <button type="button" onclick="setCallPlaybookExpanded(true)" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold cursor-pointer shrink-0" title="Expand all">Expand all</button>
+          <button type="button" onclick="setCallPlaybookExpanded(false)" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold cursor-pointer shrink-0" title="Collapse all">Collapse</button>
+        </div>
+        <div class="flex flex-wrap gap-1.5 text-[10px] font-semibold">
+          <span class="px-2 py-0.5 rounded bg-rose-500/15 border border-rose-400/40 text-rose-200">Never mention permit end date, payout or family</span>
+          <span class="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-400/40 text-cyan-200">Demo only for tech people or when asked</span>
+          <span class="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-400/40 text-emerald-200">Floor: 140K TL net</span>
+          <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-300">Best: 10:00–11:30 · 14:00–16:30</span>
+        </div>
+      </div>
+      <div id="callPlaybookBody" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-950/60"></div>
+    </aside>
   </div>
 
   <!-- Universal Full-Context AI Career, Legal, Salary & Interview Copilot Slide-Over Drawer -->
@@ -7372,6 +7409,256 @@
       renderUnifiedPipeline();
     }
 
+    // Call Playbook: "say" = Turkish line to speak, "meaning" = English gloss. {name}/{role}/{company} auto-fill from the opened pipeline item.
+    const CALL_PLAYBOOK_GROUPS = [
+      { id: "open", label: "Opening the Call" },
+      { id: "objection", label: "Questions & Objections" },
+      { id: "close", label: "Closing & Follow-up" }
+    ];
+    const CALL_PLAYBOOK_SCENARIOS = [
+      {
+        id: "switchboard", group: "open", icon: "🏢", title: "Reception / switchboard answers", trigger: "Buyurun, iyi günler",
+        say: "Merhabalar, iyi günler. Ben Hessam Mamagani. Şirketinizin yayınladığı {role} ilanına başvurdum. Bu pozisyonla ilgilenen İnsan Kaynakları uzmanıyla ya da yazılım ekibinden biriyle görüşebilir miyim?",
+        alts: [{ label: "If you have a contact name", requiresName: true, say: "Merhabalar, iyi günler. Ben Hessam Mamagani. İnsan Kaynakları ekibinden {name} ile görüşebilir miyim?" }],
+        meaning: "I applied to your posting. Could I speak with the HR specialist handling it, or someone from the software team?",
+        tip: "Asking for a person by name gets you through much faster."
+      },
+      {
+        id: "what-about", group: "open", icon: "❓", title: "They ask what it's about", trigger: "Ne konuda?",
+        say: "Başvurumla ilgili kısa bir bilgi almak istiyorum, bir dakikanızı alır.",
+        meaning: "I'd like a quick update on my application; it takes one minute.",
+        tip: "Keep it short and calm. Don't pitch to the receptionist."
+      },
+      {
+        id: "no-connect", group: "open", icon: "📧", title: "They won't connect you", trigger: "Bağlayamıyoruz, mail atın",
+        say: "Tabii, çok teşekkürler. Doğru kişiye ulaşması için e-posta adresini ve ilgilenen arkadaşın adını rica edebilir miyim?",
+        meaning: "Of course, thank you. So it reaches the right person, may I have the email address and the name of the colleague handling it?",
+        tip: "Read the address back letter by letter. A name + direct email = a successful call."
+      },
+      {
+        id: "hr-pitch", group: "open", icon: "👤", title: "HR / hiring person answers (20-sec pitch)", trigger: "Buyurun, ben İK'dan...",
+        say: "{name} merhaba, ben Hessam Mamagani. {role} ilanınıza başvurmuştum. Şu an Pilz Türkiye'de Çözüm Mimarıyım; .NET, React ve SAP entegrasyonlu kurumsal bir portalı uçtan uca geliştirdim, canlıda sorunsuz çalışıyor. İstanbul'da ikamet ediyorum, aktif çalışma iznim mevcuttur. Başvurumun durumunu öğrenmek ve uygunsanız kısa bir ön görüşme rica etmek istedim.",
+        meaning: "I applied to your role. I'm a Solutions Architect at Pilz Türkiye; I built an enterprise portal with .NET, React and SAP integration end to end, running live. I live in Istanbul with an active work permit. I wanted to check my application status and, if possible, ask for a short screening call.",
+        tip: "Ask for a short screening call, NOT a demo. HR checks fit, salary and permit. Stop talking and let them ask questions."
+      },
+      {
+        id: "tech", group: "open", icon: "🧑‍💻", title: "Developer / tech lead / CTO answers", trigger: "Yazılım ekibinden...",
+        say: "Kısaca anlatayım: kurduğum kurumsal portal canlıda; .NET, React, SAP ve e-Fatura entegrasyonu var. Uygun olursanız 5 dakikada ekran paylaşıp canlı sistemi gösterebilirim. Hangi gün sizin için uygun olur?",
+        meaning: "Briefly: the enterprise portal I built is live, with .NET, React, SAP and e-Invoice integration. If convenient, I can screen-share the live system in 5 minutes. Which day works for you?",
+        tip: "Technical people can judge a demo, so this is the place to offer it."
+      },
+      {
+        id: "recruiter", group: "open", icon: "🤝", title: "Recruiter / agency answers", trigger: "İşe alım danışmanlığı...",
+        say: "Bu pozisyon dışında .NET, yazılım mimarisi veya yapay zekâ tarafında çalıştığınız başka müşterileriniz var mı? CV'mi size doğrudan iletebilirim.",
+        meaning: "Besides this role, do you have other clients for .NET, software architecture or AI? I can send my CV directly to you.",
+        tip: "One good recruiter can pitch you to several companies."
+      },
+      {
+        id: "permit", group: "objection", icon: "🛂", title: "Foreigner / work permit worry", trigger: "Yabancı uyruklu alamıyoruz",
+        say: "Çok yerinde bir soru. İstanbul'da ikamet ediyorum ve aktif çalışma iznim var. Bilişim sektöründe yazılım uzmanları için 5 Türk çalışan şartından muafiyet bulunuyor; yeni işveren adına başvuru da e-İzin üzerinden online yapılıyor, sizin için ek bir yük oluşturmuyor. İsterseniz süreci özetleyen kısa bir notu e-postayla iletebilirim.",
+        meaning: "Good question. I live in Istanbul with an active work permit. Software specialists in IT are exempt from the 5-Turkish-employee rule, and the new employer applies online via e-İzin, with no extra burden. I can email a short summary of the process.",
+        tip: "Stay calm, facts only. Never mention the permit end date."
+      },
+      {
+        id: "salary", group: "objection", icon: "💰", title: "Salary expectation", trigger: "Maaş beklentiniz nedir?",
+        say: "Pozisyonun kapsamına ve yan haklara göre esnekim. Net 150–170 bin TL aralığını düşünüyorum.",
+        alts: [{ label: "If their budget is clearly lower", say: "Anlıyorum. Kıdemli veya mimar seviyesi için ayrı bir bütçe bandı var mı?" }],
+        meaning: "I'm flexible depending on scope and benefits. I'm thinking of a 150–170K TL net range.",
+        tip: "Large corporates 180K+ · Mid-size 160–185K · Teknopark 145–165K. Never below 140K net."
+      },
+      {
+        id: "why-leaving", group: "objection", icon: "🔄", title: "Why are you leaving Pilz?", trigger: "Neden ayrılıyorsunuz?",
+        say: "Pilz Türkiye'de kurduğum portal canlıda ve stabil çalışıyor; projeyi tamamlayıp devrettim. Şimdi daha büyük bir yazılım ekibinde mimari sorumluluk almak istiyorum.",
+        meaning: "The portal I built at Pilz Türkiye is live and stable; I completed and handed over the project. Now I want architecture responsibility in a bigger software team.",
+        tip: "Never mention the permit date, payout or family."
+      },
+      {
+        id: "start", group: "objection", icon: "📅", title: "When can you start?", trigger: "Ne zaman başlayabilirsiniz?",
+        say: "Ocak başı itibarıyla başlayabilirim; mevcut görevlerimi düzgün devretmek istiyorum.",
+        meaning: "I can start in early January; I want to hand over my current work properly."
+      },
+      {
+        id: "office", group: "objection", icon: "🏙️", title: "Office / hybrid question", trigger: "Ofise gelebilir misiniz?",
+        say: "Kartal'da oturuyorum, Anadolu yakasındayım; ofis veya hibrit çalışma benim için sorun değil. İsterseniz yüz yüze kısa bir görüşme için de uğrayabilirim.",
+        meaning: "I live in Kartal on the Asian side; office or hybrid is fine. I can also drop by for a short face-to-face meeting.",
+        tip: "This is your face-to-face bridge. Always offer to come by."
+      },
+      {
+        id: "show-me", group: "objection", icon: "🖥️", title: "They ask to see your work", trigger: "Projelerinizi görebilir miyiz?",
+        say: "Tabii, memnuniyetle. Portal ve EvenTracer canlıda; linkleri hemen e-postayla iletebilirim. İsterseniz ekran paylaşarak 5 dakikada birlikte de bakabiliriz.",
+        meaning: "Of course. The portal and EvenTracer are live; I can email the links right away, or we can look together via a 5-minute screen-share.",
+        tip: "Let them ask. Once they do, the demo is welcome."
+      },
+      {
+        id: "under-review", group: "objection", icon: "⏳", title: "Application is under review", trigger: "Değerlendirme aşamasında, dönüş yaparız",
+        say: "Anlıyorum, teşekkürler. Süreç genelde ne kadar sürüyor? Size doğrudan ulaşabilmem için e-posta adresinizi alabilir miyim?",
+        meaning: "I understand, thanks. How long does the process usually take? May I have your email so I can reach you directly?",
+        tip: "Leave with a timeline and a direct email."
+      },
+      {
+        id: "filled", group: "objection", icon: "🚫", title: "Position is filled", trigger: "Pozisyon doldu",
+        say: "Bilgi için teşekkürler. Yakında .NET, React veya yapay zekâ tarafında açılacak başka bir pozisyon olursa değerlendirmeniz için CV'mi sizde tutabilir misiniz?",
+        meaning: "Thanks for letting me know. If another .NET, React or AI role opens soon, could you keep my CV on file?"
+      },
+      {
+        id: "not-fit", group: "objection", icon: "📉", title: "You're not a fit", trigger: "Profiliniz uygun değil",
+        say: "Anlıyorum, teşekkür ederim. Gelişimim için sorabilir miyim, hangi konuda eksik gördünüz?",
+        meaning: "I understand, thank you. For my own development, may I ask which area you saw as lacking?",
+        tip: "Write the answer in Call Notes. This feedback is the data you're missing."
+      },
+      {
+        id: "busy", group: "objection", icon: "⏰", title: "They're busy right now", trigger: "Şu an müsait değilim",
+        say: "Hiç sorun değil. Sizi ne zaman aramam daha uygun olur?",
+        meaning: "No problem at all. When would be a better time to call you?",
+        tip: "Write the time down and call back exactly then."
+      },
+      {
+        id: "interested", group: "close", icon: "✅", title: "They're interested: book it", trigger: "Görüşelim",
+        say: "Harika, teşekkür ederim. Bu hafta hangi gün ve saat sizin için uygun? CV'mi ve referans mektubumu hangi adrese iletebilirim?",
+        meaning: "Great, thank you. Which day and time this week suits you? Which address should I send my CV and reference letter to?",
+        tip: "Don't hang up without a specific day and time."
+      },
+      {
+        id: "urgency", group: "close", icon: "⚡", title: "Interested but slow: honest urgency", trigger: "Sizi haberdar ederiz...",
+        say: "Başka şirketlerle de görüşme sürecindeyim; ancak sizin pozisyonunuz benim için öncelikli. Süreç takviminizi öğrenebilir miyim?",
+        meaning: "I'm also in interview processes with other companies, but your role is my priority. May I learn your timeline?",
+        tip: "Use ONLY when true (an interview is running elsewhere) and only after they've shown interest. Never on a first call, never invent offers."
+      },
+      {
+        id: "no-answer", group: "close", icon: "🔁", title: "No answer",
+        tip: "Call once more the next day at a different time (10:00–11:30 or 14:00–16:30). Still nothing: send the follow-up email."
+      },
+      {
+        id: "email", group: "close", icon: "✉️", title: "Follow-up email (within 30 min)",
+        say: "Konu: Görüşmemiz – {role} – Hessam Mamagani\n\n{name} merhaba,\n\nBugünkü görüşmemiz için teşekkür ederim. Konuştuğumuz üzere CV'mi ve referans mektubumu ekte iletiyorum.\nCanlı demolar: https://pilztr.online/portal · https://www.eventracer.com/en\nPortfolyo: https://hessam-mamagani.github.io/\n\nKısa bir görüşme için uygun olduğunuz zamanı paylaşırsanız sevinirim.\n\nSaygılarımla,\nHessam Mamagani · +90 539 229 4251",
+        tip: "Attach Hessam_Mamagani_CV_ve_Referans_TR.pdf."
+      },
+      {
+        id: "log", group: "close", icon: "📝", title: "After every call",
+        tip: "Write who you spoke to, their email, next step and callback time in Call Notes, then Save Note & Mark Called."
+      }
+    ];
+    const CALL_PLAYBOOK_SEARCH_INDEX = new Map();
+    let CALL_PLAYBOOK_CTX = null;
+
+    function getCallPlaybookContext(itemId) {
+      if (!itemId) return null;
+      try {
+        const item = getUnifiedPipelineList().find(x => String(x.id) === String(itemId));
+        if (!item) return null;
+        const cp = item.callPriority || {};
+        return {
+          company: String(item.company || "").split("(")[0].trim(),
+          role: String(item.cleanRole || item.role || "").split("&")[0].trim(),
+          name: cp.askForFirstName || "",
+          askFor: item.askForContact || "",
+          phone: item.phone || "",
+          phoneDisplay: item.phoneDisplay || item.phone || ""
+        };
+      } catch (err) {
+        console.warn("Call Playbook context failed:", err);
+        return null;
+      }
+    }
+
+    function fillCallPlaybookText(text, ctx) {
+      const c = ctx || {};
+      return String(text || "")
+        .replace(/\{name\}/g, c.name || "[İsim] Hanım/Bey")
+        .replace(/\{role\}/g, c.role || "[Pozisyon]")
+        .replace(/\{company\}/g, c.company || "[Şirket]");
+    }
+
+    function callPlaybookCopyBtn(key) {
+      return `<button type="button" onclick="copyFromStore('${key}', this, '📋 Copied!')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[10px] font-semibold text-slate-200 cursor-pointer transition shrink-0">📋 Copy</button>`;
+    }
+
+    function renderCallPlaybookItem(s, ctx) {
+      const say = s.say ? fillCallPlaybookText(s.say, ctx) : "";
+      const sayKey = say ? registerCopyPayload(`cpb_${s.id}`, say) : "";
+      const alts = (s.alts || []).filter(a => !a.requiresName || (ctx && ctx.name));
+      const altHtml = alts.map((a, i) => {
+        const t = fillCallPlaybookText(a.say, ctx);
+        const k = registerCopyPayload(`cpb_${s.id}_alt${i}`, t);
+        return `<div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-700 space-y-1">
+            <div class="flex items-center justify-between gap-2"><span class="text-[10px] font-bold text-cyan-300">${escapeHtmlSafe(a.label)}</span>${callPlaybookCopyBtn(k)}</div>
+            <div class="text-sm text-white leading-relaxed">${escapeHtmlSafe(t)}</div>
+          </div>`;
+      }).join("");
+      CALL_PLAYBOOK_SEARCH_INDEX.set(s.id, [s.title, s.trigger, say, s.meaning, s.tip, ...alts.map(a => `${a.label} ${a.say}`)]
+        .filter(Boolean).join(" ").toLocaleLowerCase("tr-TR"));
+
+      return `<details class="cpb-item glass rounded-xl border border-slate-800 overflow-hidden" data-cpb-id="${s.id}">
+          <summary class="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none hover:bg-slate-800/60">
+            <span class="cpb-chevron text-slate-400 text-[10px] transition-transform">▶</span>
+            <span class="text-base leading-none">${s.icon}</span>
+            <span class="text-xs md:text-sm font-bold text-white flex-1">${escapeHtmlSafe(s.title)}</span>
+            ${s.trigger ? `<span class="hidden sm:inline text-[10px] text-slate-400 italic truncate max-w-[45%]">"${escapeHtmlSafe(s.trigger)}"</span>` : ""}
+          </summary>
+          <div class="px-3 pb-3 pt-2 space-y-2 border-t border-slate-800">
+            ${say ? `<div class="p-2.5 rounded-lg bg-amber-950/30 border border-amber-500/30 space-y-1">
+              <div class="flex items-center justify-between gap-2"><span class="text-[10px] font-bold text-amber-300">🗣️ Say (TR)</span>${callPlaybookCopyBtn(sayKey)}</div>
+              <div class="text-sm text-white leading-relaxed whitespace-pre-wrap">${escapeHtmlSafe(say)}</div>
+            </div>` : ""}
+            ${altHtml}
+            ${s.meaning ? `<div class="text-[11px] text-slate-400 leading-snug"><span class="font-bold text-slate-300">EN:</span> ${escapeHtmlSafe(s.meaning)}</div>` : ""}
+            ${s.tip ? `<div class="text-[11px] text-emerald-300 leading-snug">💡 ${escapeHtmlSafe(s.tip)}</div>` : ""}
+          </div>
+        </details>`;
+    }
+
+    function renderCallPlaybook() {
+      const body = document.getElementById("callPlaybookBody");
+      if (!body) return;
+      const ctx = CALL_PLAYBOOK_CTX;
+      const ctxEl = document.getElementById("callPlaybookContext");
+      if (ctxEl) {
+        ctxEl.innerHTML = ctx
+          ? `<span class="font-bold text-amber-200">${escapeHtmlSafe(ctx.company)}</span>${ctx.role ? ` · ${escapeHtmlSafe(ctx.role)}` : ""}${ctx.askFor ? ` · Ask for: <span class="text-cyan-300 font-semibold">${escapeHtmlSafe(ctx.askFor)}</span>` : ""}${ctx.phone ? ` · <a href="tel:${escapeHtmlSafe(ctx.phone)}" class="text-amber-300 font-bold hover:underline">📞 ${escapeHtmlSafe(ctx.phoneDisplay)}</a>` : ""}`
+          : "General scripts. Open it from a company row to auto-fill name, role and company.";
+      }
+      CALL_PLAYBOOK_SEARCH_INDEX.clear();
+      body.innerHTML = CALL_PLAYBOOK_GROUPS.map(g => {
+        const items = CALL_PLAYBOOK_SCENARIOS.filter(s => s.group === g.id);
+        return `<div class="space-y-2" data-cpb-group="${g.id}">
+            <div class="text-[11px] font-extrabold tracking-wide text-amber-300 px-1">${escapeHtmlSafe(g.label)}</div>
+            ${items.map(s => renderCallPlaybookItem(s, ctx)).join("")}
+          </div>`;
+      }).join("") + `<div id="callPlaybookEmpty" class="hidden text-center text-xs text-slate-400 py-8">No matching scenario. Try another word.</div>`;
+      filterCallPlaybook();
+    }
+
+    function filterCallPlaybook() {
+      const q = String(document.getElementById("callPlaybookSearch")?.value || "").trim().toLocaleLowerCase("tr-TR");
+      let visible = 0;
+      document.querySelectorAll("#callPlaybookBody .cpb-item").forEach(el => {
+        const match = !q || (CALL_PLAYBOOK_SEARCH_INDEX.get(el.dataset.cpbId) || "").includes(q);
+        el.classList.toggle("hidden", !match);
+        if (match) visible++;
+        if (q && match) el.open = true;
+      });
+      document.querySelectorAll("#callPlaybookBody [data-cpb-group]").forEach(g => {
+        g.classList.toggle("hidden", !g.querySelector(".cpb-item:not(.hidden)"));
+      });
+      document.getElementById("callPlaybookEmpty")?.classList.toggle("hidden", visible > 0);
+    }
+
+    function setCallPlaybookExpanded(open) {
+      document.querySelectorAll("#callPlaybookBody .cpb-item:not(.hidden)").forEach(el => { el.open = open; });
+    }
+
+    function openCallPlaybook(itemId) {
+      CALL_PLAYBOOK_CTX = getCallPlaybookContext(itemId);
+      const search = document.getElementById("callPlaybookSearch");
+      if (search) search.value = "";
+      renderCallPlaybook();
+      document.getElementById("callPlaybookDrawer")?.classList.remove("hidden");
+    }
+
+    function closeCallPlaybook() {
+      document.getElementById("callPlaybookDrawer")?.classList.add("hidden");
+    }
+
     function buildTurkishCallScript(item) {
       const cleanComp = item.company.split("(")[0].trim();
       const cp = item.callPriority || {};
@@ -8597,6 +8884,9 @@ ${closeLine}"`;
                   <button type="button" onclick="copyFromStore('${copyCallScriptKey}', this, '📞 Turkish call script copied!')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-200 font-semibold text-xs cursor-pointer transition">
                     📋 Copy Call Script
                   </button>
+                  <button type="button" onclick="openCallPlaybook('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-amber-500/50 text-amber-200 font-bold text-xs cursor-pointer transition">
+                    📖 Call Playbook
+                  </button>
                   <button type="button" onclick="togglePipelineCheck('${item.id}', 'callWalk', ${!ch.callWalk})" class="px-3 py-1.5 rounded-lg ${ch.callWalk ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} font-bold text-xs cursor-pointer transition">
                     ${ch.callWalk ? '↩️ Undo Called' : '✅ Mark Called'}
                   </button>
@@ -8818,7 +9108,7 @@ ${closeLine}"`;
                 </div>
                 <p class="text-xs text-slate-300 font-medium truncate max-w-xl mt-0.5">${item.role}</p>
                 <p class="text-[11px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                  ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" onclick="event.stopPropagation()" class="text-amber-300 hover:text-amber-200 font-bold">📞 ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a><span class="text-slate-600">&middot;</span>` : ""}
+                  ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" onclick="event.stopPropagation()" class="text-amber-300 hover:text-amber-200 font-bold">📞 ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a><button type="button" onclick="event.stopPropagation(); openCallPlaybook('${item.id}')" class="ml-1.5 px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 text-[10px] font-bold cursor-pointer transition" title="Open Call Playbook for this company">📖 Script</button><span class="text-slate-600">&middot;</span>` : ""}
                   ${item.askForContact ? `<span class="${item.callPriority?.askForIsPoster ? 'text-amber-200 font-semibold' : 'text-cyan-300 font-medium'}">${item.callPriority?.askForIsPoster ? '🎯 Ask (Job Poster):' : '👤 Ask HR:'} ${escapeHtmlSafe(item.askForContact)}</span><span class="text-slate-600">&middot;</span>` : ""}
                   <span>📍 ${escapeHtmlSafe(locationShort)}</span>
                   <span class="text-slate-600">&middot;</span>
@@ -10450,6 +10740,8 @@ ${closeLine}"`;
       if (e.key === "Escape") {
         const drawer = document.getElementById("copilotDrawer");
         if (drawer && !drawer.classList.contains("hidden")) closeCopilotDrawer();
+        const playbook = document.getElementById("callPlaybookDrawer");
+        if (playbook && !playbook.classList.contains("hidden")) closeCallPlaybook();
         const pop = document.getElementById("healthPopover");
         if (pop && !pop.classList.contains("hidden")) pop.classList.add("hidden");
       }
