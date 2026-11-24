@@ -317,7 +317,10 @@
           </div>
         </div>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2.5 border-t border-slate-800/80">
-          <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, HR, job poster, or call notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 flex-1 focus:outline-none focus:border-emerald-500" />
+          <div class="relative flex-1">
+            <input id="pipelineSearch" oninput="renderUnifiedPipeline()" onkeydown="if(event.key==='Escape'&&this.value){clearPipelineSearch();}" placeholder="Search company, role, HR, job poster, or call notes..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-500" />
+            <button type="button" id="pipelineSearchClearBtn" onclick="clearPipelineSearch()" class="hidden absolute right-1.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-slate-400 hover:text-white hover:bg-slate-700/80 text-xs font-bold leading-none cursor-pointer transition" title="Clear search" aria-label="Clear search">&times;</button>
+          </div>
           <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 w-full sm:w-80 md:w-96 focus:outline-none focus:border-emerald-500">
               <option value="ACTIVE" selected>Active Companies — Hide Rejected (Top Sponsors First)</option>
               <option value="ALL">All Companies (Including Rejected)</option>
@@ -336,6 +339,7 @@
               <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
               <option value="CLUSTER_MASLAK">📍 Maslak &amp; İTÜ Teknokent</option>
           </select>
+          <button type="button" id="pipelineResetBtn" onclick="resetPipelineFilters()" class="hidden px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold shrink-0 cursor-pointer transition" title="Clear search and reset filter to default">Reset</button>
         </div>
       </div>
 
@@ -345,7 +349,10 @@
       <div id="tab-crm" class="hidden space-y-3">
         <div class="glass rounded-xl p-3.5 flex flex-wrap items-center justify-between gap-3 border border-slate-800">
           <div class="flex flex-wrap items-center gap-2.5 flex-1">
-            <input id="crmSearch" oninput="renderCrm()" type="text" placeholder="Filter table by company, role, location, or notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white w-full md:w-72 focus:outline-none focus:border-blue-500" />
+            <div class="relative w-full md:w-72">
+              <input id="crmSearch" oninput="renderCrm()" onkeydown="if(event.key==='Escape'&&this.value){clearCrmSearch();}" type="text" placeholder="Filter table by company, role, location, or notes..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-3 pr-8 py-1.5 text-xs text-white focus:outline-none focus:border-blue-500" />
+              <button type="button" id="crmSearchClearBtn" onclick="clearCrmSearch()" class="hidden absolute right-1.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-slate-400 hover:text-white hover:bg-slate-700/80 text-xs font-bold leading-none cursor-pointer transition" title="Clear search" aria-label="Clear search">&times;</button>
+            </div>
             <select id="crmStatusFilter" onchange="renderCrm()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
               <option value="ACTIVE" selected>Active Statuses (Hide Rejected)</option>
               <option value="ALL">All Statuses (Including Rejected)</option>
@@ -357,6 +364,7 @@
               <option value="Applied">Applied</option>
               <option value="Rejected">Rejected</option>
             </select>
+            <button type="button" id="crmResetBtn" onclick="resetCrmFilters()" class="hidden px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer transition" title="Clear search and reset status filter to default">Reset</button>
           </div>
           <button onclick="openAddModal()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white cursor-pointer">
             + Log Manual Application
@@ -1554,7 +1562,7 @@
       updateGlobalCountryCounts();
     }
 
-    function jumpToCompanyCard(compKey) {
+    function jumpToCompanyCard(compKey, preferredId = "") {
       switchTab("pipeline");
       setPipelineViewMode("compact");
       const filterEl = document.getElementById("pipelineFilter");
@@ -1562,7 +1570,9 @@
       const searchEl = document.getElementById("pipelineSearch");
       if (searchEl) searchEl.value = "";
       renderUnifiedPipeline();
-      const target = UNIFIED_PIPELINE_ITEMS.find(it => it.companyKey === compKey || it.company.toLowerCase().includes(compKey));
+      const target =
+        (preferredId ? UNIFIED_PIPELINE_ITEMS.find(it => String(it.id) === String(preferredId)) : null) ||
+        UNIFIED_PIPELINE_ITEMS.find(it => it.companyKey === compKey || it.company.toLowerCase().includes(compKey));
       if (target) {
         if (isRejectedOnlyPipelineItem(target) && filterEl) {
           filterEl.value = "ALL";
@@ -4677,37 +4687,95 @@
       }
     }
 
+    function getTodayDismissedActionKey() {
+      return `jr_today_dismissed_${new Date().toISOString().slice(0, 10)}`;
+    }
+
+    function getTodayDismissedActions() {
+      try {
+        const arr = JSON.parse(localStorage.getItem(getTodayDismissedActionKey()) || "[]");
+        return new Set(Array.isArray(arr) ? arr.map(String) : []);
+      } catch {
+        return new Set();
+      }
+    }
+
+    function dismissTodayAction(itemId) {
+      const set = getTodayDismissedActions();
+      set.add(String(itemId));
+      try {
+        localStorage.setItem(getTodayDismissedActionKey(), JSON.stringify([...set]));
+      } catch {}
+      renderTodayActionStrip();
+    }
+
+    function resetTodayDismissedActions() {
+      try {
+        localStorage.removeItem(getTodayDismissedActionKey());
+      } catch {}
+      renderTodayActionStrip();
+    }
+
+    function hasUsableDirectEmail(item, ch) {
+      const ev = item?.aiIntel?.emailVerification;
+      return Boolean(
+        item?.email &&
+        isCleanHrEmail(item.email) &&
+        !ch?.emailBlocked &&
+        !ev?.bounced &&
+        !ev?.noPublicHrEmail &&
+        !ev?.isBlockedGiant &&
+        !ev?.unconfirmedOnWeb
+      );
+    }
+
     function renderTodayActionStrip() {
       const strip = document.getElementById("todayActionStrip");
       if (!strip) return;
-      if (!UNIFIED_PIPELINE_ITEMS.length) {
-        try { UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList(); } catch {}
-      }
+      try { UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList(); } catch {}
       const checks = getPipelineCheckState();
+      const dismissed = getTodayDismissedActions();
       const actions = [];
 
-      // 1. Hot Signals (Interview / CV Downloaded / Viewed) needing follow-up
+      const isEligible = (item) => {
+        if (!item) return false;
+        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) return false;
+        if (isRejectedOnlyPipelineItem(item)) return false;
+        if (dismissed.has(String(item.id))) return false;
+        if (actions.some(a => String(a.itemId) === String(item.id))) return false;
+        return true;
+      };
+
+      // 1. True Hot Signals (Interview / CV Downloaded / Viewed) needing follow-up
       for (const item of UNIFIED_PIPELINE_ITEMS) {
-        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        if (actions.length >= 2) break;
+        if (!isEligible(item)) continue;
         const ch = resolveItemChannels(item, checks);
-        if (["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status) && (!ch.email || !ch.techDm)) {
+        const needsEmail = hasUsableDirectEmail(item, ch) && !ch.email;
+        const needsDm = !ch.techDm && !ch.hrDm && !ch.connDm;
+        if (["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀"].includes(item.status) && (needsEmail || !ch.techDm)) {
           actions.push({
             tag: item.status,
             company: item.company,
             role: item.cleanRole || item.role,
-            reason: !ch.email ? "Hot signal — send direct follow-up email + CTO LinkedIn DM" : "Hot signal — message Engineering Lead / Recruiter on LinkedIn",
+            reason: needsEmail && !ch.techDm
+              ? "Hot signal — send direct follow-up email + Tech Lead LinkedIn DM"
+              : needsEmail
+              ? "Hot signal — send direct follow-up email"
+              : needsDm
+              ? "Hot signal — message Tech Lead & Recruiter on LinkedIn"
+              : "Hot signal — follow up with Tech Lead / Engineering Manager on LinkedIn",
             btnLabel: "📂 Open Outreach",
-            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}')`,
+            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}', '${String(item.id).replace(/'/g, "\\'")}')`,
             itemId: item.id
           });
         }
-        if (actions.length >= 2) break;
       }
 
       // 2. Unfinished External Portals ('Clicked Apply ⏳')
       for (const item of UNIFIED_PIPELINE_ITEMS) {
         if (actions.length >= 3) break;
-        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        if (!isEligible(item)) continue;
         const ch = resolveItemChannels(item, checks);
         if (item.hasUnfinishedPortal && !ch.applied) {
           actions.push({
@@ -4722,21 +4790,49 @@
         }
       }
 
-      // 3. Fast-Track Sponsors needing direct Email or Tech DM
+      // 3. Applied companies with zero outreach done yet (newest applications first)
+      const untouchedApplied = UNIFIED_PIPELINE_ITEMS
+        .filter(item => {
+          if (!isEligible(item)) return false;
+          const ch = resolveItemChannels(item, checks);
+          return ch.applied && !ch.email && !ch.techDm && !ch.hrDm && !ch.connDm && !ch.callWalk;
+        })
+        .sort((a, b) => String(b.appliedAt || "").localeCompare(String(a.appliedAt || "")));
+
+      for (const item of untouchedApplied) {
+        if (actions.length >= 4) break;
+        const ch = resolveItemChannels(item, checks);
+        const needsEmail = hasUsableDirectEmail(item, ch);
+        actions.push({
+          tag: item.giantRank ? `🏆 #${item.giantRank} Sponsor` : "Needs Outreach",
+          company: item.company,
+          role: item.cleanRole || item.role,
+          reason: needsEmail
+            ? "Applied — send direct HR email & LinkedIn DM"
+            : "Applied — message Tech Lead / Recruiter on LinkedIn (no public HR email)",
+          btnLabel: "📂 Open Outreach",
+          onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}', '${String(item.id).replace(/'/g, "\\'")}')`,
+          itemId: item.id
+        });
+      }
+
+      // 4. Fallback: Fast-Track / Ranked Sponsors still needing actionable outreach
       for (const item of UNIFIED_PIPELINE_ITEMS) {
         if (actions.length >= 4) break;
-        if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
-        if (isRejectedOnlyPipelineItem(item)) continue;
-        if (actions.some(a => a.itemId === item.id)) continue;
+        if (!isEligible(item)) continue;
         const ch = resolveItemChannels(item, checks);
-        if ((item.smartMeta?.isFastSponsor || item.giantRank) && (!ch.email || !ch.techDm)) {
+        const needsEmail = hasUsableDirectEmail(item, ch) && !ch.email;
+        const hasAnyDmOrCall = Boolean(ch.techDm || ch.hrDm || ch.connDm || ch.callWalk);
+        if ((item.smartMeta?.isFastSponsor || item.giantRank) && (needsEmail || !hasAnyDmOrCall)) {
           actions.push({
             tag: item.giantRank ? `🏆 #${item.giantRank} Sponsor` : "⚡ Fast Sponsor",
             company: item.company,
             role: item.cleanRole || item.role,
-            reason: ch.applied ? "Applied — send direct HR email & Tech Lead DM today" : "High-fit sponsor — apply & send direct outreach",
+            reason: ch.applied
+              ? (needsEmail ? "Applied — send direct HR email & Tech Lead DM" : "Applied — message Tech Lead / Recruiter on LinkedIn")
+              : (needsEmail ? "High-fit sponsor — apply & send direct email / LinkedIn DM" : "High-fit sponsor — apply & message Tech Lead / Recruiter on LinkedIn"),
             btnLabel: "📂 Open Outreach",
-            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}')`,
+            onClick: `jumpToCompanyCard('${normalizeCompanyKey(item.company)}', '${String(item.id).replace(/'/g, "\\'")}')`,
             itemId: item.id
           });
         }
@@ -4746,7 +4842,10 @@
         strip.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
             <span class="text-slate-300"><strong>☀️ Today's Focus:</strong> Scan unseen jobs below or review your active applications in View 2.</span>
-            <button type="button" onclick="openCopilotDrawer(null); setTimeout(()=>sendCopilotPrompt('Give me my top 4 highest-impact actions for today based on my live D1 CRM and Dec 31 deadline.'), 100);" class="text-emerald-400 hover:underline font-semibold cursor-pointer">🤖 Ask Copilot for Today's Plan →</button>
+            <div class="flex items-center gap-3">
+              ${dismissed.size ? `<button type="button" onclick="resetTodayDismissedActions()" class="text-slate-400 hover:text-white cursor-pointer">Reset hidden (${dismissed.size})</button>` : ""}
+              <button type="button" onclick="openCopilotDrawer(null); setTimeout(()=>sendCopilotPrompt('Give me my top 4 highest-impact actions for today based on my live D1 CRM and Dec 31 deadline.'), 100);" class="text-emerald-400 hover:underline font-semibold cursor-pointer">🤖 Ask Copilot for Today's Plan →</button>
+            </div>
           </div>
         `;
         return;
@@ -4759,6 +4858,7 @@
             <p class="text-xs text-slate-400">Auto-prioritized from your live D1 applications, hot signals, and fast work-permit sponsors.</p>
           </div>
           <div class="flex items-center gap-2 text-xs flex-wrap">
+            ${dismissed.size ? `<button type="button" onclick="resetTodayDismissedActions()" class="text-slate-400 hover:text-white cursor-pointer" title="Show cards hidden today">Reset hidden (${dismissed.size})</button><span class="text-slate-700">&middot;</span>` : ""}
             ${ACTIVE_COUNTRY === "TR" ? `<button type="button" onclick="openCallPriorityQueue()" class="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/40 text-amber-200 font-bold cursor-pointer transition">📞 Pure-Tech Call Queue (35)</button><span class="text-slate-700">&middot;</span>` : ""}
             <button type="button" onclick="switchTab('pipeline'); document.getElementById('pipelineFilter').value='UNFINISHED_PORTAL'; renderUnifiedPipeline();" class="text-slate-300 hover:text-white cursor-pointer">⏳ Unfinished Portals</button>
             <span class="text-slate-700">&middot;</span>
@@ -4771,7 +4871,10 @@
               <div>
                 <div class="flex items-center justify-between gap-1.5 text-[11px] text-slate-400 mb-0.5">
                   <span class="font-semibold text-amber-300">${escapeHtmlSafe(act.tag)}</span>
-                  <button type="button" onclick="openCopilotForPipelineItem('${act.itemId}')" class="text-slate-400 hover:text-emerald-300 font-semibold cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(act.company)}">🤖 Copilot</button>
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="openCopilotForPipelineItem('${act.itemId}')" class="text-slate-400 hover:text-emerald-300 font-semibold cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(act.company)}">🤖 Copilot</button>
+                    <button type="button" onclick="dismissTodayAction('${String(act.itemId).replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-white font-bold leading-none cursor-pointer px-1 rounded hover:bg-slate-800" title="Hide from Today's Actions for today" aria-label="Dismiss">&times;</button>
+                  </div>
                 </div>
                 <div class="text-xs font-bold text-white truncate">${escapeHtmlSafe(act.company)}</div>
                 <div class="text-[11px] text-slate-300 truncate">${escapeHtmlSafe(act.role)}</div>
@@ -6097,9 +6200,31 @@
       showToast(`📌 Updated status to "${newStatus}"!`, true);
     }
 
+    function clearCrmSearch() {
+      const el = document.getElementById("crmSearch");
+      if (el) {
+        el.value = "";
+        el.focus();
+      }
+      renderCrm();
+    }
+
+    function resetCrmFilters() {
+      const searchEl = document.getElementById("crmSearch");
+      if (searchEl) searchEl.value = "";
+      const filterEl = document.getElementById("crmStatusFilter");
+      if (filterEl) filterEl.value = "ACTIVE";
+      renderCrm();
+    }
+
     function renderCrm() {
-      const q = (document.getElementById("crmSearch")?.value || "").toLowerCase();
+      const rawQ = document.getElementById("crmSearch")?.value || "";
+      const q = rawQ.toLowerCase();
       const statusFilter = document.getElementById("crmStatusFilter")?.value || "ACTIVE";
+      const clearCrmBtn = document.getElementById("crmSearchClearBtn");
+      if (clearCrmBtn) clearCrmBtn.classList.toggle("hidden", !rawQ);
+      const resetCrmBtn = document.getElementById("crmResetBtn");
+      if (resetCrmBtn) resetCrmBtn.classList.toggle("hidden", !rawQ && statusFilter === "ACTIVE");
       updateGlobalCountryCounts();
 
       const rows = STATE.applied.filter(item => {
@@ -9320,6 +9445,23 @@ ${closeLine}"`;
       `;
     }
 
+    function clearPipelineSearch() {
+      const el = document.getElementById("pipelineSearch");
+      if (el) {
+        el.value = "";
+        el.focus();
+      }
+      renderUnifiedPipeline();
+    }
+
+    function resetPipelineFilters() {
+      const searchEl = document.getElementById("pipelineSearch");
+      if (searchEl) searchEl.value = "";
+      const filterEl = document.getElementById("pipelineFilter");
+      if (filterEl) filterEl.value = "ACTIVE";
+      renderUnifiedPipeline();
+    }
+
     function renderUnifiedPipeline() {
       const container = document.getElementById("pipelineContainer");
       if (!container) return;
@@ -9327,8 +9469,13 @@ ${closeLine}"`;
       if (callQueueBtn) {
         callQueueBtn.classList.toggle("hidden", ACTIVE_COUNTRY !== "TR");
       }
-      const q = (document.getElementById("pipelineSearch")?.value || "").toLowerCase().trim();
+      const rawQ = document.getElementById("pipelineSearch")?.value || "";
+      const q = rawQ.toLowerCase().trim();
       const filter = document.getElementById("pipelineFilter")?.value || "ACTIVE";
+      const clearSearchBtn = document.getElementById("pipelineSearchClearBtn");
+      if (clearSearchBtn) clearSearchBtn.classList.toggle("hidden", !rawQ);
+      const resetBtn = document.getElementById("pipelineResetBtn");
+      if (resetBtn) resetBtn.classList.toggle("hidden", !rawQ && filter === "ACTIVE");
       const checks = getPipelineCheckState();
 
       UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList();
