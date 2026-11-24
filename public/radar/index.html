@@ -1768,6 +1768,7 @@
       document.getElementById("cloudAuthGate").classList.add("hidden");
       document.getElementById("cloudAuthGate").classList.remove("flex");
       await loadState();
+      setTimeout(() => loadSystemHealth(false), 600);
     }
 
     async function initApp() {
@@ -2707,7 +2708,7 @@
       },
       intertech: {
         domain: "intertech.com.tr",
-        emails: ["ik@intertech.com.tr", "iletisim@intertech.com.tr"],
+        emails: [],
         phone: "+90 (216) 664 20 00",
         ctoAndEngLeads: [
           { name: "Ömer Uyar / Intertech Architecture Leadership", title: "CEO & Enterprise .NET / AI Architecture Directors — Teknopark İstanbul", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Intertech%20Yazilim%20Mimari%20OR%20Direktor&geoUrn=%5B%22102105699%22%5D" }
@@ -2720,7 +2721,7 @@
       },
       pegasus: {
         domain: "flypgs.com",
-        emails: ["ik@flypgs.com"],
+        emails: [],
         phone: "+90 (216) 560 70 00",
         ctoAndEngLeads: [
           { name: "Barış Fındık / Pegasus IT & Innovation Lab", title: "CIO & Software Engineering Directors — Kurtköy Aeropark", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Pegasus%20Airlines%20Software%20Engineering%20Manager%20OR%20CIO&geoUrn=%5B%22102105699%22%5D" }
@@ -2933,7 +2934,7 @@
       },
       sahibinden: {
         domain: "sahibinden.com",
-        emails: ["ik@sahibinden.com", "kariyer@sahibinden.com"],
+        emails: [],
         phone: "+90 (216) 577 70 00",
         ctoAndEngLeads: [
           { name: "Sahibinden.com CTO / Yazılım Geliştirme Genel Müdür Yrd.", title: "Chief Technology Officer (Sahibinden Teknoloji Ar-Ge Merkezi)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=sahibinden%20CTO%20Yazilim" }
@@ -3108,7 +3109,7 @@
       },
       softtech: {
         domain: "softtech.com.tr",
-        emails: ["ik@softtech.com.tr"],
+        emails: [],
         phone: "0850 290 60 00",
         ctoAndEngLeads: [
           { name: "Softtech Software Engineering Leadership", title: "Software Development Director / Architect (İş Bankası Tech)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Softtech%20Yazilim%20Direktoru" }
@@ -3147,7 +3148,7 @@
       },
       sabancidx: {
         domain: "sabancidx.com",
-        emails: ["ik@sabancidx.com"],
+        emails: [],
         phone: "+90 (216) 538 78 00",
         ctoAndEngLeads: [
           { name: "SabancıDx Technology & Cloud Leadership", title: "CTO / Software Engineering Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=SabanciDx%20CTO%20Engineering" }
@@ -3186,7 +3187,7 @@
       },
       hitit: {
         domain: "hititcs.com",
-        emails: ["kariyer@hititcs.com"],
+        emails: ["careers@hititcs.com"],
         phone: "+90 (212) 276 15 00",
         ctoAndEngLeads: [
           { name: "Hitit Computer Services Engineering Leadership", title: "VP Engineering / Software Development Director", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Hitit%20Computer%20Services%20Software%20Director" }
@@ -3225,7 +3226,7 @@
       },
       mikro: {
         domain: "mikro.com.tr",
-        emails: ["ik@mikro.com.tr"],
+        emails: [],
         phone: "0850 225 10 10",
         ctoAndEngLeads: [
           { name: "Alpaslan Tomruk", title: "CTO — Mikro Yazılım (TeamSystem TR)", linkedinUrl: "https://www.linkedin.com/search/results/people/?keywords=Alpaslan%20Tomruk%20Mikro" }
@@ -4403,9 +4404,10 @@
         const prevCount = ALL_SCAN_JOBS.length;
 
         let cfFeed = null;
+        const feedEndpoint = `${CF_WORKER_URL}/api/feed${isAutoPoll ? "?lite=1" : ""}`;
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
-            const cfr = await fetch(`${CF_WORKER_URL}/api/feed`, { cache: "no-store", signal: AbortSignal.timeout(15000) });
+            const cfr = await fetch(feedEndpoint, { cache: "no-store", signal: AbortSignal.timeout(15000) });
             if (cfr.ok) {
               cfFeed = await cfr.json();
               break;
@@ -4424,13 +4426,22 @@
 
         if (!cfFeed && !localFeed) {
           const stEl = document.getElementById("scanStatusText");
-          if (stEl) stEl.textContent = "⚠️ Cloud feed sync timed out — retrying automatically in 5s...";
-          if (!window.__feedRetryScheduled) {
+          window.__feedFailStreak = (window.__feedFailStreak || 0) + 1;
+          if (window.__feedFailStreak <= 3 && !window.__feedRetryScheduled && !document.hidden) {
+            const delaySec = window.__feedFailStreak === 1 ? 15 : window.__feedFailStreak === 2 ? 45 : 120;
+            if (stEl) stEl.textContent = `⚠️ Cloud feed sync timed out — retrying in ${delaySec}s (${window.__feedFailStreak}/3)...`;
             window.__feedRetryScheduled = true;
-            setTimeout(() => { window.__feedRetryScheduled = false; loadCloudFeed(true); }, 5000);
+            setTimeout(() => {
+              window.__feedRetryScheduled = false;
+              if (!document.hidden && getGhToken()) loadCloudFeed(true);
+            }, delaySec * 1000);
+          } else if (stEl) {
+            stEl.textContent = "⚠️ Cloud feed paused after retries — click Refresh or Scan Jobs Now.";
           }
           return;
         }
+        window.__feedFailStreak = 0;
+        window.__lastCloudFeedSyncTs = Date.now();
 
         if (Array.isArray(cfFeed?.aiRejectedIds)) {
           for (const rid of cfFeed.aiRejectedIds) CLIENT_AI_REJECTED_IDS.add(String(rid));
@@ -4487,7 +4498,7 @@
         }
         const parsedDt = latestTimeStr ? new Date(latestTimeStr) : null;
         const scannedTime = (parsedDt && !Number.isNaN(parsedDt.getTime())) ? parsedDt.toLocaleString() : "Just now";
-        document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — refreshes every 90s across 5 country tracks).`;
+        document.getElementById("scanStatusText").textContent = `Auto-Sync Active (Last synced: ${scannedTime} — checks feed every 5m while active; cloud cron scans every 20m).`;
         updateGlobalCountryCounts();
         refreshScanButtonLabel();
         renderRadarList();
@@ -4499,9 +4510,19 @@
       }
     }
 
+    // Lightweight UI refresh only while tab is visible & unlocked (background job scanning runs server-side every 20m)
     setInterval(() => {
-      if (!IS_LOCAL) loadCloudFeed(true);
-    }, 90000);
+      if (IS_LOCAL || document.hidden || !getGhToken()) return;
+      loadCloudFeed(true);
+    }, 300000);
+
+    document.addEventListener("visibilitychange", () => {
+      if (IS_LOCAL || document.hidden || !getGhToken()) return;
+      const lastTs = window.__lastCloudFeedSyncTs || 0;
+      if (Date.now() - lastTs > 120000) {
+        loadCloudFeed(true);
+      }
+    });
 
     function updateHeaderCounts() {
       const target = new Date("2026-12-31T23:59:59");
@@ -6212,7 +6233,7 @@
         role: "Kıdemli Yazılım Mühendisi (.NET / Banking / Core)",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Pendik (Teknopark İstanbul)",
-        email: "ik@intertech.com.tr",
+        email: "",
         phone: "+902166642000",
         phoneDisplay: "+90 (216) 664 20 00",
         address: "Teknopark İstanbul, Sanayi Mah. Teknopark Bulvarı No:1/1C, Pendik, İstanbul",
@@ -6305,7 +6326,7 @@
         role: "Senior Software Architect (.NET / Cloud / SAP / Enterprise AI)",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Üsküdar (Küçük Çamlıca)",
-        email: "ik@sabancidx.com",
+        email: "",
         phone: "+902165387800",
         phoneDisplay: "+90 (216) 538 78 00",
         address: "Küçük Çamlıca Mah. Kısıklı Cad. No:56, Üsküdar, İstanbul",
@@ -6320,7 +6341,7 @@
         role: "Lead .NET / Full-Stack Architect & Enterprise AI Lead",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Üsküdar / Çamlıca",
-        email: "kocsistem.ik@kocsistem.com.tr",
+        email: "",
         phone: "+902165561000",
         phoneDisplay: "+90 (216) 556 10 00",
         address: "Bulgurlu Mah. Üsküdar Cad. No:1, Çamlıca / Üsküdar, İstanbul",
@@ -6440,7 +6461,7 @@
         role: "Senior Software Architect / Lead Full-Stack & AI Engineer",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Kozyatağı (DeBaren Plaza · M4 Metro)",
-        email: "ik@sahibinden.com",
+        email: "",
         phone: "+902165777000",
         phoneDisplay: "+90 (216) 577 70 00",
         address: "DeBaren Plaza, İçerenköy Mah. Çayır Cad. No:1, Kozyatağı / Ataşehir, İstanbul",
@@ -6653,7 +6674,7 @@
         role: "Senior .NET / Enterprise Business Applications & ERP Architect",
         cluster: "CLUSTER_GEBZE",
         clusterLabel: "🚅 Gebze GOSB Teknopark (25m Marmaray from Kartal)",
-        email: "ik@logo.com.tr",
+        email: "",
         phone: "+902626798000",
         phoneDisplay: "+90 (262) 679 80 00",
         address: "Şahabettin Bilgisu Cad. No:609, GOSB Teknopark, Gebze / Kocaeli",
@@ -6734,7 +6755,7 @@
         role: "Senior Full-Stack (.NET / React) & AI Solutions Architect",
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 İTÜ Teknokent / Tuzla İş Kuleleri (1,600+ Engineers)",
-        email: "ik@softtech.com.tr",
+        email: "",
         phone: "+908502906000",
         phoneDisplay: "0850 290 60 00 / (216) 316 30 00",
         address: "İTÜ Arı Teknokent, Maslak & Tuzla Teknoloji Operasyon Merkezi, İstanbul",
@@ -6766,7 +6787,7 @@
         role: "Senior Software Engineer / Enterprise Aviation SaaS Architect",
         cluster: "CLUSTER_MASLAK",
         clusterLabel: "📍 İTÜ Teknokent Arı 2 (Global Aviation SaaS)",
-        email: "kariyer@hititcs.com",
+        email: "careers@hititcs.com",
         phone: "+902122761500",
         phoneDisplay: "+90 (212) 276 15 00",
         address: "İTÜ Ayazağa Kampüsü Arı 2 Binası, Maslak / Sarıyer, İstanbul",
@@ -6814,7 +6835,7 @@
         role: "Senior .NET / ERP & e-Invoice Platform Architect",
         cluster: "CLUSTER_ASIAN",
         clusterLabel: "📍 Ataşehir (Italian TeamSystem ERP Group)",
-        email: "ik@mikro.com.tr",
+        email: "",
         phone: "+908502251010",
         phoneDisplay: "0850 225 10 10",
         address: "Küçükbakkalköy Mah., Ataşehir, İstanbul",
@@ -7134,7 +7155,7 @@
 
       const appliedAuto = item.category === "APPLIED" || item.hasAppliedInCrm;
       const notesStr = `${item.summary || ""} ${(item.activeRoles || []).map(r => r.notes || "").join(" ")}`;
-      const emailAuto = /\bsent direct.*email\b|\bsent cv via email\b/i.test(notesStr);
+      const emailAuto = /\bsent (?:direct|combined|follow-?up)?.*email\b|\bsent cv via email\b/i.test(notesStr);
       const hrDmAuto = /\bmessaged.*recruiter\b|\bsueda erkan\b/i.test(notesStr);
       const connAuto = /\b1st-deg.*zuhal\b/i.test(notesStr);
 
@@ -8889,7 +8910,7 @@ ${closeLine}"`;
         if (filter === "FAST_HIRE_DEC31" && !(item.smartMeta?.isFastSponsor && !item.isAgency)) return false;
         if (filter === "PENDING_EMAIL") {
           const hasValidMail = Boolean(item.email && isCleanHrEmail(item.email));
-          if (!hasValidMail || ch.email || ch.emailBlocked || item.aiIntel?.emailVerification?.bounced || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail) {
+          if (!hasValidMail || ch.email || ch.emailBlocked || item.aiIntel?.emailVerification?.bounced || item.aiIntel?.emailVerification?.isBlockedGiant || item.aiIntel?.emailVerification?.noPublicHrEmail || item.aiIntel?.emailVerification?.unconfirmedOnWeb) {
             return false;
           }
         }
@@ -10322,7 +10343,7 @@ ${closeLine}"`;
 
     renderCoachTab();
     initApp();
-    setTimeout(() => loadSystemHealth(false), 800);
+    setTimeout(() => { if (IS_LOCAL || getGhToken()) loadSystemHealth(false); }, 800);
   </script>
 </body>
 </html>
