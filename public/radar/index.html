@@ -319,7 +319,8 @@
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2.5 border-t border-slate-800/80">
           <input id="pipelineSearch" oninput="renderUnifiedPipeline()" placeholder="Search company, role, HR, job poster, or call notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 flex-1 focus:outline-none focus:border-emerald-500" />
           <select id="pipelineFilter" onchange="renderUnifiedPipeline()" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 w-full sm:w-80 md:w-96 focus:outline-none focus:border-emerald-500">
-              <option value="ALL">All Companies (Top Sponsors First)</option>
+              <option value="ACTIVE" selected>Active Companies — Hide Rejected (Top Sponsors First)</option>
+              <option value="ALL">All Companies (Including Rejected)</option>
               <option value="CALL_PRIORITY">📞 Call Priority Queue — 35 Pure-Tech Sponsors (Uncalled First)</option>
               <option value="HOT_SIGNALS">🔥 Hot Signals (Invite / CV Downloaded / Viewed)</option>
               <option value="UNFINISHED_PORTAL">⏳ Unfinished External Portals</option>
@@ -346,7 +347,8 @@
           <div class="flex flex-wrap items-center gap-2.5 flex-1">
             <input id="crmSearch" oninput="renderCrm()" type="text" placeholder="Filter table by company, role, location, or notes..." class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white w-full md:w-72 focus:outline-none focus:border-blue-500" />
             <select id="crmStatusFilter" onchange="renderCrm()" class="bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200">
-              <option value="ALL">All Statuses</option>
+              <option value="ACTIVE" selected>Active Statuses (Hide Rejected)</option>
+              <option value="ALL">All Statuses (Including Rejected)</option>
               <option value="Interview 🎯">Interview / Invite 🎯</option>
               <option value="CV Downloaded ⭐">CV Downloaded ⭐</option>
               <option value="Viewed 👀">Viewed 👀</option>
@@ -1449,6 +1451,14 @@
       }
     };
 
+    function isRejectedStatus(status) {
+      return /^rejected\b/i.test(String(status || "").trim());
+    }
+
+    function isRejectedOnlyPipelineItem(item) {
+      return Boolean(item) && !item.activeRoles?.length && !item.unfinishedPortals?.length && Boolean(item.rejectedRoles?.length);
+    }
+
     function updateGlobalCountryCounts() {
       const keys = ["TR", "IE", "DE", "NL", "UK", "GLOBAL_REMOTE", "OTHER_ABROAD", "ALL"];
       const counts = { TR: 0, IE: 0, DE: 0, NL: 0, UK: 0, GLOBAL_REMOTE: 0, OTHER_ABROAD: 0, ALL: 0 };
@@ -1462,15 +1472,28 @@
           counts[cg] = (counts[cg] || 0) + 1;
           counts.ALL++;
         });
-      } else if (ACTIVE_TAB === "crm") {
+      } else if (ACTIVE_TAB === "crm" || (ACTIVE_TAB === "pipeline" && typeof PIPELINE_VIEW_MODE !== "undefined" && PIPELINE_VIEW_MODE === "table")) {
+        const crmStatusFilter = document.getElementById("crmStatusFilter")?.value || "ACTIVE";
         STATE.applied.forEach(item => {
+          const isRej = isRejectedStatus(item.status);
+          if (crmStatusFilter === "Rejected") {
+            if (!isRej) return;
+          } else if (crmStatusFilter !== "ALL" && isRej) {
+            return;
+          }
           const cg = classifyCountryGroup(item.company, item.location, item.countryGroup);
           counts[cg] = (counts[cg] || 0) + 1;
           counts.ALL++;
         });
       } else {
         const pipeItems = UNIFIED_PIPELINE_ITEMS.length ? UNIFIED_PIPELINE_ITEMS : (typeof getUnifiedPipelineList === "function" ? getUnifiedPipelineList() : []);
+        const pipeFilter = document.getElementById("pipelineFilter")?.value || "ACTIVE";
         pipeItems.forEach(item => {
+          if (pipeFilter === "REJECTED") {
+            if (!item.rejectedRoles?.length) return;
+          } else if (pipeFilter !== "ALL" && isRejectedOnlyPipelineItem(item)) {
+            return;
+          }
           const cg = item.countryGroup || "TR";
           counts[cg] = (counts[cg] || 0) + 1;
           counts.ALL++;
@@ -1522,7 +1545,7 @@
       }
       const pipeFilterEl = document.getElementById("pipelineFilter");
       if (pipeFilterEl && ACTIVE_COUNTRY !== "TR" && pipeFilterEl.value === "CALL_PRIORITY") {
-        pipeFilterEl.value = "ALL";
+        pipeFilterEl.value = "ACTIVE";
       }
 
       renderRadarList();
@@ -1535,12 +1558,15 @@
       switchTab("pipeline");
       setPipelineViewMode("compact");
       const filterEl = document.getElementById("pipelineFilter");
-      if (filterEl) filterEl.value = "ALL";
+      if (filterEl) filterEl.value = "ACTIVE";
       const searchEl = document.getElementById("pipelineSearch");
       if (searchEl) searchEl.value = "";
       renderUnifiedPipeline();
       const target = UNIFIED_PIPELINE_ITEMS.find(it => it.companyKey === compKey || it.company.toLowerCase().includes(compKey));
       if (target) {
+        if (isRejectedOnlyPipelineItem(target) && filterEl) {
+          filterEl.value = "ALL";
+        }
         if (target.countryGroup !== ACTIVE_COUNTRY && ACTIVE_COUNTRY !== "ALL") {
           setActiveCountry(target.countryGroup);
         }
@@ -4700,6 +4726,7 @@
       for (const item of UNIFIED_PIPELINE_ITEMS) {
         if (actions.length >= 4) break;
         if (ACTIVE_COUNTRY !== "ALL" && item.countryGroup !== ACTIVE_COUNTRY) continue;
+        if (isRejectedOnlyPipelineItem(item)) continue;
         if (actions.some(a => a.itemId === item.id)) continue;
         const ch = resolveItemChannels(item, checks);
         if ((item.smartMeta?.isFastSponsor || item.giantRank) && (!ch.email || !ch.techDm)) {
@@ -6072,13 +6099,19 @@
 
     function renderCrm() {
       const q = (document.getElementById("crmSearch")?.value || "").toLowerCase();
-      const statusFilter = document.getElementById("crmStatusFilter")?.value || "ALL";
+      const statusFilter = document.getElementById("crmStatusFilter")?.value || "ACTIVE";
       updateGlobalCountryCounts();
 
       const rows = STATE.applied.filter(item => {
         const cg = classifyCountryGroup(item.company, item.location, item.countryGroup);
         if (ACTIVE_COUNTRY !== "ALL" && cg !== ACTIVE_COUNTRY) return false;
-        if (statusFilter !== "ALL" && item.status !== statusFilter) return false;
+        if (statusFilter === "ACTIVE") {
+          if (isRejectedStatus(item.status)) return false;
+        } else if (statusFilter === "Rejected") {
+          if (!isRejectedStatus(item.status)) return false;
+        } else if (statusFilter !== "ALL" && item.status !== statusFilter) {
+          return false;
+        }
         if (!q) return true;
         return `${item.company} ${item.title} ${item.location} ${item.notes} ${item.platform || ""}`.toLowerCase().includes(q);
       });
@@ -8107,9 +8140,9 @@ ${closeLine}"`;
         if (countryGroup === "GLOBAL_REMOTE" && NO_VISA_REMOTE_RE.test(vip?.company || apps[0]?.company || companyKey)) {
           continue;
         }
-        const activeRoles = apps.filter(a => a.status !== "Rejected" && a.status !== "Clicked Apply ⏳");
+        const activeRoles = apps.filter(a => !isRejectedStatus(a.status) && a.status !== "Clicked Apply ⏳");
         const unfinishedPortals = apps.filter(a => a.status === "Clicked Apply ⏳");
-        const rejectedRoles = apps.filter(a => a.status === "Rejected");
+        const rejectedRoles = apps.filter(a => isRejectedStatus(a.status));
 
         if (!activeRoles.length && !unfinishedPortals.length && !vip && !TOP_GIANT_RANK_MAP[companyKey] && !rejectedRoles.length) {
           continue;
@@ -8268,6 +8301,10 @@ ${closeLine}"`;
       }
 
       list.sort((a, b) => {
+        const aRej = isRejectedOnlyPipelineItem(a);
+        const bRej = isRejectedOnlyPipelineItem(b);
+        if (aRej !== bRej) return aRej ? 1 : -1;
+
         const aHasRank = typeof a.giantRank === "number" && a.giantRank > 0;
         const bHasRank = typeof b.giantRank === "number" && b.giantRank > 0;
         if (aHasRank && bHasRank && a.giantRank !== b.giantRank) {
@@ -8290,8 +8327,11 @@ ${closeLine}"`;
     function renderRolesSummaryHtml(item) {
       const active = item.activeRoles || [];
       const portals = item.unfinishedPortals || [];
-      const rejected = item.rejectedRoles || [];
-      if (!active.length && !portals.length && !rejected.length) return "";
+      const allRejected = item.rejectedRoles || [];
+      const pipeFilter = document.getElementById("pipelineFilter")?.value || "ACTIVE";
+      const showRejected = pipeFilter === "ALL" || pipeFilter === "REJECTED";
+      const visibleRejected = showRejected ? allRejected : [];
+      if (!active.length && !portals.length && !visibleRejected.length) return "";
 
       const statusOpts = ["Applied", "Clicked Apply ⏳", "Viewed 👀", "CV Downloaded ⭐", "HR Messaged 💬", "Interview 🎯", "Offer 🏆", "Rejected"];
       const renderRolePill = (r, styleClass) => {
@@ -8317,10 +8357,10 @@ ${closeLine}"`;
 
       return `
         <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-1.5">
-          <div class="text-[11px] font-bold text-slate-300 mb-1">📂 Reconciled Roles at ${escapeHtmlSafe(item.company)} (${active.length} Active${portals.length ? ` · ${portals.length} Finish Portal` : ""}${rejected.length ? ` · ${rejected.length} Closed/Rejected` : ""}):</div>
+          <div class="text-[11px] font-bold text-slate-300 mb-1">📂 Reconciled Roles at ${escapeHtmlSafe(item.company)} (${active.length} Active${portals.length ? ` · ${portals.length} Finish Portal` : ""}${visibleRejected.length ? ` · ${visibleRejected.length} Closed/Rejected` : (allRejected.length ? ` · ${allRejected.length} Rejected hidden` : "")}):</div>
           ${active.map(r => renderRolePill(r, "bg-emerald-950/30 border-emerald-500/30 text-emerald-200")).join("")}
           ${portals.map(r => renderRolePill(r, "bg-amber-950/30 border-amber-500/40 text-amber-200")).join("")}
-          ${rejected.map(r => renderRolePill(r, "bg-rose-950/25 border-rose-500/30 text-rose-300/90 opacity-80")).join("")}
+          ${visibleRejected.map(r => renderRolePill(r, "bg-rose-950/25 border-rose-500/30 text-rose-300/90 opacity-80")).join("")}
         </div>
       `;
     }
@@ -9069,7 +9109,10 @@ ${closeLine}"`;
       const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(cleanComp)}${geoParam}`;
       const rowDmKey = registerCopyPayload(`row_dm_${item.id}`, dmText);
 
-      const statusBadgeHtml = item.status === "Interview 🎯"
+      const isRejectedCard = isRejectedOnlyPipelineItem(item) || isRejectedStatus(item.status);
+      const statusBadgeHtml = isRejectedCard
+        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">Rejected</span>`
+        : item.status === "Interview 🎯"
         ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/25 text-purple-200 border border-purple-400/50">🎯 Interview</span>`
         : item.status === "CV Downloaded ⭐"
         ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-200 border border-amber-400/40">⭐ CV Downloaded</span>`
@@ -9084,6 +9127,8 @@ ${closeLine}"`;
       const isHotCard = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status);
       const rowBorder = isExpanded
         ? "pipe-card-expanded"
+        : isRejectedCard
+        ? "border-l-4 border-l-rose-500/70 border-rose-500/30 bg-rose-950/15 opacity-75"
         : item.status === "Interview 🎯"
         ? "border-l-4 border-l-purple-500 border-purple-500/50 bg-purple-950/15"
         : doneCount >= 3
@@ -9176,9 +9221,10 @@ ${closeLine}"`;
       const cMeta = COUNTRY_DISPLAY_META[item.countryGroup] || COUNTRY_DISPLAY_META.TR;
       const countryLabel = cMeta.label;
       const smart = item.smartMeta || computeClientSmartSalaryAndTier(item.company, item.cleanRole || item.role, item.address, item.countryGroup);
+      const isRejectedCard = isRejectedOnlyPipelineItem(item) || isRejectedStatus(item.status);
 
       return `
-        <div id="pipeRow-${item.id}" class="glass rounded-xl p-4 border ${doneCount >= 3 ? 'border-emerald-500/50 bg-emerald-950/15' : item.giantRank ? 'border-blue-500/40 hover:border-emerald-500/40' : 'border-slate-800 hover:border-emerald-500/30'} transition flex flex-col justify-between space-y-3">
+        <div id="pipeRow-${item.id}" class="glass rounded-xl p-4 border ${isRejectedCard ? 'border-rose-500/35 bg-rose-950/15 opacity-75' : doneCount >= 3 ? 'border-emerald-500/50 bg-emerald-950/15' : item.giantRank ? 'border-blue-500/40 hover:border-emerald-500/40' : 'border-slate-800 hover:border-emerald-500/30'} transition flex flex-col justify-between space-y-3">
           <div>
             <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
               <div class="flex items-center gap-2 flex-wrap">
@@ -9193,7 +9239,7 @@ ${closeLine}"`;
                   <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
                   <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
                 </div>
-                ${item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/6)</span>` : ""}
+                ${isRejectedCard ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">Rejected</span>` : item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/6)</span>` : ""}
               </div>
             </div>
             <h3 class="text-base font-bold text-white">${item.company}</h3>
@@ -9282,7 +9328,7 @@ ${closeLine}"`;
         callQueueBtn.classList.toggle("hidden", ACTIVE_COUNTRY !== "TR");
       }
       const q = (document.getElementById("pipelineSearch")?.value || "").toLowerCase().trim();
-      const filter = document.getElementById("pipelineFilter")?.value || "ALL";
+      const filter = document.getElementById("pipelineFilter")?.value || "ACTIVE";
       const checks = getPipelineCheckState();
 
       UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList();
@@ -9292,6 +9338,8 @@ ${closeLine}"`;
         ? UNIFIED_PIPELINE_ITEMS
         : UNIFIED_PIPELINE_ITEMS.filter(it => it.countryGroup === ACTIVE_COUNTRY);
 
+      let totalActiveCompanies = 0;
+      let totalRejectedCompanies = 0;
       let totalApplied = 0;
       let totalEmailed = 0;
       let totalDmSent = 0;
@@ -9299,6 +9347,11 @@ ${closeLine}"`;
       let totalUnfinished = 0;
 
       countryScoped.forEach(item => {
+        if (isRejectedOnlyPipelineItem(item)) {
+          totalRejectedCompanies++;
+          return;
+        }
+        totalActiveCompanies++;
         const ch = resolveItemChannels(item, checks);
         if (ch.applied) totalApplied++;
         if (ch.email) totalEmailed++;
@@ -9311,7 +9364,10 @@ ${closeLine}"`;
       if (badge) {
         const cMeta = COUNTRY_DISPLAY_META[ACTIVE_COUNTRY] || COUNTRY_DISPLAY_META.ALL;
         const countryTag = `${cMeta.flag} ${cMeta.label}`;
-        badge.textContent = `${countryTag}: ${countryScoped.length} Companies · ✅ ${totalApplied} Applied · 💬 ${totalDmSent} DMed · 📧 ${totalEmailed} Emailed${totalUnfinished ? ` · ⏳ ${totalUnfinished} Finish Portal` : ""}${totalHot ? ` · 🔥 ${totalHot} Hot` : ""}`;
+        const rejectedTag = totalRejectedCompanies
+          ? ` · ${totalRejectedCompanies} Rejected${filter === "ALL" || filter === "REJECTED" ? "" : " hidden"}`
+          : "";
+        badge.textContent = `${countryTag}: ${totalActiveCompanies} Active Companies · ✅ ${totalApplied} Applied · 💬 ${totalDmSent} DMed · 📧 ${totalEmailed} Emailed${totalUnfinished ? ` · ⏳ ${totalUnfinished} Finish Portal` : ""}${totalHot ? ` · 🔥 ${totalHot} Hot` : ""}${rejectedTag}`;
       }
 
       const filtered = countryScoped.filter(item => {
@@ -9319,7 +9375,7 @@ ${closeLine}"`;
 
         if (filter === "REJECTED") {
           if (!item.rejectedRoles?.length) return false;
-        } else if (!item.activeRoles?.length && !item.unfinishedPortals?.length && item.rejectedRoles?.length && !item.giantRank) {
+        } else if (filter !== "ALL" && isRejectedOnlyPipelineItem(item)) {
           return false;
         }
         if (filter === "CALL_PRIORITY" && !item.callPriority) return false;
@@ -9358,7 +9414,7 @@ ${closeLine}"`;
 
       if (!filtered.length) {
         container.className = "space-y-2";
-        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No companies match this filter in the selected country pill. Try switching the filter dropdown to <strong>🏆 All (Top Giants #1 First)</strong> or picking another country pill above.</div>`;
+        container.innerHTML = `<div class="glass rounded-xl p-8 text-center text-slate-400">No companies match this filter in the selected country pill. Try switching the filter dropdown to <strong>Active Companies</strong> or <strong>All Companies (Including Rejected)</strong>, or picking another country pill above.</div>`;
         return;
       }
 
