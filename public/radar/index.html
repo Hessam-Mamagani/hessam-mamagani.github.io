@@ -4221,7 +4221,7 @@
     function parseClientJobAgeHours(job) {
       if (!job) return 9999;
       const idStr = String(job.id || "").trim();
-      const isPrem = /premium|👑/i.test(String(job.postedAgo || "")) || (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("Top Applicant")));
+      const isPrem = /premium|👑|unblocked|🔓/i.test(String(job.postedAgo || "")) || (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("Top Applicant") || String(t).includes("Unblocked")));
       if (!isPrem && /^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
       if (job.postedTs && Number(job.postedTs) > 1000000000000) {
         return Math.max(0, (Date.now() - Number(job.postedTs)) / 3600000);
@@ -4272,25 +4272,38 @@
       const seenRoleSigs = new Set();
       return (raw || []).filter(j => {
         if (!j || !j.id || matcher.has(j)) return false;
-        if (HIDE_APPLIED_COMPANIES) {
+        const isUnblocked = isClientManualUnblocked(j);
+        if (!isUnblocked && HIDE_APPLIED_COMPANIES) {
           const b = normClientCompanyBrand(j.company || "");
           if (b.length >= 3 && matcher.appliedByBrand.has(b)) return false;
         }
         if (!isValidClientJob(j)) return false;
-        if (!isClientJobWithinTpr(j, tprOverride)) return false;
+        if (!isUnblocked && !isClientJobWithinTpr(j, tprOverride)) return false;
         const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
         const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
         if (seenRoleSigs.has(sig)) return false;
         seenRoleSigs.add(sig);
         return true;
+      }).sort((a, b) => {
+        const ubDiff = (isClientManualUnblocked(b) ? 1 : 0) - (isClientManualUnblocked(a) ? 1 : 0);
+        return ubDiff !== 0 ? ubDiff : ((b.score || 0) - (a.score || 0));
       });
     }
 
     let CLIENT_AI_REJECTED_IDS = new Set();
     let CLIENT_AI_REJECTED_LOG = [];
     let AI_FILTERED_LOG_OPEN = false;
+    function isClientManualUnblocked(job) {
+      if (!job) return false;
+      if (job.manualUnblocked === true) return true;
+      if (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("Unblocked"))) return true;
+      if (typeof job.aiVerdict === "string" && (job.aiVerdict.startsWith("🔓") || job.aiVerdict.startsWith("Unblocked by you"))) return true;
+      return false;
+    }
+
     function isClientAiVerified(job) {
       if (!job) return false;
+      if (isClientManualUnblocked(job)) return true;
       if (job.aiEvaluated === true) return true;
       if (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("AI Matched") || String(t).includes("Top Applicant"))) return true;
       if (typeof job.aiVerdict === "string" && (job.aiVerdict.startsWith("🤖") || job.aiVerdict.startsWith("👑"))) return true;
@@ -4299,6 +4312,7 @@
 
     function isValidClientJob(job) {
       if (CLIENT_AI_REJECTED_IDS.has(String(job.id || ""))) return false;
+      if (isClientManualUnblocked(job)) return true;
       if ((job.score || 0) > 0 && (job.score || 0) < 65) return false;
       const title = (job.title || "").toLowerCase();
       const comp = (job.company || "").toLowerCase();
@@ -4444,7 +4458,7 @@
         window.__lastCloudFeedSyncTs = Date.now();
 
         if (Array.isArray(cfFeed?.aiRejectedIds)) {
-          for (const rid of cfFeed.aiRejectedIds) CLIENT_AI_REJECTED_IDS.add(String(rid));
+          CLIENT_AI_REJECTED_IDS = new Set(cfFeed.aiRejectedIds.map(String));
         }
         if (Array.isArray(cfFeed?.aiRejectedLog)) {
           CLIENT_AI_REJECTED_LOG = cfFeed.aiRejectedLog;
@@ -4472,15 +4486,16 @@
         ALL_SCAN_JOBS = Array.from(combinedMap.values())
           .filter(j => {
             if (!j || !j.id || matcher.has(j) || !isValidClientJob(j)) return false;
+            const isUnblocked = isClientManualUnblocked(j);
             const ageHrs = parseClientJobAgeHours(j);
-            if (ageHrs === null || ageHrs > 176) return false;
+            if (!isUnblocked && (ageHrs === null || ageHrs > 176)) return false;
             const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
             const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
             if (seenRoleSigs.has(sig)) return false;
             seenRoleSigs.add(sig);
             return true;
           })
-          .sort((a, b) => (b.score || 0) - (a.score || 0));
+          .sort((a, b) => ((isClientManualUnblocked(b) ? 1 : 0) - (isClientManualUnblocked(a) ? 1 : 0)) || ((b.score || 0) - (a.score || 0)));
         LAST_SCAN_JOBS = ALL_SCAN_JOBS;
 
         try {
@@ -4722,15 +4737,16 @@
       ALL_SCAN_JOBS = Array.from(mergedMap.values())
         .filter(j => {
           if (!j || !j.id || matcher.has(j) || !isValidClientJob(j)) return false;
+          const isUnblocked = isClientManualUnblocked(j);
           const ageHrs = parseClientJobAgeHours(j);
-          if (ageHrs === null || ageHrs > 176) return false;
+          if (!isUnblocked && (ageHrs === null || ageHrs > 176)) return false;
           const cg = classifyCountryGroup(j.company, j.location, j.countryGroup);
           const sig = `${cg}::${normClientCompanyBrand(j.company)}::${normClientRoleCore(j.title)}`;
           if (seenRoleSigs.has(sig)) return false;
           seenRoleSigs.add(sig);
           return true;
         })
-        .sort((a, b) => (b.score || 0) - (a.score || 0));
+        .sort((a, b) => ((isClientManualUnblocked(b) ? 1 : 0) - (isClientManualUnblocked(a) ? 1 : 0)) || ((b.score || 0) - (a.score || 0)));
       LAST_SCAN_JOBS = ALL_SCAN_JOBS;
     }
 
@@ -5250,20 +5266,117 @@
       renderAiFilteredLog();
     }
 
-    async function unrejectAiFilteredJob(id) {
+    async function unrejectAiFilteredJob(id, btnEl) {
       const sid = String(id || "").trim();
       if (!sid) return;
-      CLIENT_AI_REJECTED_IDS.delete(sid);
-      CLIENT_AI_REJECTED_LOG = (CLIENT_AI_REJECTED_LOG || []).filter(r => String(r.id) !== sid);
-      renderAiFilteredLog();
+      const rec = (CLIENT_AI_REJECTED_LOG || []).find(r => String(r.id) === sid) || null;
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = "Moving...";
+      }
+      let restoredJob = null;
       try {
-        await fetch(`${CF_WORKER_URL}/api/unreject-ai`, {
+        const res = await fetch(`${CF_WORKER_URL}/api/unreject-ai`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: sid })
+          body: JSON.stringify({
+            id: sid,
+            title: rec?.title || "",
+            company: rec?.company || "",
+            location: rec?.location || "",
+            country: rec?.country || ACTIVE_COUNTRY || "TR",
+            url: rec?.url || "",
+            reason: rec?.reason || ""
+          })
         });
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.job && data.job.id) restoredJob = data.job;
+        }
       } catch {}
-      showToast("Unblocked job #" + escapeHtmlSafe(sid) + " — open link directly or run a scan to re-evaluate.", true);
+
+      CLIENT_AI_REJECTED_IDS.delete(sid);
+      CLIENT_AI_REJECTED_LOG = (CLIENT_AI_REJECTED_LOG || []).filter(r => String(r.id) !== sid);
+
+      if (!restoredJob && rec) {
+        const rc = String(rec.country || ACTIVE_COUNTRY || "TR").toUpperCase();
+        restoredJob = {
+          id: sid,
+          title: rec.title || `Job #${sid}`,
+          company: rec.company || "Company",
+          location: rec.location || (rc === "TR" ? "Istanbul, Türkiye" : rc),
+          countryGroup: ["TR", "IE", "DE", "NL", "UK"].includes(rc) ? rc : "TR",
+          url: rec.url || (/^\d{6,}$/.test(sid) ? `https://www.linkedin.com/jobs/view/${sid}/` : ""),
+          score: 78,
+          tags: ["🔓 Unblocked"],
+          description: `Manually unblocked from AI Filtered Log.${rec.reason ? ` Original note: ${rec.reason}.` : ""} Click Inspect to load details.`,
+          postedAgo: "Just unblocked",
+          postedTs: Date.now(),
+          aiEvaluated: true,
+          manualUnblocked: true,
+          aiVerdict: `Unblocked by you${rec.reason ? ` (was filtered: ${rec.reason})` : ""}`
+        };
+      }
+
+      if (restoredJob) {
+        restoredJob.manualUnblocked = true;
+        ALL_SCAN_JOBS = [restoredJob, ...(ALL_SCAN_JOBS || []).filter(j => String(j.id) !== sid)];
+        LAST_SCAN_JOBS = ALL_SCAN_JOBS;
+        try {
+          localStorage.setItem("jr_last_good_feed_v1", JSON.stringify({
+            ts: Date.now(),
+            jobs: ALL_SCAN_JOBS.slice(0, 90).map(j => ({ ...j, description: String(j.description || "").slice(0, 2200) }))
+          }));
+        } catch {}
+      }
+
+      updateGlobalCountryCounts();
+      renderRadarList();
+      const cardEl = document.getElementById(`jobcard-${sid}`);
+      if (cardEl) cardEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      showToast(restoredJob ? `Moved "${escapeHtmlSafe(restoredJob.title)}" to top unseen cards.` : `Unblocked job #${escapeHtmlSafe(sid)}.`, true);
+    }
+
+    async function clearAiFilteredJobs(includeCache = false) {
+      const scope = ACTIVE_COUNTRY || "ALL";
+      const scopeLabel = scope === "ALL" ? "ALL tracks" : `${(COUNTRY_DISPLAY_META[scope] || {}).short || scope}`;
+      const visibleCount = (CLIENT_AI_REJECTED_LOG || []).filter(r => r && r.id && (scope === "ALL" || String(r.country || "TR").toUpperCase() === scope)).length;
+      const confirmMsg = includeCache
+        ? `Delete ALL filtered jobs from D1 (Log + 8-day AI Rejection Cache) for ${scopeLabel}?\n\nNext scan will re-evaluate those jobs from scratch.`
+        : `Clear ${visibleCount} AI Filtered Log item(s) for ${scopeLabel}?\n\n(Keeps the 8-day rejection cache so AI won't waste calls re-filtering them.)`;
+      if (!window.confirm(confirmMsg)) return;
+      let resData = null;
+      try {
+        const r = await fetch(`${CF_WORKER_URL}/api/clear-ai-rejected`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ country: scope, includeCache: !!includeCache })
+        });
+        if (r.ok) resData = await r.json();
+      } catch {}
+      if (scope === "ALL") {
+        CLIENT_AI_REJECTED_LOG = [];
+        if (includeCache) CLIENT_AI_REJECTED_IDS.clear();
+      } else {
+        const removedIds = new Set(
+          (CLIENT_AI_REJECTED_LOG || [])
+            .filter(r => r && r.id && String(r.country || "TR").toUpperCase() === scope)
+            .map(r => String(r.id))
+        );
+        CLIENT_AI_REJECTED_LOG = (CLIENT_AI_REJECTED_LOG || []).filter(r => !(r && r.id && String(r.country || "TR").toUpperCase() === scope));
+        if (includeCache) {
+          for (const rid of removedIds) CLIENT_AI_REJECTED_IDS.delete(rid);
+        }
+      }
+      renderAiFilteredLog();
+      const logN = Number(resData?.clearedLog ?? visibleCount);
+      const cacheN = Number(resData?.clearedCache ?? 0);
+      showToast(
+        includeCache
+          ? `Purged ${logN} log row(s) & ${cacheN} cached rejection(s) from D1 (${scopeLabel}).`
+          : `Cleared ${logN} AI Filtered Log row(s) (${scopeLabel}).`,
+        true
+      );
     }
 
     function renderAiFilteredLog() {
@@ -5290,6 +5403,13 @@
             <span class="text-[11px] font-semibold text-blue-400 shrink-0">${AI_FILTERED_LOG_OPEN ? "Hide" : "Inspect"}</span>
           </button>
           ${AI_FILTERED_LOG_OPEN ? `
+            <div class="border-t border-slate-800 px-3.5 py-1.5 bg-slate-900/70 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+              <span class="text-slate-400">Auto-prunes in D1: Log 3d &middot; Cache 8d &middot; Verdicts 10d</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="clearAiFilteredJobs(false)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold cursor-pointer" title="Clear visible AI Filtered Log entries (keeps 8-day cache)">Clear Log</button>
+                <button type="button" onclick="clearAiFilteredJobs(true)" class="px-2 py-0.5 rounded bg-rose-950/70 hover:bg-rose-900/80 border border-rose-500/40 text-rose-200 font-semibold cursor-pointer" title="Delete both AI Filtered Log and 8-day AI Rejection Cache from D1">Delete All DB</button>
+              </div>
+            </div>
             <div class="border-t border-slate-800 divide-y divide-slate-800/80 max-h-72 overflow-y-auto bg-slate-950/60">
               ${list.map(r => `
                 <div class="px-3.5 py-2 flex flex-wrap items-center justify-between gap-2">
@@ -5299,7 +5419,7 @@
                   </div>
                   <div class="flex items-center gap-1.5 shrink-0">
                     ${r.url ? `<a href="${r.url}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-300 text-[11px] font-semibold">Open &nearr;</a>` : ""}
-                    <button type="button" onclick="unrejectAiFilteredJob('${String(r.id).replace(/'/g, "\\'")}')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold cursor-pointer" title="Remove from AI rejection cache">Unblock</button>
+                    <button type="button" onclick="unrejectAiFilteredJob('${String(r.id).replace(/'/g, "\\'")}', this)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold cursor-pointer" title="Promote immediately to top unseen cards & whitelist from AI re-rejection">Unblock</button>
                   </div>
                 </div>
               `).join("")}
@@ -5372,13 +5492,18 @@
         const scoreColor = job.score >= 80 ? "text-emerald-300 bg-emerald-500/15 border-emerald-500/30" :
                            job.score >= 65 ? "text-blue-300 bg-blue-500/15 border-blue-500/30" :
                                              "text-slate-300 bg-slate-800 border-slate-700";
+        const isUnblockedCard = isClientManualUnblocked(job);
+        const unblockedBadgeHtml = isUnblockedCard
+          ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded border bg-cyan-500/15 text-cyan-200 border-cyan-500/40">Unblocked</span>`
+          : "";
 
         return `
-          <div id="jobcard-${job.id}" class="glass rounded-xl p-4 border border-slate-800 hover:border-slate-700 transition">
+          <div id="jobcard-${job.id}" class="glass rounded-xl p-4 border ${isUnblockedCard ? "border-cyan-500/45 hover:border-cyan-400/70" : "border-slate-800 hover:border-slate-700"} transition">
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="px-2 py-0.5 text-xs font-bold rounded border ${scoreColor}">${job.score}% Match</span>
+                  ${unblockedBadgeHtml}
                   ${priorBadgeHtml}
                   <h3 class="text-sm md:text-base font-bold text-white cursor-pointer hover:text-blue-300 transition" onclick="inspectJob('${job.id}')">${escapeHtmlSafe(job.title)}</h3>
                 </div>
