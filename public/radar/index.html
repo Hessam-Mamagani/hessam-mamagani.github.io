@@ -333,6 +333,7 @@
               <option value="TOP_GIANTS">🏢 Top Ranked Giants</option>
               <option value="EMAILED">📧 Emailed</option>
               <option value="DM_SENT">💬 LinkedIn DM Sent</option>
+              <option value="WALKED">🚶 Walked Offices (In-Person Visited)</option>
               <option value="REJECTED">❌ Rejected / Closed</option>
               <optgroup label="🚶 Walking Routes (Grouped Near Each Other from Yakacık M4)">
                 <option value="ROUTE_KOZYATAGI_ATASEHIR">🚶 Route 1: Kozyatağı &amp; Ataşehir Plazas (M4 · 20m)</option>
@@ -7646,8 +7647,10 @@
         techDm: !!(byCo.techDm || byId.techDm || byVip.techDm || byPrimary.techDm),
         hrDm: !!(hrDmAuto || byCo.hrDm || byId.hrDm || byVip.hrDm || byPrimary.hrDm),
         connDm: !!(connAuto || byCo.connDm || byId.connDm || byVip.connDm || byPrimary.connDm),
-        callWalk: !!(byCo.callWalk || byCo.called || byCo.walked || byId.callWalk || byId.called || byId.walked || byVip.callWalk || byVip.called || byVip.walked),
+        callWalk: !!(byCo.callWalk || byCo.called || byId.callWalk || byId.called || byVip.callWalk || byVip.called),
         callDate: byCo.callDate || byId.callDate || byVip.callDate || "",
+        walked: !!(byCo.walked || byId.walked || byVip.walked || byPrimary.walked),
+        walkedDate: byCo.walkedDate || byId.walkedDate || byVip.walkedDate || byPrimary.walkedDate || "",
         callNote: byCo.callNote || byId.callNote || byVip.callNote || byPrimary.callNote || "",
         callNoteUpdatedAt: byCo.callNoteUpdatedAt || byId.callNoteUpdatedAt || "",
         emailBlocked: !!(byCo.emailBlocked || byId.emailBlocked || byVip.emailBlocked || byPrimary.emailBlocked || item?.aiIntel?.emailVerification?.bounced),
@@ -8011,12 +8014,13 @@ ${closeLine}"`;
 
       const currentResolved = item
         ? resolveItemChannels(item, st)
-        : (st[cKey] || { applied: false, email: false, techDm: false, hrDm: false, connDm: false, callWalk: false });
+        : (st[cKey] || { applied: false, email: false, techDm: false, hrDm: false, connDm: false, callWalk: false, walked: false });
 
       const updated = {
         ...currentResolved,
         [field]: !!value,
-        ...(field === "callWalk" && value ? { callDate: new Date().toISOString().slice(0, 10) } : {})
+        ...(field === "callWalk" && value ? { callDate: new Date().toISOString().slice(0, 10) } : {}),
+        ...(field === "walked" && value ? { walkedDate: new Date().toISOString().slice(0, 10) } : {})
       };
       st[cKey] = updated;
       st[strId] = updated;
@@ -8042,7 +8046,7 @@ ${closeLine}"`;
       const rowsToAdvance = crmItem && crmItem.status === "Applied"
         ? [crmItem, ...matchingAppliedRows.filter(r => String(r.id) !== String(crmItem.id))]
         : matchingAppliedRows;
-      if (rowsToAdvance.length && (field === "email" || field === "techDm" || field === "hrDm" || field === "connDm" || field === "callWalk") && value) {
+      if (rowsToAdvance.length && (field === "email" || field === "techDm" || field === "hrDm" || field === "connDm" || field === "callWalk" || field === "walked") && value) {
         for (const row of rowsToAdvance) {
           row.status = "HR Messaged 💬";
           if (IS_LOCAL) {
@@ -8709,9 +8713,13 @@ ${closeLine}"`;
             <input type="checkbox" ${ch.connDm ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'connDm', this.checked)" class="accent-emerald-500 rounded" />
             <span class="${ch.connDm ? 'font-bold text-emerald-300' : 'text-slate-400'}">👥 1st-Deg</span>
           </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="Phone Switchboard Call or Office Walk-In Done">
+          <label class="flex items-center gap-1 cursor-pointer select-none" title="Phone Switchboard Call Done">
             <input type="checkbox" ${ch.callWalk ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'callWalk', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.callWalk ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call/Walk</span>
+            <span class="${ch.callWalk ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call</span>
+          </label>
+          <label class="flex items-center gap-1 cursor-pointer select-none" title="Physically Visited / Walked Into Office${ch.walkedDate ? ` (${ch.walkedDate})` : ''}">
+            <input type="checkbox" ${ch.walked ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'walked', this.checked)" class="accent-cyan-400 rounded" />
+            <span class="${ch.walked ? 'font-bold text-cyan-300' : 'text-slate-400'}">🚶 Walked</span>
           </label>
         </div>
       `;
@@ -9234,6 +9242,7 @@ ${closeLine}"`;
                     <span class="text-xs font-extrabold text-amber-300">📞 Direct Call &amp; Switchboard Tracker</span>
                     ${item.callPriority ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-500/25 text-amber-200 border border-amber-400/40">Priority #${item.callPriority.callRank} · ${escapeHtmlSafe(item.callPriority.waveLabel)}</span>` : ""}
                     ${ch.callWalk ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/25 text-emerald-200 border border-emerald-400/40">✅ Called${ch.callDate ? ` (${escapeHtmlSafe(ch.callDate)})` : ""}</span>` : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-slate-300 border border-slate-700">Not Called Yet</span>`}
+                    ${ch.walked ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/25 text-cyan-200 border border-cyan-400/40">🚶 Walked${ch.walkedDate ? ` (${escapeHtmlSafe(ch.walkedDate)})` : ""}</span>` : ""}
                   </div>
                   ${item.callPriority?.whyStrong ? `<div class="text-[11px] text-slate-300">${escapeHtmlSafe(item.callPriority.whyStrong)}</div>` : ""}
                 </div>
@@ -9247,6 +9256,9 @@ ${closeLine}"`;
                   </button>
                   <button type="button" onclick="togglePipelineCheck('${item.id}', 'callWalk', ${!ch.callWalk})" class="px-3 py-1.5 rounded-lg ${ch.callWalk ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} font-bold text-xs cursor-pointer transition">
                     ${ch.callWalk ? '↩️ Undo Called' : '✅ Mark Called'}
+                  </button>
+                  <button type="button" onclick="togglePipelineCheck('${item.id}', 'walked', ${!ch.walked})" class="px-3 py-1.5 rounded-lg ${ch.walked ? 'bg-slate-800 hover:bg-slate-700 text-cyan-200 border border-cyan-500/40' : 'bg-cyan-600 hover:bg-cyan-500 text-white'} font-bold text-xs cursor-pointer transition">
+                    ${ch.walked ? '↩️ Undo Walked' : '🚶 Mark Walked'}
                   </button>
                 </div>
               </div>
@@ -9308,7 +9320,12 @@ ${closeLine}"`;
             </div>
             <div class="text-[11px] text-slate-400 border-t border-slate-800/80 pt-2 flex flex-wrap items-center justify-between gap-2">
               <span>📍 ${item.address} &middot; <span class="text-slate-300">${item.summary}</span></span>
-              <a href="${mapsHref}" target="_blank" class="text-blue-400 hover:underline font-medium shrink-0">🗺️ Google Maps ↗</a>
+              <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="togglePipelineCheck('${item.id}', 'walked', ${!ch.walked})" class="px-2.5 py-1 rounded-lg ${ch.walked ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/50 hover:bg-slate-800' : 'bg-cyan-600 hover:bg-cyan-500 text-white'} text-[11px] font-bold cursor-pointer transition">
+                  ${ch.walked ? `✅ Walked${ch.walkedDate ? ` (${escapeHtmlSafe(ch.walkedDate)})` : ''}` : '🚶 Mark Walked'}
+                </button>
+                <a href="${mapsHref}" target="_blank" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-blue-300 font-semibold transition">🗺️ Google Maps ↗</a>
+              </div>
             </div>
           </div>
 
@@ -9414,7 +9431,7 @@ ${closeLine}"`;
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const ch = resolveItemChannels(item, checks);
-      const doneCount = [ch.applied, ch.email, ch.techDm, ch.hrDm, ch.connDm, ch.callWalk].filter(Boolean).length;
+      const doneCount = [ch.applied, ch.email, ch.techDm, ch.hrDm, ch.connDm, ch.callWalk, ch.walked].filter(Boolean).length;
       const isExpanded = PIPELINE_EXPANDED_IDS.has(String(item.id));
       const mail = buildUnifiedEmail(item);
       const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
@@ -9439,8 +9456,8 @@ ${closeLine}"`;
         : item.hasUnfinishedPortal && !ch.applied
         ? `<a href="${item.jobUrl}" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/50">⏳ Finish Portal ↗</a>`
         : ch.applied
-        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">Applied (${doneCount}/6)</span>`
-        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Step 1: Apply (${doneCount}/6)</span>`;
+        ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300">Applied (${doneCount}/7)</span>`
+        : `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400">Step 1: Apply (${doneCount}/7)</span>`;
 
       const isHotCard = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀", "HR Messaged 💬"].includes(item.status);
       const rowBorder = isExpanded
@@ -9467,6 +9484,7 @@ ${closeLine}"`;
                   ${item.callPriority ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${item.callPriority.wave === 'W1' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : item.callPriority.wave === 'W2' ? 'bg-blue-500/20 text-blue-200 border border-blue-400/40' : 'bg-teal-500/20 text-teal-200 border border-teal-400/40'}">📞 #${item.callPriority.callRank} · ${item.callPriority.wave === 'W3' ? 'Missing Tech' : item.callPriority.wave}</span>` : ""}
                   <span class="text-sm font-bold text-white hover:text-blue-300 transition">${cMeta.flag} ${item.company}</span>
                   ${statusBadgeHtml}
+                  ${ch.walked ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">🚶 Walked${ch.walkedDate ? ` · ${escapeHtmlSafe(ch.walkedDate)}` : ""}</span>` : ""}
                   ${item.giantRank ? `<span class="text-[11px] text-amber-300/90 font-semibold">#${item.giantRank} Sponsor</span>` : ""}
                 </div>
                 <p class="text-xs text-slate-300 font-medium truncate max-w-xl mt-0.5">${item.role}</p>
@@ -9523,7 +9541,7 @@ ${closeLine}"`;
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
       const ch = resolveItemChannels(item, checks);
-      const doneCount = [ch.applied, ch.email, ch.techDm, ch.hrDm, ch.connDm, ch.callWalk].filter(Boolean).length;
+      const doneCount = [ch.applied, ch.email, ch.techDm, ch.hrDm, ch.connDm, ch.callWalk, ch.walked].filter(Boolean).length;
       const mail = buildUnifiedEmail(item);
       const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
       const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.mapQuery)}`;
@@ -9557,7 +9575,7 @@ ${closeLine}"`;
                   <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇹🇷 TR</button>
                   <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white shadow' : 'text-slate-400 hover:text-white'}">🇬🇧 EN</button>
                 </div>
-                ${isRejectedCard ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">Rejected</span>` : item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/6)</span>` : ""}
+                ${isRejectedCard ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40">Rejected</span>` : item.vipBadge ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">${item.vipBadge}</span>` : ch.applied ? `<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Applied (${doneCount}/7)</span>` : ""}
               </div>
             </div>
             <h3 class="text-base font-bold text-white">${item.company}</h3>
@@ -9732,6 +9750,7 @@ ${closeLine}"`;
         if (filter === "NEEDS_OUTREACH" && !(ch.applied && !ch.email && !ch.techDm && !ch.hrDm && !ch.connDm)) return false;
         if (filter === "EMAILED" && !ch.email) return false;
         if (filter === "DM_SENT" && !(ch.techDm || ch.hrDm || ch.connDm)) return false;
+        if (filter === "WALKED" && !ch.walked) return false;
         if (filter === "CONNECTIONS" && !item.vipBadge && !ch.connDm && !/connection|1st-deg/i.test(item.summary || "")) return false;
         if (filter.startsWith("ROUTE_") && !(item.walkRoutes || []).includes(filter)) return false;
         if (filter === "CLUSTER_MASLAK" && item.cluster !== "CLUSTER_MASLAK") return false;
@@ -9809,9 +9828,9 @@ ${closeLine}"`;
 
       if (filter.startsWith("ROUTE_")) {
         filtered.sort((a, b) => {
-          const aDone = resolveItemChannels(a, checks).callWalk ? 1 : 0;
-          const bDone = resolveItemChannels(b, checks).callWalk ? 1 : 0;
-          if (aDone !== bDone) return aDone - bDone;
+          const aWalked = resolveItemChannels(a, checks).walked ? 1 : 0;
+          const bWalked = resolveItemChannels(b, checks).walked ? 1 : 0;
+          if (aWalked !== bWalked) return aWalked - bWalked;
           const aHot = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀"].includes(a.status) ? 0 : 1;
           const bHot = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀"].includes(b.status) ? 0 : 1;
           if (aHot !== bHot) return aHot - bHot;
@@ -9831,9 +9850,14 @@ ${closeLine}"`;
         ROUTE_ITU_MASLAK: "🚶 Route 6: İTÜ Arı Teknokent & Maslak (M2 · Pure-Tech Cluster)",
         ROUTE_LEVENT_SISLI: "🚶 Route 7: Levent / Mecidiyeköy / Şişli / Kağıthane (M2)"
       };
-      const visitedRouteCount = filter.startsWith("ROUTE_") ? filtered.filter(it => resolveItemChannels(it, checks).callWalk).length : 0;
+      let hideWalkedRoute = false;
+      try { hideWalkedRoute = localStorage.getItem("jr_hide_walked_route") === "1"; } catch {}
+      const visitedRouteCount = filter.startsWith("ROUTE_") ? filtered.filter(it => resolveItemChannels(it, checks).walked).length : 0;
+      const visibleList = (filter.startsWith("ROUTE_") && hideWalkedRoute)
+        ? filtered.filter(it => !resolveItemChannels(it, checks).walked)
+        : filtered;
       const routeBannerHtml = filter.startsWith("ROUTE_")
-        ? `<div class="glass rounded-xl p-3.5 border border-cyan-500/45 bg-cyan-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2"><div><strong class="text-cyan-300">${ROUTE_LABELS[filter] || filter} (${filtered.length} Nearby · ✅ ${visitedRouteCount} Done · ⏳ ${filtered.length - visitedRouteCount} Left)</strong><span class="text-slate-300 ml-1">— Sorted unvisited &amp; highest priority first. Call at 09:30 to grab a name/slot, then tap <strong>🗺️ Google Maps ↗</strong> in Step 1!</span></div></div>`
+        ? `<div class="glass rounded-xl p-3.5 border border-cyan-500/45 bg-cyan-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2"><div><strong class="text-cyan-300">${ROUTE_LABELS[filter] || filter} (${filtered.length} Nearby · 🚶 ${visitedRouteCount} Walked · ⏳ ${filtered.length - visitedRouteCount} Left)</strong><span class="text-slate-300 ml-1">— Calling at 09:30 won't clear your walk list; tick <strong>🚶 Walked</strong> after visiting in person.</span></div><label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-cyan-500/40 text-cyan-200 font-bold cursor-pointer select-none shrink-0"><input type="checkbox" ${hideWalkedRoute ? "checked" : ""} onchange="try{localStorage.setItem('jr_hide_walked_route', this.checked ? '1' : '0');}catch{} renderUnifiedPipeline();" class="accent-cyan-400 rounded cursor-pointer" /><span>Hide Walked</span></label></div>`
         : "";
 
       const calledPureTechCount = filter === "CALL_PRIORITY"
@@ -9859,12 +9883,15 @@ ${closeLine}"`;
            </div>`
         : "";
 
-      if (PIPELINE_VIEW_MODE === "cards") {
+      if (filter.startsWith("ROUTE_") && !visibleList.length) {
         container.className = "space-y-2";
-        container.innerHTML = `${routeBannerHtml}${callQueueBannerHtml}${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
+        container.innerHTML = routeBannerHtml + `<div class="glass rounded-xl p-8 text-center text-cyan-200 text-sm font-semibold border border-cyan-500/30">🎉 All ${filtered.length} companies on this route are marked 🚶 Walked! Uncheck <strong>Hide Walked</strong> above to review your notes.</div>`;
+      } else if (PIPELINE_VIEW_MODE === "cards") {
+        container.className = "space-y-2";
+        container.innerHTML = `${routeBannerHtml}${callQueueBannerHtml}${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${visibleList.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
       } else {
         container.className = "space-y-2";
-        container.innerHTML = routeBannerHtml + callQueueBannerHtml + emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
+        container.innerHTML = routeBannerHtml + callQueueBannerHtml + emailQueueBannerHtml + visibleList.map(item => renderPipelineRow(item, checks)).join("");
       }
     }
     function renderVipChecklist() { renderUnifiedPipeline(); }
