@@ -3894,7 +3894,7 @@
         bestEmail: safeEmail,
         emailVerification: foundEmailVerification || existingIntel.emailVerification || null,
         phoneDisplay: safePhoneDisplay,
-        officeAndMetro: existingIntel.officeAndMetro || kb?.officeAndMetro || fetchedIntel?.officeAndMetro || item.address,
+        officeAndMetro: (fetchedIntel?.officeAndMetro && !/^(istanbul(?:\s*&\s*gebze)?(?:,\s*(?:türkiye|turkey))?|türkiye|turkey|remote|hybrid)$/i.test(String(fetchedIntel.officeAndMetro).trim()) ? fetchedIntel.officeAndMetro : "") || existingIntel.officeAndMetro || kb?.officeAndMetro || item.address,
         walkInVerdict: existingIntel.walkInVerdict || kb?.walkInVerdict || fetchedIntel?.walkInVerdict || item.summary
       };
 
@@ -8524,8 +8524,10 @@ ${closeLine}"`;
         const rawPhoneDisp = callPriority?.phoneDisplay || (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
         const phoneDisplay = rawPhoneDisp;
         const phone = callPriority?.phone || primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
-        const address = kb?.officeAndMetro || vip?.address || known.address || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
-        const mapQuery = vip?.mapQuery || known.mapQuery || `${displayCompany.split("(")[0].trim()} ${address}`;
+        const rawAiOffice = String(mergedIntel?.officeAndMetro || "").trim();
+        const aiSpecificOffice = rawAiOffice && !/^(istanbul(?:\s*&\s*gebze)?(?:,\s*(?:türkiye|turkey))?|istanbul,\s*istanbul,\s*(?:türkiye|turkey)|türkiye|turkey|remote|hybrid)$/i.test(rawAiOffice) ? rawAiOffice : "";
+        const address = kb?.officeAndMetro || vip?.address || known.address || aiSpecificOffice || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
+        const mapQuery = vip?.mapQuery || known.mapQuery || (aiSpecificOffice ? `${displayCompany.split("(")[0].trim()} ${aiSpecificOffice}` : `${displayCompany.split("(")[0].trim()} ${address}`);
 
         const uniqueRoleTitles = [];
         for (const a of liveApps) {
@@ -8547,7 +8549,7 @@ ${closeLine}"`;
         const isAgency = AGENCY_RE.test(displayCompany);
         const smartMeta = computeClientSmartSalaryAndTier(displayCompany, cleanRole, address, vip?.summary || primaryApp?.notes || "");
         const defaultLangMode = countryGroup === "TR" ? "MULTI" : "EN";
-        const routeText = `${displayCompany} ${address} ${vip?.clusterLabel || ""} ${primaryApp?.location || ""} ${vip?.summary || ""} ${known.badge || ""} ${known.note || ""}`;
+        const routeText = `${displayCompany} ${address} ${aiSpecificOffice} ${vip?.clusterLabel || ""} ${primaryApp?.location || ""} ${vip?.summary || ""} ${known.badge || ""} ${known.note || ""}`;
         const walkRoutes = [];
         if (countryGroup === "TR") {
           if (/teknopark\s*(?:i|İ|ı)stanbul|teknopark\s*bulvar|kurtköy|kurtkoy|pendik|aeropark|sabiha\s*gökçen|sabiha\s*gokcen|\b(architecht|intertech|orion\s+innovation|icterra|ctech|borda|pegasus)\b/i.test(routeText)) {
