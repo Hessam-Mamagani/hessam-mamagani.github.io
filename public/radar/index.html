@@ -334,10 +334,21 @@
               <option value="EMAILED">📧 Emailed</option>
               <option value="DM_SENT">💬 LinkedIn DM Sent</option>
               <option value="REJECTED">❌ Rejected / Closed</option>
-              <option value="CLUSTER_ASIAN">📍 Asian Side (Kartal / Ataşehir / Üsküdar)</option>
-              <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla</option>
-              <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
-              <option value="CLUSTER_MASLAK">📍 Maslak &amp; İTÜ Teknokent</option>
+              <optgroup label="🚶 Walking Routes (Grouped Near Each Other from Yakacık M4)">
+                <option value="ROUTE_KOZYATAGI_ATASEHIR">🚶 Route 1: Kozyatağı &amp; Ataşehir Plazas (M4 · 20m)</option>
+                <option value="ROUTE_PENDIK_TEKNO">🚶 Route 2: Pendik / Kurtköy &amp; Teknopark İstanbul (M4 · 15m)</option>
+                <option value="ROUTE_KARTAL_MALTEPE">🚶 Route 3: Kartal / Maltepe / Küçükyalı (M4 · 5–12m)</option>
+                <option value="ROUTE_UMRANIYE_USKUDAR">🚶 Route 4: Ümraniye &amp; Üsküdar / Altunizade (M4→M5 · 30m)</option>
+                <option value="ROUTE_TUZLA_GEBZE">🚶 Route 5: Tuzla / Gebze GOSB &amp; Bilişim Vadisi (25m)</option>
+                <option value="ROUTE_ITU_MASLAK">🚶 Route 6: İTÜ Arı Teknokent &amp; Maslak (M2 · Pure-Tech)</option>
+                <option value="ROUTE_LEVENT_SISLI">🚶 Route 7: Levent / Mecidiyeköy / Şişli / Kağıthane (M2)</option>
+              </optgroup>
+              <optgroup label="📍 Broad City Zones">
+                <option value="CLUSTER_ASIAN">📍 All Asian Side (Routes 1–4 Combined)</option>
+                <option value="CLUSTER_GEBZE">📍 Gebze / Bilişim Vadisi / Tuzla</option>
+                <option value="CLUSTER_LEVENT">📍 Levent &amp; Şişli</option>
+                <option value="CLUSTER_MASLAK">📍 Maslak &amp; İTÜ Teknokent</option>
+              </optgroup>
           </select>
           <button type="button" id="pipelineResetBtn" onclick="resetPipelineFilters()" class="hidden px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold shrink-0 cursor-pointer transition" title="Clear search and reset filter to default">Reset</button>
         </div>
@@ -1997,12 +2008,36 @@
 
     const COMPANY_CONTACT_DB = [
       {
+        match: /era\s+consulting/i,
+        phone: "+902165272466",
+        phoneDisplay: "+90 (216) 527 24 66",
+        email: "",
+        address: "Dural Plaza Kat:7, Kozyatağı Mah. Şehit İlknur Keleş Sok. No:5, Kadıköy (5m walk from Kozyatağı M4)",
+        mapQuery: "Dural Plaza Şehit İlknur Keleş Sokak No 5 Kozyatağı Kadıköy İstanbul",
+        badge: "👀 CV Viewed · Dural Plaza Floor 7 (Kozyatağı M4)",
+        lang: "TR",
+        note: "Same building as Sufle (Floor 9)! Viewed your CV on Nov 14. Call +90 (216) 527 24 66 before walking over."
+      },
+      {
+        match: /\bsufle\b/i,
+        phone: "+908503051767",
+        phoneDisplay: "+90 850 305 17 67",
+        email: "",
+        address: "Dural Plaza Kat:9 (No:5/9), Kozyatağı Mah. Şehit İlknur Keleş Sok., Kadıköy (5m walk from Kozyatağı M4)",
+        mapQuery: "Dural Plaza Şehit İlknur Keleş Sokak No 5 Kozyatağı Kadıköy İstanbul",
+        badge: "☁️ AWS Cloud & Software House · Dural Plaza Floor 9 (Kozyatağı M4)",
+        lang: "TR",
+        note: "Same building as ERA Consulting (Floor 7)! AWS cloud & modern software engineering team."
+      },
+      {
         match: /tcm/i,
         phone: "+902165742250",
         phoneDisplay: "+90 (216) 574 22 50",
         email: "gizemnur.masali@tcm.com.tr",
         badge: "🔥 Direct HR Email & Ataşehir HQ",
         lang: "TR",
+        address: "Kavakyeli Plaza C Blok Kat:11, Fetih Mah. Libadiye Cad. Tahralı Sok., Ataşehir",
+        mapQuery: "Kavakyeli Plaza Fetih Mahallesi Libadiye Caddesi Ataşehir İstanbul",
         note: "Ask for Gizemnur Masalı Hanım (İnsan Kaynakları / İşe Alım). Mention you just emailed your EN & TR CVs for Senior Software Developer & Back-end Developer (.NET)!"
       },
       {
@@ -8489,8 +8524,8 @@ ${closeLine}"`;
         const rawPhoneDisp = callPriority?.phoneDisplay || (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
         const phoneDisplay = rawPhoneDisp;
         const phone = callPriority?.phone || primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
-        const address = kb?.officeAndMetro || vip?.address || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
-        const mapQuery = vip?.mapQuery || `${displayCompany.split("(")[0].trim()} ${address}`;
+        const address = kb?.officeAndMetro || vip?.address || known.address || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
+        const mapQuery = vip?.mapQuery || known.mapQuery || `${displayCompany.split("(")[0].trim()} ${address}`;
 
         const uniqueRoleTitles = [];
         for (const a of liveApps) {
@@ -8512,10 +8547,35 @@ ${closeLine}"`;
         const isAgency = AGENCY_RE.test(displayCompany);
         const smartMeta = computeClientSmartSalaryAndTier(displayCompany, cleanRole, address, vip?.summary || primaryApp?.notes || "");
         const defaultLangMode = countryGroup === "TR" ? "MULTI" : "EN";
+        const routeText = `${displayCompany} ${address} ${vip?.clusterLabel || ""} ${primaryApp?.location || ""} ${vip?.summary || ""} ${known.badge || ""} ${known.note || ""}`;
+        const walkRoutes = [];
+        if (countryGroup === "TR") {
+          if (/teknopark\s*(?:i|İ|ı)stanbul|teknopark\s*bulvar|kurtköy|kurtkoy|pendik|aeropark|sabiha\s*gökçen|sabiha\s*gokcen|\b(architecht|intertech|orion\s+innovation|icterra|ctech|borda|pegasus)\b/i.test(routeText)) {
+            walkRoutes.push("ROUTE_PENDIK_TEKNO");
+          }
+          if (/kartal|yakacık|yakacik|soğanlık|soganlik|milangaz|maltepe|küçükyalı|kucukyali|aydınevler|aydinevler|bostancı|bostanci|cevizli|\b(pazarama|pluxee|sodexo)\b|siemens.*kartal|hitachi.*kartal|bosch.*küçükyalı/i.test(routeText)) {
+            walkRoutes.push("ROUTE_KARTAL_MALTEPE");
+          }
+          if (/kozyatağı|kozyatagi|ataşehir|atasehir|küçükbakkalköy|kucukbakkalkoy|içerenköy|icerenkoy|yenisahra|göztepe|goztepe|merdivenköy|merdivenkoy|kadıköy|kadikoy|nidakule\s*ataşehir|varyap\s*meridian|debaren|dural\s*plaza|kavakyeli|palladium|business\s*istanbul|girne\s*cad|\b(sahibinden|ntt\s*data|nozzle|208\s*software|mikro\s*yazılım|mikro\s*yazilim|tcm\s*bilişim|tcm\b|atos|mirsis|rdc\s*partner|viennalife|multisport|benefit\s*systems|era\s*consulting|sufle|migros|sompo|ukx)\b/i.test(routeText)) {
+            walkRoutes.push("ROUTE_KOZYATAGI_ATASEHIR");
+          }
+          if (/ümraniye|umraniye|üsküdar|uskudar|altunizade|çamlıca|camlica|bulgurlu|ünalan|unalan|emaar|burhaniye|kısıklı|kisikli|anel\s*iş|akkom|cessas|\b(koçsistem|kocsistem|sabancıdx|sabancidx|iyzico|papara|param\s*tech|pargesoft|sap\s*türkiye|obase|arabam\.com|hangikredi)\b/i.test(routeText)) {
+            walkRoutes.push("ROUTE_UMRANIYE_USKUDAR");
+          }
+          if (/gebze|gosb|bilişim\s*vadisi|bilisim\s*vadisi|kocaeli|tuzla|çayırova|cayirova|dilovası|dilovasi|muallimköy|şekerpınar|sekerpinar|\b(logo\s*yazılım|logo\s*yazilim|festo|bimser|milvus|altınay)\b|softtech.*tuzla/i.test(routeText)) {
+            walkRoutes.push("ROUTE_TUZLA_GEBZE");
+          }
+          if (vip?.cluster === "CLUSTER_MASLAK" || /(?:itü|İTÜ|itu)\s*(?:arı|ari)?\s*teknokent|(?:itü|İTÜ|itu)\s*ayazağa|maslak|ayazağa|ayazaga|sarıyer|sariyer|spine\s*tower|olive\s*plaza|doğuş\s*center|seba\s*office|maslak\s*uniq|windowist|\b(obss|commencis|bgts|bilgeadam|etiya|veripark|softtech|innova|İnnova|hitit|paycore|fineksus|sovos|token\s*finansal|adesso|trendyol|doğuş\s*teknoloji)\b/i.test(routeText)) {
+            walkRoutes.push("ROUTE_ITU_MASLAK");
+          }
+          if (vip?.cluster === "CLUSTER_LEVENT" || /levent|esentepe\s*[/,]\s*(?:şişli|sisli|beşiktaş|besiktas|levent)|büyükdere\s*cad|mecidiyeköy|mecidiyekoy|şişli|sisli|kağıthane|kagithane|beşiktaş|besiktas|gayrettepe|etiler|kanyon|ferko|torun\s*center|trump\s*towers|maya\s*akar|bellevue|libelle|levent\s*199|\b(microsoft|aws|google|insider|amadeus|hepsiburada|midas|colendi|yemeksepeti|delivery\s*hero|mastercard|ibm|peakup|dream\s*games|getir)\b/i.test(routeText)) {
+            walkRoutes.push("ROUTE_LEVENT_SISLI");
+          }
+        }
         const detectedCluster = vip?.cluster || (
-          /gebze|kocaeli|bilişim vadisi|çayırova|gosb/i.test(address) ? "CLUSTER_GEBZE" :
-          /maslak|sarıyer|ayazağa/i.test(address) ? "CLUSTER_MASLAK" :
-          /kartal|pendik|kurtköy|ataşehir|üsküdar|ümraniye|kozyatağı|küçükyalı|maltepe|tuzla|asya/i.test(address) ? "CLUSTER_ASIAN" :
+          walkRoutes.includes("ROUTE_TUZLA_GEBZE") ? "CLUSTER_GEBZE" :
+          walkRoutes.some(r => ["ROUTE_PENDIK_TEKNO", "ROUTE_KARTAL_MALTEPE", "ROUTE_KOZYATAGI_ATASEHIR", "ROUTE_UMRANIYE_USKUDAR"].includes(r)) ? "CLUSTER_ASIAN" :
+          walkRoutes.includes("ROUTE_ITU_MASLAK") ? "CLUSTER_MASLAK" :
           "CLUSTER_LEVENT"
         );
 
@@ -8539,6 +8599,7 @@ ${closeLine}"`;
           cleanRole,
           location: primaryApp?.location || vip?.address || "Istanbul",
           cluster: detectedCluster,
+          walkRoutes,
           clusterLabel: vip?.clusterLabel || `${COUNTRY_DISPLAY_META[countryGroup]?.flag || "📍"} ${primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"))}`,
           appliedAt: latestDate,
           status: topStatus,
@@ -9673,6 +9734,7 @@ ${closeLine}"`;
         if (filter === "EMAILED" && !ch.email) return false;
         if (filter === "DM_SENT" && !(ch.techDm || ch.hrDm || ch.connDm)) return false;
         if (filter === "CONNECTIONS" && !item.vipBadge && !ch.connDm && !/connection|1st-deg/i.test(item.summary || "")) return false;
+        if (filter.startsWith("ROUTE_") && !(item.walkRoutes || []).includes(filter)) return false;
         if (filter === "CLUSTER_MASLAK" && item.cluster !== "CLUSTER_MASLAK") return false;
         if (filter === "CLUSTER_LEVENT" && item.cluster !== "CLUSTER_LEVENT") return false;
         if (filter === "CLUSTER_ASIAN" && item.cluster !== "CLUSTER_ASIAN") return false;
@@ -9746,6 +9808,35 @@ ${closeLine}"`;
         });
       }
 
+      if (filter.startsWith("ROUTE_")) {
+        filtered.sort((a, b) => {
+          const aDone = resolveItemChannels(a, checks).callWalk ? 1 : 0;
+          const bDone = resolveItemChannels(b, checks).callWalk ? 1 : 0;
+          if (aDone !== bDone) return aDone - bDone;
+          const aHot = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀"].includes(a.status) ? 0 : 1;
+          const bHot = ["Interview 🎯", "CV Downloaded ⭐", "Viewed 👀"].includes(b.status) ? 0 : 1;
+          if (aHot !== bHot) return aHot - bHot;
+          const aRank = a.callPriority?.callRank || (a.giantRank ? a.giantRank + 40 : 999);
+          const bRank = b.callPriority?.callRank || (b.giantRank ? b.giantRank + 40 : 999);
+          if (aRank !== bRank) return aRank - bRank;
+          return String(b.appliedAt || "").localeCompare(String(a.appliedAt || ""));
+        });
+      }
+
+      const ROUTE_LABELS = {
+        ROUTE_KOZYATAGI_ATASEHIR: "🚶 Route 1: Kozyatağı & Ataşehir Plazas (M4 · 20m from Yakacık)",
+        ROUTE_PENDIK_TEKNO: "🚶 Route 2: Pendik / Kurtköy & Teknopark İstanbul (M4 · 15m from Yakacık)",
+        ROUTE_KARTAL_MALTEPE: "🚶 Route 3: Kartal / Maltepe / Küçükyalı (M4 · 5–12m from Yakacık)",
+        ROUTE_UMRANIYE_USKUDAR: "🚶 Route 4: Ümraniye & Üsküdar / Altunizade (M4→M5 · 30m)",
+        ROUTE_TUZLA_GEBZE: "🚶 Route 5: Tuzla / Gebze GOSB & Bilişim Vadisi (Marmaray · 25m)",
+        ROUTE_ITU_MASLAK: "🚶 Route 6: İTÜ Arı Teknokent & Maslak (M2 · Pure-Tech Cluster)",
+        ROUTE_LEVENT_SISLI: "🚶 Route 7: Levent / Mecidiyeköy / Şişli / Kağıthane (M2)"
+      };
+      const visitedRouteCount = filter.startsWith("ROUTE_") ? filtered.filter(it => resolveItemChannels(it, checks).callWalk).length : 0;
+      const routeBannerHtml = filter.startsWith("ROUTE_")
+        ? `<div class="glass rounded-xl p-3.5 border border-cyan-500/45 bg-cyan-950/20 text-xs text-slate-200 flex flex-wrap items-center justify-between gap-2 mb-2"><div><strong class="text-cyan-300">${ROUTE_LABELS[filter] || filter} (${filtered.length} Nearby · ✅ ${visitedRouteCount} Done · ⏳ ${filtered.length - visitedRouteCount} Left)</strong><span class="text-slate-300 ml-1">— Sorted unvisited &amp; highest priority first. Call at 09:30 to grab a name/slot, then tap <strong>🗺️ Google Maps ↗</strong> in Step 1!</span></div></div>`
+        : "";
+
       const calledPureTechCount = filter === "CALL_PRIORITY"
         ? filtered.filter(it => resolveItemChannels(it, checks).callWalk).length
         : 0;
@@ -9771,10 +9862,10 @@ ${closeLine}"`;
 
       if (PIPELINE_VIEW_MODE === "cards") {
         container.className = "space-y-2";
-        container.innerHTML = `${callQueueBannerHtml}${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
+        container.innerHTML = `${routeBannerHtml}${callQueueBannerHtml}${emailQueueBannerHtml}<div class="grid grid-cols-1 md:grid-cols-2 gap-4">${filtered.map(item => renderPipelineCard(item, checks)).join("")}</div>`;
       } else {
         container.className = "space-y-2";
-        container.innerHTML = callQueueBannerHtml + emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
+        container.innerHTML = routeBannerHtml + callQueueBannerHtml + emailQueueBannerHtml + filtered.map(item => renderPipelineRow(item, checks)).join("");
       }
     }
     function renderVipChecklist() { renderUnifiedPipeline(); }
