@@ -471,7 +471,7 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            {/* Project 5 - GuardGit MCP (MIT Open-Source SEP-1865 MCP App) */}
+            {/* Project 5 - GuardGit MCP (AGPL-3.0 Open-Source SEP-1865 MCP App) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -481,7 +481,7 @@ export default function Portfolio() {
               <div className="h-48 bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 p-5 flex flex-col justify-between text-white relative overflow-hidden group">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
-                    MIT Open-Source · SEP-1865 MCP App
+                    AGPL-3.0 Open-Source · SEP-1865 MCP App
                   </span>
                   <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 </div>
@@ -506,14 +506,14 @@ export default function Portfolio() {
                   GuardGit MCP (DevSecOps Cockpit)
                 </h3>
                 <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
-                  MIT open-source SEP-1865 MCP App &amp; CLI for AI coding agents
+                  AGPL-3.0 open-source SEP-1865 MCP App &amp; CLI for AI coding agents
                   (Antigravity, Claude, Cursor) featuring pre-commit secret &amp; high-entropy
                   scanning, semantic JSON diffing with breaking-change flags, read-only
                   git merge-tree conflict dry-runs, atomic commit splitting, and a bundled
                   interactive cockpit UI.
                 </p>
                 <div className="flex flex-wrap gap-1.5 mb-5">
-                  {["TypeScript", "MCP App", "SEP-1865", "DevSecOps", "Git Merge-Tree", "MIT License"].map((tag) => (
+                  {["TypeScript", "MCP App", "SEP-1865", "DevSecOps", "Git Merge-Tree", "AGPL-3.0"].map((tag) => (
                     <span
                       key={tag}
                       className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full"
@@ -529,7 +529,7 @@ export default function Portfolio() {
                     rel="noreferrer"
                     className="text-gray-700 hover:text-gray-900 font-medium flex items-center"
                   >
-                    <Github className="w-4 h-4 mr-1.5" /> MIT Open Source
+                    <Github className="w-4 h-4 mr-1.5" /> AGPL-3.0 Open Source
                   </a>
                   <a
                     href="https://github.com/Hessam-Mamagani/guardgit-mcp"
