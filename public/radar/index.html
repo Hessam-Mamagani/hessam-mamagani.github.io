@@ -3436,28 +3436,28 @@
 
     function buildLinkedInPeopleSearchHref(companyOrBrand = "", mode = "tech", countryGroup = "TR", personName = "") {
       const brand = getLinkedInCompanySearchBrand(companyOrBrand).replace(/"/g, "").trim();
-      const quotedBrand = brand ? `"${brand}"` : "";
       const geoParam = getGeoParamForCountry(countryGroup);
-      const isTr = !countryGroup || countryGroup === "TR";
       if (mode === "connections") {
-        return `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(quotedBrand || brand)}${geoParam}`;
+        return `https://www.linkedin.com/search/results/people/?${brand ? `company=${encodeURIComponent(brand)}&` : ""}network=%5B%22F%22%5D${geoParam}`;
       }
       if (mode === "person") {
         const cleanPerson = String(personName || "").replace(/"/g, "").trim();
-        const q = cleanPerson && quotedBrand ? `"${cleanPerson}" ${quotedBrand}` : cleanPerson ? `"${cleanPerson}"` : quotedBrand;
-        return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
+        const parts = cleanPerson.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2 && parts[parts.length - 1].replace(/\./g, "").length >= 2) {
+          const lastName = parts[parts.length - 1];
+          const firstName = parts.slice(0, -1).join(" ");
+          return `https://www.linkedin.com/search/results/people/?${brand ? `company=${encodeURIComponent(brand)}&` : ""}firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}${geoParam}`;
+        }
+        return `https://www.linkedin.com/search/results/people/?${brand ? `company=${encodeURIComponent(brand)}&` : ""}keywords=${encodeURIComponent(cleanPerson || brand)}${geoParam}`;
       }
+      // LinkedIn 2026 Conversational AI People Search: natural language WITHOUT quotes or company= returns 100% current employees
       if (mode === "hr") {
-        const roles = isTr
-          ? `("Technical Recruiter" OR "Talent Acquisition" OR "IT Recruiter" OR "İnsan Kaynakları")`
-          : `("Technical Recruiter" OR "Talent Acquisition" OR "Recruiter")`;
-        const q = quotedBrand ? `${quotedBrand} AND ${roles}` : roles;
+        const q = brand ? `Recruiters and Talent Acquisition who work at ${brand}` : `Recruiters and Talent Acquisition`;
         return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
       }
-      const techRoles = isTr
-        ? `("CTO" OR "Engineering Manager" OR "Director" OR "Yazılım Müdürü")`
-        : `("CTO" OR "Engineering Manager" OR "Software Director" OR "Tech Lead")`;
-      const q = quotedBrand ? `${quotedBrand} AND ${techRoles}` : techRoles;
+      const q = brand
+        ? `Engineering Managers, Directors, and Tech Leads who work at ${brand}`
+        : `Engineering Managers, Directors, and Tech Leads`;
       return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
     }
 
