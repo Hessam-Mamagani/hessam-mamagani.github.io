@@ -2623,8 +2623,8 @@
         const mail = buildOutreachEmail(item);
         const mailtoHref = `mailto:${item.email || ""}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
         const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(item.email || "")}&su=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}`;
-        const liCtoUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company.split("(")[0].trim() + " CTO OR VP Engineering OR Engineering Manager OR Yazılım Müdürü")}`;
-        const liSearchUrl = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(item.company.split("(")[0].trim() + " Talent Acquisition OR Technical Recruiter OR İnsan Kaynakları")}`;
+        const liCtoUrl = buildLinkedInPeopleSearchHref(item.company, "tech", item.countryGroup || "TR");
+        const liSearchUrl = buildLinkedInPeopleSearchHref(item.company, "hr", item.countryGroup || "TR");
         const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent('"' + item.company.split("(")[0].trim() + '" iletişim telefon insan kaynakları kariyer e-posta')}`;
         const isContacted = item.status === "HR Messaged 💬";
         const isProactive = !!item.isProactive;
@@ -3418,6 +3418,107 @@
       return geoMap[cg] ? `&geoUrn=%5B%22${geoMap[cg]}%22%5D` : "";
     }
 
+    function getLinkedInCompanySearchBrand(company = "") {
+      let s = String(company || "").split("(")[0].trim();
+      if (s.includes(" / ")) s = s.split(" / ")[0].trim();
+      let cur = s
+        .replace(/\b(?:a\.?ş\.?|anonim\s+şirketi|san\.\s*ve\s*tic\.?|ltd\.?|şti\.?|inc\.?|llc\.?|gmbh|plc)\b/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const trailingNoiseRe = /(?:\s*[-–—,|]\s*|\s+)(?:uk\s*&\s*ireland|united\s+kingdom|european\s+tech\s+hub|tech\s+hub|business\s+solutions|digital\s+industries|information\s+technology|türkiye|turkiye|turkey|istanbul|i̇stanbul|gebze|dublin|london|berlin|munich|münchen|amsterdam|eindhoven|walldorf|germany|ireland|netherlands|emea|europe|global|se|tr|uk|de|nl|ie)\s*$/i;
+      for (let i = 0; i < 4; i++) {
+        const next = cur.replace(trailingNoiseRe, "").trim();
+        if (!next || next === cur || next.length < 2) break;
+        cur = next;
+      }
+      return cur.length >= 2 ? cur : s;
+    }
+
+    function buildLinkedInPeopleSearchHref(companyOrBrand = "", mode = "tech", countryGroup = "TR", personName = "") {
+      const brand = getLinkedInCompanySearchBrand(companyOrBrand).replace(/"/g, "").trim();
+      const quotedBrand = brand ? `"${brand}"` : "";
+      const geoParam = getGeoParamForCountry(countryGroup);
+      const isTr = !countryGroup || countryGroup === "TR";
+      if (mode === "connections") {
+        return `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(quotedBrand || brand)}${geoParam}`;
+      }
+      if (mode === "person") {
+        const cleanPerson = String(personName || "").replace(/"/g, "").trim();
+        const q = cleanPerson && quotedBrand ? `"${cleanPerson}" ${quotedBrand}` : cleanPerson ? `"${cleanPerson}"` : quotedBrand;
+        return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
+      }
+      if (mode === "hr") {
+        const roles = isTr
+          ? `("Technical Recruiter" OR "Talent Acquisition" OR "IT Recruiter" OR "İnsan Kaynakları")`
+          : `("Technical Recruiter" OR "Talent Acquisition" OR "Recruiter")`;
+        const q = quotedBrand ? `${quotedBrand} AND ${roles}` : roles;
+        return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
+      }
+      const techRoles = isTr
+        ? `("CTO" OR "Engineering Manager" OR "Director" OR "Yazılım Müdürü")`
+        : `("CTO" OR "Engineering Manager" OR "Software Director" OR "Tech Lead")`;
+      const q = quotedBrand ? `${quotedBrand} AND ${techRoles}` : techRoles;
+      return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
+    }
+
+    function isGenericPlaceholderPerson(person) {
+      const name = String(person?.name || "").trim();
+      if (!name) return true;
+      if (!extractRealFirstName(name)) return true;
+      if (/\b(direktörlüğü|ekibi|yönetimi|insan\s+kaynakları|talent\s+acquisition|people\s*&\s*culture|tech\s+hr\s+team|people\s+team|hr\s+team|recruiting|recruitment|leadership|engineering\s+team|solutions\s+architecture)\b/i.test(name)) {
+        return true;
+      }
+      return false;
+    }
+
+    function mergeVerifiedPeopleLists(lists = [], countryGroup = "TR") {
+      const US_CELEB_RE = /\b(werner vogels|prasad kalyanaraman|andy jassy|matt garman|satya nadella|sundar pichai)\b/i;
+      const byKey = new Map();
+      const order = [];
+      for (const arr of lists) {
+        if (!Array.isArray(arr)) continue;
+        for (const p of arr) {
+          if (!p || !String(p.name || "").trim()) continue;
+          const cleanName = String(p.name).trim();
+          if (countryGroup !== "US" && US_CELEB_RE.test(cleanName)) continue;
+          const key = foldTurkishToAscii(cleanName).replace(/[^a-z0-9]+/g, " ").trim();
+          if (!key) continue;
+          const existing = byKey.get(key);
+          if (!existing) {
+            byKey.set(key, { ...p, name: cleanName });
+            order.push(key);
+          } else {
+            const hasBetterUrl = (p.linkedinUrl || "").includes("/in/") && !(existing.linkedinUrl || "").includes("/in/");
+            const hasAccents = /[ğüşıöçĞÜŞİÖÇ]/.test(cleanName) && !/[ğüşıöçĞÜŞİÖÇ]/.test(existing.name || "");
+            const hasLongerTitle = String(p.title || "").length > String(existing.title || "").length;
+            byKey.set(key, {
+              ...existing,
+              name: hasAccents ? cleanName : existing.name,
+              title: hasLongerTitle ? p.title : existing.title,
+              linkedinUrl: hasBetterUrl ? p.linkedinUrl : (existing.linkedinUrl || p.linkedinUrl || "")
+            });
+          }
+        }
+      }
+      const all = order.map(k => byKey.get(k));
+      const realPeople = all.filter(p => !isGenericPlaceholderPerson(p));
+      const placeholders = all.filter(p => isGenericPlaceholderPerson(p));
+      return realPeople.length ? realPeople : placeholders;
+    }
+
+    function sanitizeLinkedInPeopleUrl(url = "", item = null, person = null, group = "cto") {
+      const rawUrl = String(url || "").trim();
+      if (rawUrl && /linkedin\.com\/in\//i.test(rawUrl)) return rawUrl;
+      const cg = item?.countryGroup || "TR";
+      if (person && !isGenericPlaceholderPerson(person)) {
+        return buildLinkedInPeopleSearchHref(item?.company || "", "person", cg, person.name);
+      }
+      if (!rawUrl || /linkedin\.com\/search\/results\/people/i.test(rawUrl)) {
+        return buildLinkedInPeopleSearchHref(item?.company || "", group === "hr" ? "hr" : "tech", cg);
+      }
+      return rawUrl;
+    }
+
     const TR_FEMALE_FIRST_NAMES = new Set([
       "aslı", "aydan", "aylin", "ayşe", "ayşegül", "aysun", "bahar", "banu", "başak", "begüm", "belis", "berna",
       "betül", "beyza", "birsu", "burcu", "buse", "büşra", "cansu", "cemre", "ceren", "çiğdem", "damla", "demet",
@@ -3554,11 +3655,12 @@
       const cm = COUNTRY_DISPLAY_META[item?.countryGroup || "TR"] || COUNTRY_DISPLAY_META.TR;
       const countryTag = item?.countryGroup === "TR" ? "Türkiye (Geo-Locked)" : `${cm.flag} ${cm.label}`;
 
-      const renderProfileLink = (url) => {
-        if (!url) return "";
-        const isDirect = url.includes("/in/");
+      const renderProfileLink = (url, person = null, group = "cto") => {
+        const safeUrl = sanitizeLinkedInPeopleUrl(url, item, person, group);
+        if (!safeUrl) return "";
+        const isDirect = safeUrl.includes("/in/");
         const label = isDirect ? "↗ Verified Profile" : "🔎 LinkedIn (Local)";
-        return `<a href="${url}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/30 text-[11px] font-semibold shrink-0 transition">${label}</a>`;
+        return `<a href="${safeUrl}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded bg-blue-600/30 hover:bg-blue-600/50 text-blue-200 border border-blue-500/30 text-[11px] font-semibold shrink-0 transition">${label}</a>`;
       };
 
       return `
@@ -3582,7 +3684,7 @@
                   <div class="flex items-center gap-1.5 shrink-0">
                     <button type="button" onclick="copyPersonInvite('${itemId}', 'cto', ${pIdx}, this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-200 text-[11px] font-semibold cursor-pointer transition" title="Copy <300-char LinkedIn Connection Request Note">🤝 Invite</button>
                     <button type="button" onclick="copyPersonDm('${itemId}', 'cto', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold cursor-pointer transition" title="Copy short post-connection DM">📋 Accepted DM</button>
-                    ${renderProfileLink(p.linkedinUrl)}
+                    ${renderProfileLink(p.linkedinUrl, p, "cto")}
                   </div>
                 </div>
               `).join("")}
@@ -3603,7 +3705,7 @@
                   <div class="flex items-center gap-1.5 shrink-0">
                     <button type="button" onclick="copyPersonInvite('${itemId}', 'hr', ${pIdx}, this)" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-200 text-[11px] font-semibold cursor-pointer transition" title="Copy <300-char LinkedIn Connection Request Note">🤝 Invite</button>
                     <button type="button" onclick="copyPersonDm('${itemId}', 'hr', ${pIdx}, this)" class="px-2.5 py-1 rounded bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold cursor-pointer transition" title="Copy short post-connection DM">📋 Accepted DM</button>
-                    ${renderProfileLink(p.linkedinUrl)}
+                    ${renderProfileLink(p.linkedinUrl, p, "hr")}
                   </div>
                 </div>
               `).join("")}
@@ -3697,38 +3799,43 @@
       const compKey = item.companyKey || normalizeCompanyKey(item.company);
       const kb = EXECUTIVE_INTEL_KB[compKey] || Object.entries(EXECUTIVE_INTEL_KB).find(([k]) => item.company.toLowerCase().includes(k))?.[1] || null;
 
-      const mergeUniquePeople = (baseList = [], extraList = []) => {
-        const seen = new Set();
-        const out = [];
-        for (const p of [...baseList, ...extraList]) {
-          if (!p || !p.name) continue;
-          if (item.countryGroup !== "ABROAD" && US_CELEB_CHECK.test(p.name)) continue;
-          const k = p.name.toLowerCase().trim();
-          if (seen.has(k)) continue;
-          seen.add(k);
-          out.push(p);
-        }
-        return out;
-      };
-
+      const crmTargetId = item.primaryCrmId || item.id;
+      const matchingCrmRows = STATE.applied.filter(a => {
+        if (String(a.id) === String(crmTargetId)) return true;
+        if (normalizeCompanyKey(a.company || "") !== compKey) return false;
+        return classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup;
+      });
       const existingIntel = item.aiIntel || {};
-      const mergedCto = mergeUniquePeople(kb?.ctoAndEngLeads || existingIntel.ctoAndEngLeads || [], fetchedIntel?.ctoAndEngLeads || []);
-      const mergedHr = mergeUniquePeople(kb?.hrAndRecruiters || existingIntel.hrAndRecruiters || [], fetchedIntel?.hrAndRecruiters || []);
+      const existingCtoPool = [
+        ...(existingIntel.ctoAndEngLeads || []),
+        ...matchingCrmRows.flatMap(r => r.aiIntel?.ctoAndEngLeads || [])
+      ];
+      const existingHrPool = [
+        ...(existingIntel.hrAndRecruiters || []),
+        ...matchingCrmRows.flatMap(r => r.aiIntel?.hrAndRecruiters || [])
+      ];
+      const prevNamedCto = mergeVerifiedPeopleLists([existingCtoPool], item.countryGroup).filter(p => !isGenericPlaceholderPerson(p));
+      const prevNamedHr = mergeVerifiedPeopleLists([existingHrPool], item.countryGroup).filter(p => !isGenericPlaceholderPerson(p));
+      const prevNamedKeys = new Set([...prevNamedCto, ...prevNamedHr].map(p => foldTurkishToAscii(p.name)));
+
+      const mergedCto = mergeVerifiedPeopleLists([existingCtoPool, fetchedIntel?.ctoAndEngLeads || [], kb?.ctoAndEngLeads || []], item.countryGroup);
+      const mergedHr = mergeVerifiedPeopleLists([existingHrPool, fetchedIntel?.hrAndRecruiters || [], kb?.hrAndRecruiters || []], item.countryGroup);
+      const finalNamedAll = [...mergedCto, ...mergedHr].filter(p => !isGenericPlaceholderPerson(p));
+      const newlyAddedNamedCount = finalNamedAll.filter(p => !prevNamedKeys.has(foldTurkishToAscii(p.name))).length;
 
       const cleanComp = item.company.split("(")[0].trim();
-      const geoParam = getGeoParamForCountry(item.countryGroup);
       if (!mergedCto.length) {
         mergedCto.push({
           name: `${cleanComp} — Engineering / Tech Leadership`,
           title: `CTO / VP Engineering / Software Manager (${targetCountry})`,
-          linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " CTO OR Engineering Manager OR Yazılım Müdürü")}${geoParam}`
+          linkedinUrl: buildLinkedInPeopleSearchHref(item.company, "tech", item.countryGroup)
         });
       }
       if (!mergedHr.length) {
         mergedHr.push({
           name: `${cleanComp} — Talent Acquisition / HR`,
           title: `Technical Recruiter / İnsan Kaynakları (${targetCountry})`,
-          linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " Technical Recruiter OR Talent Acquisition OR İnsan Kaynakları")}${geoParam}`
+          linkedinUrl: buildLinkedInPeopleSearchHref(item.company, "hr", item.countryGroup)
         });
       }
 
@@ -3741,16 +3848,19 @@
       const safePhoneDisplay = item.phoneDisplay || kb?.phone || foundPhoneDisplay || "";
       const safePhone = item.phone || (safePhoneDisplay ? safePhoneDisplay.replace(/[^\d+]/g, "") : "");
 
+      const keepExistingMeta = newlyAddedNamedCount === 0 && prevNamedKeys.size > 0;
       const finalIntel = {
         ...existingIntel,
-        poweredBy: fetchedIntel?.poweredBy || "Country-Locked LinkedIn + Live DNS Verifier",
+        poweredBy: keepExistingMeta
+          ? (existingIntel.poweredBy || fetchedIntel?.poweredBy || "Country-Locked LinkedIn + Live DNS Verifier")
+          : (fetchedIntel?.poweredBy || existingIntel.poweredBy || "Country-Locked LinkedIn + Live DNS Verifier"),
         ctoAndEngLeads: mergedCto,
         hrAndRecruiters: mergedHr,
         bestEmail: safeEmail,
         emailVerification: foundEmailVerification || existingIntel.emailVerification || null,
         phoneDisplay: safePhoneDisplay,
-        officeAndMetro: kb?.officeAndMetro || existingIntel.officeAndMetro || fetchedIntel?.officeAndMetro || item.address,
-        walkInVerdict: kb?.walkInVerdict || existingIntel.walkInVerdict || fetchedIntel?.walkInVerdict || item.summary
+        officeAndMetro: existingIntel.officeAndMetro || kb?.officeAndMetro || fetchedIntel?.officeAndMetro || item.address,
+        walkInVerdict: existingIntel.walkInVerdict || kb?.walkInVerdict || fetchedIntel?.walkInVerdict || item.summary
       };
 
       if (fetchedIntel?.customExecutiveDm && !US_CELEB_CHECK.test(fetchedIntel.customExecutiveDm) && !isLegacyOutreachDraft(fetchedIntel.customExecutiveDm)) {
@@ -3773,10 +3883,6 @@
         localStorage.setItem(`jr_intel_${itemId}`, JSON.stringify(finalIntel));
       } catch {}
 
-      const crmTargetId = item.primaryCrmId || item.id;
-      const matchingCrmRows = STATE.applied.filter(
-        a => String(a.id) === String(crmTargetId) || normalizeCompanyKey(a.company || "") === compKey
-      );
       for (const crmRow of matchingCrmRows) {
         crmRow.aiIntel = finalIntel;
         if (cleanFoundEmail || (!crmRow.contactEmail && item.email)) {
@@ -3794,10 +3900,16 @@
 
       if (btn) {
         btn.disabled = false;
-        btn.innerHTML = "✅ Local People Updated";
+        btn.innerHTML = newlyAddedNamedCount > 0 ? `✅ +${newlyAddedNamedCount} Contact(s) Added` : "✅ Saved Contacts Kept";
       }
       renderUnifiedPipeline();
-      showToast(`👥 Loaded verified ${targetCountry} contacts for ${item.company}!`, true);
+      if (newlyAddedNamedCount > 0) {
+        showToast(`👥 Added ${newlyAddedNamedCount} new ${targetCountry} contact(s) for ${item.company} (merged with existing contacts)!`, true);
+      } else if (finalNamedAll.length > 0) {
+        showToast(`ℹ️ Live search found no extra contacts for ${item.company} — all ${finalNamedAll.length} saved contact(s) preserved safely.`, true);
+      } else {
+        showToast(`ℹ️ No public profiles returned by AI search for ${item.company} — click 👨‍💻 LinkedIn Tech Leads or 👩‍💼 LinkedIn Recruiters directly.`, false);
+      }
     }
 
     async function runAiVerifyEmail(idOrIdx, btn, openGmailAfter = false) {
@@ -3854,13 +3966,12 @@
         };
         if (data.recruiterName) {
           const cleanComp = item.company.split("(")[0].trim();
-          const geoParam = getGeoParamForCountry(item.countryGroup);
           const existingHr = Array.isArray(nextIntel.hrAndRecruiters) ? [...nextIntel.hrAndRecruiters] : [];
           if (!existingHr.some(p => String(p?.name || "").toLowerCase() === String(data.recruiterName).toLowerCase())) {
             existingHr.unshift({
               name: data.recruiterName,
               title: data.recruiterTitle || `Talent Acquisition / HR (${cleanComp})`,
-              linkedinUrl: `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(data.recruiterName + " " + cleanComp)}${geoParam}`
+              linkedinUrl: buildLinkedInPeopleSearchHref(item.company, "person", item.countryGroup, data.recruiterName)
             });
             nextIntel.hrAndRecruiters = existingHr;
           }
@@ -3884,9 +3995,11 @@
         }
 
         const crmTargetId = item.primaryCrmId || item.id;
-        const matchingRows = STATE.applied.filter(
-          a => String(a.id) === String(crmTargetId) || normalizeCompanyKey(a.company || "") === compKey
-        );
+        const matchingRows = STATE.applied.filter(a => {
+          if (String(a.id) === String(crmTargetId)) return true;
+          if (normalizeCompanyKey(a.company || "") !== compKey) return false;
+          return classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup;
+        });
         for (const row of matchingRows) {
           if (foundNewAltEmail || !ch.emailBlocked) row.contactEmail = vEmail;
           row.aiIntel = nextIntel;
@@ -6091,7 +6204,13 @@
                 const r = await fetch(`${apiBase}/api/find-contact`, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ id: newEntry.id, company: newEntry.company })
+                  body: JSON.stringify({
+                    id: newEntry.id,
+                    company: newEntry.company,
+                    role: newEntry.title,
+                    country: newEntry.countryGroup,
+                    lang: newEntry.countryGroup === "TR" ? "TR" : "EN"
+                  })
                 });
                 if (!r.ok) continue;
                 const data = await r.json();
@@ -6103,7 +6222,15 @@
                       target.contactPhoneDisplay = data.info.contactPhoneDisplay;
                     }
                     if (data.info.contactEmail) target.contactEmail = data.info.contactEmail;
-                    if (data.info.aiIntel) target.aiIntel = data.info.aiIntel;
+                    if (data.info.aiIntel) {
+                      const prevI = target.aiIntel || {};
+                      target.aiIntel = {
+                        ...prevI,
+                        ...data.info.aiIntel,
+                        ctoAndEngLeads: mergeVerifiedPeopleLists([prevI.ctoAndEngLeads || [], data.info.aiIntel.ctoAndEngLeads || []], target.countryGroup || "TR"),
+                        hrAndRecruiters: mergeVerifiedPeopleLists([prevI.hrAndRecruiters || [], data.info.aiIntel.hrAndRecruiters || []], target.countryGroup || "TR")
+                      };
+                    }
                     if (data.info.contactPerson && !target.notes.includes(data.info.contactPerson)) {
                       target.notes = target.notes ? `${target.notes} | HR: ${data.info.contactPerson}` : `HR: ${data.info.contactPerson}`;
                     }
@@ -7983,7 +8110,9 @@ ${closeLine}"`;
       d1Post("/api/outreach-check", { itemId: cKey, checks: updated });
 
       const compKey = item.companyKey || normalizeCompanyKey(item.company || "");
-      const matchingRows = STATE.applied.filter(a => normalizeCompanyKey(a.company || "") === compKey);
+      const matchingRows = STATE.applied.filter(
+        a => normalizeCompanyKey(a.company || "") === compKey && classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup
+      );
       for (const row of matchingRows) {
         if (!row.aiIntel || typeof row.aiIntel !== "object") row.aiIntel = {};
         row.aiIntel.emailVerification = isBlocked
@@ -8290,7 +8419,15 @@ ${closeLine}"`;
 
         const cardId = vip?.id || String(primaryApp?.id || `CO-${companyKey}`);
 
-        let savedIntel = apps.map(a => a.aiIntel).find(i => i?.emailVerification) || primaryApp?.aiIntel || apps.map(a => a.aiIntel).find(Boolean) || null;
+        const allRowIntels = apps.map(a => a.aiIntel).filter(Boolean);
+        const intelWithRealPeople = allRowIntels.find(i =>
+          [...(i.ctoAndEngLeads || []), ...(i.hrAndRecruiters || [])].some(p => !isGenericPlaceholderPerson(p))
+        );
+        const intelWithEmailVerif = allRowIntels.find(i => i?.emailVerification);
+        let savedIntel = intelWithRealPeople || intelWithEmailVerif || primaryApp?.aiIntel || allRowIntels[0] || null;
+        if (savedIntel && intelWithEmailVerif && !savedIntel.emailVerification) {
+          savedIntel = { ...savedIntel, bestEmail: intelWithEmailVerif.bestEmail || savedIntel.bestEmail, emailVerification: intelWithEmailVerif.emailVerification };
+        }
         let localIntel = null;
         try {
           localIntel = JSON.parse(localStorage.getItem(`jr_intel_${cardId}`) || (primaryApp ? localStorage.getItem(`jr_intel_${primaryApp.id}`) : "null") || "null");
@@ -8305,33 +8442,28 @@ ${closeLine}"`;
         const FAKE_PHONE_GUARD = /212\s*345\s*6789|555\s*123|000\s*00\s*00/;
 
         let mergedIntel = null;
-        if (kb || savedIntel) {
+        if (kb || savedIntel || localIntel) {
           const cleanSaved = savedIntel ? { ...savedIntel } : {};
           if (countryGroup === "TR") {
             if (US_CELEB_GUARD.test(cleanSaved.walkInVerdict || "")) delete cleanSaved.walkInVerdict;
             if (US_CELEB_GUARD.test(cleanSaved.customExecutiveDm || "")) delete cleanSaved.customExecutiveDm;
             if (US_CELEB_GUARD.test(cleanSaved.customHrDm || "")) delete cleanSaved.customHrDm;
           }
-          const mergeLists = (a = [], b = []) => {
-            const seen = new Set();
-            const res = [];
-            for (const p of [...a, ...b]) {
-              if (!p || !p.name) continue;
-              if (countryGroup === "TR" && US_CELEB_GUARD.test(p.name)) continue;
-              const k = p.name.toLowerCase().trim();
-              if (seen.has(k)) continue;
-              seen.add(k);
-              res.push(p);
-            }
-            return res;
-          };
+          const mergedCtoList = mergeVerifiedPeopleLists(
+            [...allRowIntels.map(i => i.ctoAndEngLeads || []), localIntel?.ctoAndEngLeads || [], kb?.ctoAndEngLeads || []],
+            countryGroup
+          );
+          const mergedHrList = mergeVerifiedPeopleLists(
+            [...allRowIntels.map(i => i.hrAndRecruiters || []), localIntel?.hrAndRecruiters || [], kb?.hrAndRecruiters || []],
+            countryGroup
+          );
           mergedIntel = {
             ...cleanSaved,
-            poweredBy: cleanSaved.poweredBy || "Verified Country Intelligence Graph",
-            ctoAndEngLeads: mergeLists(kb?.ctoAndEngLeads || [], cleanSaved.ctoAndEngLeads || []),
-            hrAndRecruiters: mergeLists(kb?.hrAndRecruiters || [], cleanSaved.hrAndRecruiters || []),
-            officeAndMetro: kb?.officeAndMetro || cleanSaved.officeAndMetro || vip?.clusterLabel || primaryApp?.location || "",
-            walkInVerdict: kb?.walkInVerdict || cleanSaved.walkInVerdict || vip?.summary || primaryApp?.notes || ""
+            poweredBy: intelWithRealPeople?.poweredBy || cleanSaved.poweredBy || "Verified Country Intelligence Graph",
+            ctoAndEngLeads: mergedCtoList,
+            hrAndRecruiters: mergedHrList,
+            officeAndMetro: cleanSaved.officeAndMetro || kb?.officeAndMetro || vip?.clusterLabel || primaryApp?.location || "",
+            walkInVerdict: cleanSaved.walkInVerdict || kb?.walkInVerdict || vip?.summary || primaryApp?.notes || ""
           };
         }
 
@@ -8979,9 +9111,10 @@ ${closeLine}"`;
       const legalNote = buildLegalSponsorSnippet(item.countryGroup, chosenLang === "TR" ? "TR" : "EN", cleanComp);
       const copyLegalKey = registerCopyPayload(`drawer_legal_${item.id}`, legalNote);
 
-      const linkedinJobsSearchUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanComp + " Software Engineer")}&location=${encodeURIComponent(countryLabel)}`;
-      const localTechSearchHref = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " CTO OR Engineering Manager OR Software Director")}${geoParam}`;
-      const localHrSearchHref = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(cleanComp + " Technical Recruiter OR Talent Acquisition")}${geoParam}`;
+      const searchBrand = getLinkedInCompanySearchBrand(item.company);
+      const linkedinJobsSearchUrl = `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchBrand + " Software Engineer")}&location=${encodeURIComponent(countryLabel)}`;
+      const localTechSearchHref = buildLinkedInPeopleSearchHref(item.company, "tech", item.countryGroup);
+      const localHrSearchHref = buildLinkedInPeopleSearchHref(item.company, "hr", item.countryGroup);
 
       const copyFullEmailKey = registerCopyPayload(`drawer_full_email_${item.id}`, `${item.email ? `To: ${item.email}\n` : ""}Subject: ${mail.subject}\n\n${mail.body}`);
       const copyCtoDmKey = registerCopyPayload(`drawer_cto_dm_${item.id}`, dmText);
@@ -9231,7 +9364,7 @@ ${closeLine}"`;
       const geoParam = getGeoParamForCountry(item.countryGroup);
       const cMeta = COUNTRY_DISPLAY_META[item.countryGroup] || COUNTRY_DISPLAY_META.TR;
       const smart = item.smartMeta || computeClientSmartSalaryAndTier(item.company, item.cleanRole || item.role, item.address, item.countryGroup);
-      const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(cleanComp)}${geoParam}`;
+      const myConnectionsHref = buildLinkedInPeopleSearchHref(item.company, "connections", item.countryGroup);
       const rowDmKey = registerCopyPayload(`row_dm_${item.id}`, dmText);
 
       const isRejectedCard = isRejectedOnlyPipelineItem(item) || isRejectedStatus(item.status);
@@ -9338,7 +9471,7 @@ ${closeLine}"`;
       const hrDmText = buildUnifiedDm(item, "hr", null, true);
       const cleanComp = item.company.split("(")[0].trim();
       const geoParam = getGeoParamForCountry(item.countryGroup);
-      const myConnectionsHref = `https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22F%22%5D&keywords=${encodeURIComponent(cleanComp)}${geoParam}`;
+      const myConnectionsHref = buildLinkedInPeopleSearchHref(item.company, "connections", item.countryGroup);
       const cardEmailKey = registerCopyPayload(`card_email_${item.id}`, `${item.email ? `To: ${item.email}\n` : ""}Subject: ${mail.subject}\n\n${mail.body}`);
       const cardDmKey = registerCopyPayload(`card_dm_${item.id}`, dmText);
       const cardHrDmKey = registerCopyPayload(`card_hr_dm_${item.id}`, hrDmText);
@@ -9426,7 +9559,7 @@ ${closeLine}"`;
 
             <!-- Quick Action Buttons -->
             <div class="flex flex-wrap items-center gap-1.5 pt-1">
-              <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(cleanComp + ' Software Engineer')}&location=${encodeURIComponent(countryLabel)}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1">
+              <a href="https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(getLinkedInCompanySearchBrand(item.company) + ' Software Engineer')}&location=${encodeURIComponent(countryLabel)}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-1">
                 🔍 LinkedIn Jobs
               </a>
               <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
