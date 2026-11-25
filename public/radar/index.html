@@ -3456,6 +3456,8 @@
     function getLinkedInCompanySearchBrand(company = "") {
       let s = String(company || "").split("(")[0].trim();
       if (s.includes(" / ")) s = s.split(" / ")[0].trim();
+      const dashSplit = s.split(/\s+[-–—|]\s+/)[0].trim();
+      if (dashSplit.length >= 2) s = dashSplit;
       let cur = s
         .replace(/\b(?:a\.?ş\.?|anonim\s+şirketi|san\.\s*ve\s*tic\.?|ltd\.?|şti\.?|inc\.?|llc\.?|gmbh|plc)\b/gi, " ")
         .replace(/\s+/g, " ")
@@ -3477,13 +3479,8 @@
       }
       if (mode === "person") {
         const cleanPerson = String(personName || "").replace(/"/g, "").trim();
-        const parts = cleanPerson.split(/\s+/).filter(Boolean);
-        if (parts.length >= 2 && parts[parts.length - 1].replace(/\./g, "").length >= 2) {
-          const lastName = parts[parts.length - 1];
-          const firstName = parts.slice(0, -1).join(" ");
-          return `https://www.linkedin.com/search/results/people/?${brand ? `company=${encodeURIComponent(brand)}&` : ""}firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}${geoParam}`;
-        }
-        return `https://www.linkedin.com/search/results/people/?${brand ? `company=${encodeURIComponent(brand)}&` : ""}keywords=${encodeURIComponent(cleanPerson || brand)}${geoParam}`;
+        const q = cleanPerson && brand ? `${cleanPerson} ${brand}` : (cleanPerson || brand);
+        return `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}${geoParam}`;
       }
       // LinkedIn 2026 Conversational AI People Search: natural language WITHOUT quotes or company= returns 100% current employees
       if (mode === "hr") {
