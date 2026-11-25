@@ -14,6 +14,7 @@ import {
   Cpu,
   Terminal,
   Database,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -470,24 +471,96 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            {/* Project 5 - Smart Commit Generator AI */}
+            {/* Project 5 - GuardGit MCP (MIT Open-Source SEP-1865 MCP App) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
               transition={{ duration: 0.6, delay: 0.5 }}
               className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
             >
+              <div className="h-48 bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-900 p-5 flex flex-col justify-between text-white relative overflow-hidden group">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-mono">
+                    MIT Open-Source · SEP-1865 MCP App
+                  </span>
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                </div>
+                <div className="font-mono text-xs text-slate-300 space-y-1 bg-black/30 p-3 rounded-lg border border-white/10">
+                  <div className="text-emerald-300">$ npx guardgit-mcp</div>
+                  <div>→ Secret &amp; Entropy Guard · Structural JSON Diff</div>
+                  <div className="text-sky-300">✓ git merge-tree dry-run · Atomic Commit Splitter</div>
+                </div>
+                <a
+                  href="https://github.com/Hessam-Mamagani/guardgit-mcp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center"
+                >
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium shadow-lg flex items-center gap-2">
+                    <Github className="w-4 h-4" /> View on GitHub
+                  </span>
+                </a>
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-2 text-gray-900">
+                  GuardGit MCP (DevSecOps Cockpit)
+                </h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
+                  MIT open-source SEP-1865 MCP App &amp; CLI for AI coding agents
+                  (Antigravity, Claude, Cursor) featuring pre-commit secret &amp; high-entropy
+                  scanning, semantic JSON diffing with breaking-change flags, read-only
+                  git merge-tree conflict dry-runs, atomic commit splitting, and a bundled
+                  interactive cockpit UI.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {["TypeScript", "MCP App", "SEP-1865", "DevSecOps", "Git Merge-Tree", "MIT License"].map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
+                  <a
+                    href="https://github.com/Hessam-Mamagani/guardgit-mcp"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-gray-700 hover:text-gray-900 font-medium flex items-center"
+                  >
+                    <Github className="w-4 h-4 mr-1.5" /> MIT Open Source
+                  </a>
+                  <a
+                    href="https://github.com/Hessam-Mamagani/guardgit-mcp"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-emerald-600 font-semibold hover:text-emerald-800 transition-colors flex items-center gap-1"
+                  >
+                    GitHub <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Project 6 - Smart Commit Generator AI */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={projectsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.55 }}
+              className="bg-white rounded-xl shadow-lg overflow-hidden transform hover:translate-y-[-6px] transition-all duration-300 hover:shadow-xl border border-gray-100 flex flex-col"
+            >
               <div className="h-48 bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900 p-5 flex flex-col justify-between text-white relative overflow-hidden group">
                 <div className="flex items-center justify-between">
                   <span className="px-2.5 py-1 rounded bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-mono">
-                    VS Marketplace & Open VSX
+                    VS Marketplace &amp; Open VSX
                   </span>
                   <Terminal className="w-5 h-5 text-amber-400" />
                 </div>
                 <div className="font-mono text-xs text-slate-300 space-y-1 bg-black/30 p-3 rounded-lg border border-white/10">
-                  <div className="text-amber-300">★ Smart Commit Generator AI v1.4.7</div>
-                  <div>→ OpenAI · Gemini · DeepSeek · Groq · Grok · Ollama</div>
-                  <div className="text-emerald-400">✓ git merge-tree dry-run & secret scan</div>
+                  <div className="text-amber-300">Smart Commit Generator AI v1.7.0</div>
+                  <div>→ Copilot · Gemini · Claude · OpenAI · Groq · Ollama (+4)</div>
+                  <div className="text-emerald-400">✓ Structural JSON diff · merge-tree · Pre-Commit Guard</div>
                 </div>
                 <a
                   href="https://marketplace.visualstudio.com/items?itemName=Hessam-Mamagani.smart-commit-generator-ai"
@@ -505,13 +578,13 @@ export default function Portfolio() {
                   Smart Commit Generator AI
                 </h3>
                 <p className="text-gray-600 text-sm mb-5 leading-relaxed flex-1">
-                  Zero-dependency VS Code, Cursor & Antigravity IDE extension (4,200+ LOC)
-                  supporting 6 LLM providers, 14 Git/PR automation commands, custom Activity
-                  Bar Webview, in-memory conflict dry-runs (git merge-tree), and pre-commit
-                  DevSecOps secret & debug scanners.
+                  Zero-dependency VS Code, Cursor &amp; Antigravity IDE extension (9,400+ LOC)
+                  supporting 10 LLM providers, 18 Git/PR automation commands, custom Activity
+                  Bar Webview, structural JSON diffing, in-memory git merge-tree dry-runs,
+                  and pre-commit DevSecOps secret &amp; artifact guards.
                 </p>
                 <div className="flex flex-wrap gap-1.5 mb-5">
-                  {["VS Code API", "Node.js", "6 LLM Providers", "Git SCM", "DevSecOps", "OIDC CI/CD"].map((tag) => (
+                  {["VS Code API", "Node.js", "10 LLM Providers", "18 Commands", "DevSecOps", "OIDC CI/CD"].map((tag) => (
                     <span
                       key={tag}
                       className="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full"
@@ -522,12 +595,12 @@ export default function Portfolio() {
                 </div>
                 <div className="flex justify-between items-center pt-3 border-t border-gray-100 text-sm">
                   <a
-                    href="https://github.com/Hessam-Mamagani/smart-commit-generator"
+                    href="https://open-vsx.org/extension/Hessam-Mamagani/smart-commit-generator-ai"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-gray-600 hover:text-gray-900 font-medium flex items-center"
+                    className="text-gray-600 hover:text-gray-900 font-medium flex items-center gap-1"
                   >
-                    <Github className="w-4 h-4 mr-1.5" /> Open Source
+                    <Terminal className="w-4 h-4 mr-0.5" /> Open VSX
                   </a>
                   <a
                     href="https://marketplace.visualstudio.com/items?itemName=Hessam-Mamagani.smart-commit-generator-ai"
@@ -535,7 +608,7 @@ export default function Portfolio() {
                     rel="noreferrer"
                     className="text-amber-600 font-semibold hover:text-amber-800 transition-colors flex items-center gap-1"
                   >
-                    Marketplace <ExternalLink className="w-3.5 h-3.5" />
+                    VS Marketplace <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               </div>
