@@ -119,7 +119,7 @@
           <span id="modeBadge" class="px-2 py-0.5 text-[11px] font-bold rounded bg-blue-600 text-white tracking-wider">LIVE D1</span>
           <h1 class="text-lg md:text-xl font-bold text-white tracking-tight">Hessam Mamagani — JobRadar &amp; AI Copilot</h1>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5">
+        <p class="hidden sm:block text-xs text-slate-400 mt-0.5">
           .NET (8/10) · C# · React · Next.js · TypeScript · SQL/Redis · Azure · SAP/e-Invoice · Agentic AI &nbsp;&middot;&nbsp; 2027 Floor: ≥140K TL Net · €66K–€95K EU
         </p>
       </div>
@@ -136,7 +136,7 @@
             <span id="healthChipDot" class="w-2 h-2 rounded-full bg-slate-400 animate-pulse"></span>
             <span id="healthChipLabel">⚡ Agents</span>
           </button>
-          <div id="healthPopover" class="hidden absolute right-0 mt-2 w-80 sm:w-96 glass rounded-xl p-3.5 border border-slate-700 shadow-2xl z-50 text-xs space-y-2.5">
+          <div id="healthPopover" class="hidden absolute right-0 mt-2 w-80 sm:w-96 max-w-[calc(100vw-2rem)] glass rounded-xl p-3.5 border border-slate-700 shadow-2xl z-50 text-xs space-y-2.5">
             <div class="flex items-center justify-between border-b border-slate-800 pb-2">
               <span class="font-bold text-white">⚡ Live Agents &amp; Scrapers Health</span>
               <button type="button" id="healthRefreshBtn" onclick="loadSystemHealth(true)" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-600 text-cyan-300 text-[11px] font-semibold cursor-pointer">🔄 Re-check</button>
@@ -290,7 +290,7 @@
     <section id="tab-pipeline" class="mt-4 hidden space-y-4">
       <div class="glass rounded-xl p-4 border border-slate-800 space-y-3">
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="min-w-[260px] flex-1">
+          <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2.5 flex-wrap">
               <h2 class="text-base font-bold text-white">🎯 My Applications &amp; Sponsor Outreach</h2>
               <span id="pipelineProgressBadge" class="text-xs text-slate-400">Loading...</span>
@@ -3710,7 +3710,7 @@
             <div class="space-y-1.5">
               ${ctoList.map((p, pIdx) => `
                 <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-800">
-                  <div class="min-w-[200px] flex-1">
+                  <div class="min-w-0 flex-1 break-words">
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
@@ -3731,7 +3731,7 @@
             <div class="space-y-1.5">
               ${hrList.map((p, pIdx) => `
                 <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/90 px-3 py-2 rounded-lg border border-slate-800">
-                  <div class="min-w-[200px] flex-1">
+                  <div class="min-w-0 flex-1 break-words">
                     <span class="font-bold text-white">${p.name}</span>
                     <span class="text-slate-400"> — ${p.title}</span>
                   </div>
@@ -8689,38 +8689,29 @@ ${closeLine}"`;
     function renderSixChannelCheckboxes(item, resolvedChannels, compact = true) {
       const ch = resolvedChannels;
       const cls = compact
-        ? "flex items-center gap-2.5 flex-wrap shrink-0 text-[11px] bg-black/40 px-2.5 py-1.5 rounded-lg border border-slate-800"
-        : "grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs";
+        ? "flex flex-wrap items-center gap-1.5 text-[11px]"
+        : "grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs";
+      const pill = (checked, key, label, title, isCyan = false) => {
+        const activeCls = isCyan
+          ? "bg-cyan-500/15 border-cyan-500/45 text-cyan-300 font-semibold"
+          : "bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-semibold";
+        const accentCls = isCyan ? "accent-cyan-400" : "accent-emerald-500";
+        return `
+          <label class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border cursor-pointer select-none transition ${checked ? activeCls : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'}" title="${title}">
+            <input type="checkbox" ${checked ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', '${key}', this.checked)" class="w-3 h-3 ${accentCls} rounded cursor-pointer" />
+            <span class="truncate">${label}</span>
+          </label>
+        `;
+      };
       return `
         <div class="${cls}" onclick="event.stopPropagation()">
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="Job Portal / Easy Apply Submitted">
-            <input type="checkbox" ${ch.applied ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'applied', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.applied ? 'font-bold text-emerald-300' : 'text-slate-400'}">🌐 Apply</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="Direct Email Sent (Gmail)">
-            <input type="checkbox" ${ch.email ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'email', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.email ? 'font-bold text-emerald-300' : 'text-slate-400'}">📧 Email</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="CTO / VP Eng / Tech Manager LinkedIn DM Sent">
-            <input type="checkbox" ${ch.techDm ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'techDm', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.techDm ? 'font-bold text-emerald-300' : 'text-slate-400'}">👨‍💻 Tech DM</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="HR / Technical Recruiter LinkedIn DM Sent">
-            <input type="checkbox" ${ch.hrDm ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'hrDm', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.hrDm ? 'font-bold text-emerald-300' : 'text-slate-400'}">👩‍💼 HR DM</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="1st-Degree Connection / Referral Messaged">
-            <input type="checkbox" ${ch.connDm ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'connDm', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.connDm ? 'font-bold text-emerald-300' : 'text-slate-400'}">👥 1st-Deg</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="Phone Switchboard Call Done">
-            <input type="checkbox" ${ch.callWalk ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'callWalk', this.checked)" class="accent-emerald-500 rounded" />
-            <span class="${ch.callWalk ? 'font-bold text-emerald-300' : 'text-slate-400'}">📞 Call</span>
-          </label>
-          <label class="flex items-center gap-1 cursor-pointer select-none" title="Physically Visited / Walked Into Office${ch.walkedDate ? ` (${ch.walkedDate})` : ''}">
-            <input type="checkbox" ${ch.walked ? "checked" : ""} onchange="togglePipelineCheck('${item.id}', 'walked', this.checked)" class="accent-cyan-400 rounded" />
-            <span class="${ch.walked ? 'font-bold text-cyan-300' : 'text-slate-400'}">🚶 Walked</span>
-          </label>
+          ${pill(ch.applied, "applied", "Apply", "Job Portal / Easy Apply Submitted")}
+          ${pill(ch.email, "email", "Email", "Direct Email Sent (Gmail)")}
+          ${pill(ch.techDm, "techDm", "Tech DM", "CTO / VP Eng / Tech Manager LinkedIn DM Sent")}
+          ${pill(ch.hrDm, "hrDm", "HR DM", "HR / Technical Recruiter LinkedIn DM Sent")}
+          ${pill(ch.connDm, "connDm", "1st-Deg", "1st-Degree Connection / Referral Messaged")}
+          ${pill(ch.callWalk, "callWalk", "Call", "Phone Switchboard Call Done")}
+          ${pill(ch.walked, "walked", "Walked", `Physically Visited / Walked Into Office${ch.walkedDate ? ` (${ch.walkedDate})` : ""}`, true)}
         </div>
       `;
     }
@@ -9219,16 +9210,24 @@ ${closeLine}"`;
           };
 
       return `
-        <div class="pipe-drawer-body p-4 border-t border-slate-700/80 space-y-3.5 text-xs">
-          <!-- Priority Next-Step Guide Banner -->
-          <div class="p-3 rounded-xl border ${nextStepBanner.color} flex flex-wrap items-center justify-between gap-2">
-            <div class="space-y-0.5">
-              <div class="text-[10px] font-extrabold tracking-wider uppercase">${nextStepBanner.badge}</div>
-              <div class="text-xs text-slate-100">${escapeHtmlSafe(nextStepBanner.text)}</div>
+        <div class="pipe-drawer-body p-3 sm:p-4 border-t border-slate-700/80 space-y-3 text-xs">
+          <!-- Compact Next-Step & Quick Jump Strip -->
+          <div class="px-3 py-2 rounded-xl border ${nextStepBanner.color} flex flex-wrap items-center justify-between gap-2">
+            <div class="min-w-0 flex-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span class="text-[10px] font-extrabold tracking-wider uppercase shrink-0">${nextStepBanner.badge}</span>
+              <span class="text-[11px] text-slate-200">${escapeHtmlSafe(nextStepBanner.text)}</span>
             </div>
-            <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow cursor-pointer transition shrink-0">
-              🤖 Ask Copilot About ${escapeHtmlSafe(cleanComp)}
-            </button>
+            <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+              <a href="${mapsHref}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-blue-600/25 hover:bg-blue-600/45 border border-blue-500/40 text-blue-200 text-[11px] font-bold transition">
+                🗺️ Maps ↗
+              </a>
+              <a href="${item.jobUrl}" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] font-semibold transition">
+                🌐 Job Post ↗
+              </a>
+              <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold shadow cursor-pointer transition">
+                🤖 Copilot
+              </button>
+            </div>
           </div>
 
           ${renderRolesSummaryHtml(item)}
@@ -9427,6 +9426,65 @@ ${closeLine}"`;
       `;
     }
 
+    function formatCompactAskFor(raw = "") {
+      const s = String(raw || "").trim();
+      if (!s) return null;
+      const parenIdx = s.indexOf("(");
+      if (parenIdx > 1) {
+        const name = s.slice(0, parenIdx).trim();
+        let role = s
+          .slice(parenIdx + 1)
+          .replace(/\)+$/, "")
+          .replace(/\s+(?:at|@)\s+.+$/i, "")
+          .replace(/\s*\([^)]*\)\s*/g, " ")
+          .replace(/\s*\([^)]*$/, "")
+          .replace(/\s+[—–-]\s+.+$/, "")
+          .replace(/\s*\|\s*.+$/, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (role.length > 30) role = role.slice(0, 28).trim() + "…";
+        return { name, role, full: s };
+      }
+      const dashSplit = s.split(/\s+[—–-]\s+/);
+      const name = (dashSplit[0] || s).trim();
+      let role = (dashSplit[1] || "").trim();
+      if (role.length > 30) role = role.slice(0, 28).trim() + "…";
+      return { name, role, full: s };
+    }
+
+    function formatCompactLocation(item) {
+      const rawCluster = String(item?.clusterLabel || "").split("(")[0];
+      const rawAddr = String(item?.address || "");
+      const cleanLoc = (str) =>
+        String(str || "")
+          .replace(/[\u{1F1E6}-\u{1F1FF}]{2}/gu, "")
+          .replace(/^[📍🚅🌍🌎🌐\s]+/u, "")
+          .replace(/^(?:TR|IE|DE|NL|UK|US)\s+/i, "")
+          .replace(/,\s*(?:Türkiye|Turkey)\s*$/i, "")
+          .replace(/\bIstanbul,\s*Istanbul\b/gi, "Istanbul")
+          .replace(/\bİstanbul,\s*İstanbul\b/gi, "İstanbul")
+          .replace(/\s+/g, " ")
+          .trim();
+      let loc = cleanLoc(rawCluster);
+      const addrClean = cleanLoc(rawAddr);
+      if ((!loc || /^i?stanbul$/i.test(loc)) && addrClean && addrClean.length > loc.length) {
+        const shortAddr = addrClean.split(/[,/]/).slice(0, 2).join(", ").trim();
+        if (shortAddr) loc = shortAddr;
+      }
+      if (!loc) loc = addrClean || "Istanbul";
+      return loc.length > 34 ? loc.slice(0, 32).trim() + "…" : loc;
+    }
+
+    function formatCompactSalary(band = "") {
+      const s = String(band || "").trim();
+      if (!s) return "";
+      const tlMatch = s.match(/(\d{2,3})[.,]000\s*[–-]\s*(\d{2,3})[.,]000\s*TL/i);
+      if (tlMatch) return `${tlMatch[1]}–${tlMatch[2]}K TL`;
+      const fxMatch = s.match(/([€£$])\s*(\d{2,3})[.,]000\s*[–-]\s*[€£$]?\s*(\d{2,3})[.,]000/i);
+      if (fxMatch) return `${fxMatch[1]}${fxMatch[2]}–${fxMatch[3]}K`;
+      return s.replace(/\s*\/\s*(?:mo|ay|year)$/i, "");
+    }
+
     function renderPipelineRow(item, checks) {
       const defaultLang = getDefaultLangForItem(item);
       const chosenLang = getPreferredLang(item.id, defaultLang);
@@ -9472,62 +9530,85 @@ ${closeLine}"`;
         ? "border-l-4 border-l-amber-400 hover:border-blue-500/50"
         : "border-l-4 border-l-slate-600 hover:border-blue-500/40";
 
-      const locationShort = item.clusterLabel.split("(")[0].replace(/^📍\s*/, "").trim();
+      const locationShort = formatCompactLocation(item);
+      const compactAsk = formatCompactAskFor(item.askForContact);
+      const salaryShort = formatCompactSalary(smart.salaryBand);
+      const hasPhone = Boolean(item.phone && item.phone !== "Global Remote");
 
       return `
         <div id="pipeRow-${item.id}" class="glass rounded-xl border ${rowBorder} transition overflow-hidden">
-          <!-- Clean Single-Row Summary Bar -->
-          <div class="pipe-row-header p-3.5 flex flex-wrap items-center justify-between gap-3 cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
-            <div class="flex items-start gap-2.5 flex-1 min-w-[260px]">
-              <div class="min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  ${item.callPriority ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${item.callPriority.wave === 'W1' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : item.callPriority.wave === 'W2' ? 'bg-blue-500/20 text-blue-200 border border-blue-400/40' : 'bg-teal-500/20 text-teal-200 border border-teal-400/40'}">📞 #${item.callPriority.callRank} · ${item.callPriority.wave === 'W3' ? 'Missing Tech' : item.callPriority.wave}</span>` : ""}
-                  <span class="text-sm font-bold text-white hover:text-blue-300 transition">${cMeta.flag} ${item.company}</span>
-                  ${statusBadgeHtml}
-                  ${ch.walked ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">🚶 Walked${ch.walkedDate ? ` · ${escapeHtmlSafe(ch.walkedDate)}` : ""}</span>` : ""}
-                  ${item.giantRank ? `<span class="text-[11px] text-amber-300/90 font-semibold">#${item.giantRank} Sponsor</span>` : ""}
+          <!-- Clean Responsive 2-Band Summary Header -->
+          <div class="pipe-row-header cursor-pointer select-none" onclick="if(!event.target.closest('input,button,a,label')) togglePipelineExpand('${item.id}')">
+            <!-- Band 1: Full-Width Identity, Status & Meta -->
+            <div class="px-3 sm:px-4 pt-3 pb-2.5 space-y-1.5">
+              <div class="flex items-start justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    ${item.callPriority ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${item.callPriority.wave === 'W1' ? 'bg-amber-500/25 text-amber-200 border border-amber-400/50' : item.callPriority.wave === 'W2' ? 'bg-blue-500/20 text-blue-200 border border-blue-400/40' : 'bg-teal-500/20 text-teal-200 border border-teal-400/40'}">#${item.callPriority.callRank} · ${item.callPriority.wave === 'W3' ? 'Tech' : item.callPriority.wave}</span>` : ""}
+                    <span class="text-sm sm:text-[15px] font-bold text-white hover:text-blue-300 transition leading-snug">${cMeta.flag} ${escapeHtmlSafe(item.company)}</span>
+                    ${statusBadgeHtml}
+                    ${ch.walked ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-200 border border-cyan-400/40">🚶 Walked${ch.walkedDate ? ` · ${escapeHtmlSafe(ch.walkedDate)}` : ""}</span>` : ""}
+                    ${item.giantRank ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300/90 border border-amber-500/25 font-semibold">#${item.giantRank}</span>` : ""}
+                  </div>
+                  <p class="text-xs text-slate-300 font-medium truncate mt-0.5" title="${escapeHtmlSafe(item.role)}">${escapeHtmlSafe(item.role)}</p>
                 </div>
-                <p class="text-xs text-slate-300 font-medium truncate max-w-xl mt-0.5">${item.role}</p>
-                <p class="text-[11px] text-slate-400 mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                  ${item.phone && item.phone !== "Global Remote" ? `<a href="tel:${item.phone}" onclick="event.stopPropagation()" class="text-amber-300 hover:text-amber-200 font-bold">📞 ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a><button type="button" onclick="event.stopPropagation(); openCallPlaybook('${item.id}')" class="ml-1.5 px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 text-[10px] font-bold cursor-pointer transition" title="Open Call Playbook for this company">📖 Script</button><span class="text-slate-600">&middot;</span>` : ""}
-                  ${item.askForContact ? `<span class="${item.callPriority?.askForIsPoster ? 'text-amber-200 font-semibold' : 'text-cyan-300 font-medium'}">${item.callPriority?.askForIsPoster ? '🎯 Ask (Job Poster):' : '👤 Ask HR:'} ${escapeHtmlSafe(item.askForContact)}</span><span class="text-slate-600">&middot;</span>` : ""}
-                  <span>📍 ${escapeHtmlSafe(locationShort)}</span>
-                  <span class="text-slate-600">&middot;</span>
-                  <span>Quote: <strong class="text-amber-300/90 font-medium">${escapeHtmlSafe(smart.salaryBand)}</strong></span>
-                </p>
-                ${ch.callNote ? `<p class="text-[11px] text-emerald-300 mt-0.5 truncate max-w-2xl" title="${escapeHtmlSafe(ch.callNote)}">📝 Call Note${ch.callNoteUpdatedAt ? ` (${escapeHtmlSafe(ch.callNoteUpdatedAt)})` : ""}: ${escapeHtmlSafe(ch.callNote)}</p>` : ""}
+                <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
+                  <div class="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px]">
+                    <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">TR</button>
+                    <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-1.5 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}" title="English outreach">EN</button>
+                  </div>
+                  <button type="button" onclick="togglePipelineExpand('${item.id}')" class="px-2.5 py-1 rounded-lg ${isExpanded ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm'} text-xs font-semibold transition cursor-pointer">
+                    ${isExpanded ? '▲ Close' : '▼ Steps'}
+                  </button>
+                </div>
               </div>
+
+              <!-- High-Signal Scannable Metadata Row (No Duplicate Company/City Noise) -->
+              <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-slate-400">
+                ${hasPhone ? `
+                  <span class="inline-flex items-center gap-1.5" onclick="event.stopPropagation()">
+                    <a href="tel:${item.phone}" class="text-amber-300 hover:text-amber-200 font-bold">📞 ${escapeHtmlSafe(item.phoneDisplay || item.phone)}</a>
+                    <button type="button" onclick="openCallPlaybook('${item.id}')" class="px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/35 border border-amber-400/40 text-amber-200 text-[10px] font-bold cursor-pointer transition" title="Open Call Playbook for this company">📖 Script</button>
+                  </span>
+                ` : ""}
+                ${compactAsk ? `
+                  <span class="inline-flex items-center gap-1 min-w-0 max-w-full ${item.callPriority?.askForIsPoster ? 'text-amber-200 font-semibold' : 'text-cyan-300 font-medium'}" title="${escapeHtmlSafe(compactAsk.full)}">
+                    <span class="shrink-0">${item.callPriority?.askForIsPoster ? '🎯' : '👤'}</span>
+                    <span class="truncate">${escapeHtmlSafe(compactAsk.name)}${compactAsk.role ? ` <span class="text-slate-400 font-normal">· ${escapeHtmlSafe(compactAsk.role)}</span>` : ""}</span>
+                  </span>
+                ` : ""}
+                <a href="${mapsHref}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="inline-flex items-center gap-1 text-slate-300 hover:text-blue-300 transition" title="Open in Google Maps: ${escapeHtmlSafe(item.address || locationShort)}">
+                  <span>📍</span>
+                  <span class="underline decoration-slate-600 hover:decoration-blue-400 underline-offset-2">${escapeHtmlSafe(locationShort)}</span>
+                </a>
+                <span class="inline-flex items-center gap-1 text-amber-300/90 font-medium" title="Suggested 2027 Band: ${escapeHtmlSafe(smart.salaryBand)}">
+                  <span>💰</span><span>${escapeHtmlSafe(salaryShort)}</span>
+                </span>
+              </div>
+              ${ch.callNote ? `<p class="text-[11px] text-emerald-300 truncate" title="${escapeHtmlSafe(ch.callNote)}">📝 ${ch.callNoteUpdatedAt ? `(${escapeHtmlSafe(ch.callNoteUpdatedAt)}) ` : ""}${escapeHtmlSafe(ch.callNote)}</p>` : ""}
             </div>
 
-            <!-- Language Switcher (Strictly TR or EN — Never Glued Together) -->
-            <div class="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-[10px] shrink-0" onclick="event.stopPropagation()">
-              <button type="button" onclick="setPreferredLang('${item.id}', 'TR')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'TR' ? 'bg-red-600 text-white' : 'text-slate-400 hover:text-white'}" title="Türkçe outreach">🇹🇷 TR</button>
-              <button type="button" onclick="setPreferredLang('${item.id}', 'EN')" class="px-2 py-0.5 rounded font-bold transition ${chosenLang === 'EN' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}" title="English outreach">🇬🇧 EN</button>
-            </div>
-
-            <!-- 6-Channel Outreach Checkboxes -->
-            ${renderSixChannelCheckboxes(item, ch, true)}
-
-            <!-- Clean Action Buttons -->
-            <div class="flex items-center gap-1.5 shrink-0" onclick="event.stopPropagation()">
-              ${!isExpanded ? `
+            <!-- Band 2: Compact Outreach Progress + Instant 1-Tap Actions (Desktop Inline / Mobile Stacked) -->
+            <div class="px-3 sm:px-4 py-2 bg-slate-950/40 border-t border-slate-800/70 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2" onclick="event.stopPropagation()">
+              ${renderSixChannelCheckboxes(item, ch, true)}
+              <div class="flex flex-wrap items-center gap-1.5">
+                <a href="${mapsHref}" target="_blank" rel="noopener" class="flex-1 sm:flex-none text-center px-2.5 py-1.5 sm:py-1 rounded-lg bg-blue-600/20 hover:bg-blue-600/35 border border-blue-500/40 text-blue-200 font-semibold text-xs transition" title="Navigate to ${escapeHtmlSafe(item.address || item.company)} in Google Maps">
+                  🗺️ Maps
+                </a>
                 ${item.email && !ch.emailBlocked ? `
-                  <a href="${gmailHref}" target="_blank" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="Open Gmail to ${escapeHtmlSafe(item.email)}">
+                  <a href="${gmailHref}" target="_blank" rel="noopener" class="flex-1 sm:flex-none text-center px-2.5 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition" title="Open Gmail to ${escapeHtmlSafe(item.email)}">
                     ✉️ Email
                   </a>
                 ` : ch.emailBlocked ? `
-                  <span class="px-2 py-1 rounded bg-rose-500/15 border border-rose-500/35 text-rose-300 font-semibold text-[11px]" title="Email bounced/blocked — use LinkedIn DM">🚫 Mail Blocked</span>
+                  <span class="px-2 py-1 rounded-lg bg-rose-500/15 border border-rose-500/35 text-rose-300 font-semibold text-[11px]" title="Email bounced/blocked — use LinkedIn DM">🚫 Blocked</span>
                 ` : ""}
-                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 LinkedIn DM copied!')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy Peer-to-Peer LinkedIn DM">
-                  💬 Copy DM
+                <button type="button" onclick="copyFromStore('${rowDmKey}', this, '💬 LinkedIn DM copied!')" class="flex-1 sm:flex-none text-center px-2.5 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-xs transition cursor-pointer" title="Copy LinkedIn DM (${chosenLang})">
+                  💬 DM
                 </button>
-                <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-semibold text-xs transition cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(cleanComp)}">
+                <button type="button" onclick="openCopilotForPipelineItem('${item.id}')" class="flex-1 sm:flex-none text-center px-2.5 py-1.5 sm:py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-semibold text-xs transition cursor-pointer" title="Open AI Copilot for ${escapeHtmlSafe(cleanComp)}">
                   🤖 Copilot
                 </button>
-              ` : ""}
-              <button type="button" onclick="togglePipelineExpand('${item.id}')" class="px-3 py-1 rounded ${isExpanded ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600' : 'bg-emerald-600 hover:bg-emerald-500 text-white'} text-xs font-semibold transition cursor-pointer">
-                ${isExpanded ? '▲ Close' : '📂 Step-by-Step'}
-              </button>
+              </div>
             </div>
           </div>
 
@@ -9567,8 +9648,8 @@ ${closeLine}"`;
                 <span class="px-2 py-0.5 rounded text-xs font-extrabold ${item.giantRank ? 'bg-amber-500/20 text-amber-200 border border-amber-500/40' : 'bg-slate-800 text-slate-200 border border-slate-700'}">
                   ${rankLabel}
                 </span>
-                <span class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30">${cMeta.flag} ${item.clusterLabel}</span>
-                <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">💰 ${escapeHtmlSafe(smart.salaryBand)}</span>
+                <a href="${mapsHref}" target="_blank" rel="noopener" class="text-xs px-2 py-0.5 rounded font-medium bg-blue-500/15 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 transition" title="Open in Google Maps">🗺️ ${escapeHtmlSafe(formatCompactLocation(item))}</a>
+                <span class="text-[11px] px-2 py-0.5 rounded font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30" title="${escapeHtmlSafe(smart.salaryBand)}">💰 ${escapeHtmlSafe(formatCompactSalary(smart.salaryBand))}</span>
               </div>
               <div class="flex items-center gap-1.5 flex-wrap">
                 <div class="flex items-center gap-0.5 bg-black/60 p-0.5 rounded-lg border border-slate-700/80 text-[10px]">
@@ -9631,7 +9712,7 @@ ${closeLine}"`;
 
             <!-- 6-Channel Action Checklist -->
             <div class="bg-black/40 p-2.5 rounded-lg border border-emerald-500/20">
-              <span class="text-[10px] font-bold text-emerald-300 tracking-wider block mb-1.5">6-Channel Outreach Progress (${doneCount}/6):</span>
+              <span class="text-[10px] font-bold text-emerald-300 tracking-wider block mb-1.5">Outreach Progress (${doneCount}/7):</span>
               ${renderSixChannelCheckboxes(item, ch, false)}
             </div>
 
