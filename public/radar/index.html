@@ -4020,7 +4020,7 @@
 
         if (ch.emailBlocked && foundNewAltEmail) {
           const cKey = `co:${compKey}`;
-          const cleared = { ...ch, emailBlocked: false, blockedEmail: "" };
+          const cleared = { ...(checksNow[cKey] || {}), ...ch, emailBlocked: false, blockedEmail: "" };
           checksNow[cKey] = cleared;
           checksNow[itemId] = cleared;
           savePipelineCheckState(checksNow);
@@ -7683,6 +7683,7 @@
       const cur = resolveItemChannels(item, st);
       const today = new Date().toISOString().slice(0, 10);
       const updated = {
+        ...(st[cKey] || {}),
         ...cur,
         callNote: noteText,
         callNoteUpdatedAt: today,
@@ -8017,6 +8018,7 @@ ${closeLine}"`;
         : (st[cKey] || { applied: false, email: false, techDm: false, hrDm: false, connDm: false, callWalk: false, walked: false });
 
       const updated = {
+        ...(st[cKey] || {}),
         ...currentResolved,
         [field]: !!value,
         ...(field === "callWalk" && value ? { callDate: new Date().toISOString().slice(0, 10) } : {}),
@@ -8128,6 +8130,7 @@ ${closeLine}"`;
       const currentResolved = resolveItemChannels(item, st);
       const badAddr = String(item.email || currentResolved.blockedEmail || "").trim();
       const updated = {
+        ...(st[cKey] || {}),
         ...currentResolved,
         email: isBlocked ? false : currentResolved.email,
         emailBlocked: !!isBlocked,
@@ -8478,24 +8481,39 @@ ${closeLine}"`;
         const US_CELEB_GUARD = /\b(werner vogels|werner bey|prasad kalyanaraman|andy jassy|matt garman|satya nadella|sundar pichai)\b/i;
         const FAKE_PHONE_GUARD = /212\s*345\s*6789|555\s*123|000\s*00\s*00/;
 
+        const coOverrideEarly = checksForOverrides[`co:${companyKey}`] || {};
+        const removedPeopleSet = new Set([
+          ...(Array.isArray(coOverrideEarly.removedPeople) ? coOverrideEarly.removedPeople : []),
+          ...allRowIntels.flatMap(i => Array.isArray(i?.removedPeople) ? i.removedPeople : []),
+          ...(Array.isArray(localIntel?.removedPeople) ? localIntel.removedPeople : [])
+        ].map(n => foldTurkishToAscii(n)).filter(Boolean));
+        const filterRemovedPeople = (arr = []) =>
+          removedPeopleSet.size
+            ? arr.filter(p => {
+                const fk = foldTurkishToAscii(p?.name || "");
+                return fk && ![...removedPeopleSet].some(rm => fk === rm || fk.includes(rm));
+              })
+            : arr;
+
         let mergedIntel = null;
-        if (kb || savedIntel || localIntel) {
+        if (kb || savedIntel || localIntel || coOverrideEarly.customCtoLeads?.length || coOverrideEarly.customHrRecruiters?.length || coOverrideEarly.customDrafts) {
           const cleanSaved = savedIntel ? { ...savedIntel } : {};
           if (countryGroup === "TR") {
             if (US_CELEB_GUARD.test(cleanSaved.walkInVerdict || "")) delete cleanSaved.walkInVerdict;
             if (US_CELEB_GUARD.test(cleanSaved.customExecutiveDm || "")) delete cleanSaved.customExecutiveDm;
             if (US_CELEB_GUARD.test(cleanSaved.customHrDm || "")) delete cleanSaved.customHrDm;
           }
-          const mergedCtoList = mergeVerifiedPeopleLists(
-            [...allRowIntels.map(i => i.ctoAndEngLeads || []), localIntel?.ctoAndEngLeads || [], kb?.ctoAndEngLeads || []],
+          const mergedCtoList = filterRemovedPeople(mergeVerifiedPeopleLists(
+            [coOverrideEarly.customCtoLeads || [], ...allRowIntels.map(i => i.ctoAndEngLeads || []), localIntel?.ctoAndEngLeads || [], kb?.ctoAndEngLeads || []],
             countryGroup
-          );
-          const mergedHrList = mergeVerifiedPeopleLists(
-            [...allRowIntels.map(i => i.hrAndRecruiters || []), localIntel?.hrAndRecruiters || [], kb?.hrAndRecruiters || []],
+          ));
+          const mergedHrList = filterRemovedPeople(mergeVerifiedPeopleLists(
+            [coOverrideEarly.customHrRecruiters || [], ...allRowIntels.map(i => i.hrAndRecruiters || []), localIntel?.hrAndRecruiters || [], kb?.hrAndRecruiters || []],
             countryGroup
-          );
+          ));
           mergedIntel = {
             ...cleanSaved,
+            ...(coOverrideEarly.customDrafts || {}),
             poweredBy: intelWithRealPeople?.poweredBy || cleanSaved.poweredBy || "Verified Country Intelligence Graph",
             ctoAndEngLeads: mergedCtoList,
             hrAndRecruiters: mergedHrList,
@@ -8522,7 +8540,7 @@ ${closeLine}"`;
         const callPriority = countryGroup === "TR" ? (CALL_PRIORITY_DIRECTORY[companyKey] || null) : null;
         const scrapedPoster = (mergedIntel?.hrAndRecruiters || []).find(p => /poster/i.test(p?.title || ""));
         const topHrPerson = scrapedPoster || (mergedIntel?.hrAndRecruiters || []).find(p => p?.name && !/recruitment|talent acquisition|insan kaynaklar/i.test(p.name));
-        const coOverride = checksForOverrides[`co:${companyKey}`] || {};
+        const coOverride = coOverrideEarly;
         const verifiedAddr = String(
           coOverride.verifiedOfficeAddress ||
           allRowIntels.find(i => i?.verifiedOfficeAddress)?.verifiedOfficeAddress ||
@@ -8542,6 +8560,16 @@ ${closeLine}"`;
           coOverride.verifiedAskForContact ||
           allRowIntels.find(i => i?.verifiedAskForContact)?.verifiedAskForContact ||
           localIntel?.verifiedAskForContact || ""
+        ).trim();
+        const verifiedSalaryQuote = String(
+          coOverride.verifiedSalaryQuote ||
+          allRowIntels.find(i => i?.verifiedSalaryQuote)?.verifiedSalaryQuote ||
+          localIntel?.verifiedSalaryQuote || ""
+        ).trim();
+        const verifiedJobUrl = String(
+          coOverride.verifiedJobUrl ||
+          allRowIntels.find(i => i?.verifiedJobUrl)?.verifiedJobUrl ||
+          localIntel?.verifiedJobUrl || ""
         ).trim();
 
         const derivedAskFor = verifiedAskFor || callPriority?.askFor || (topHrPerson ? `${topHrPerson.name}${topHrPerson.title ? ` (${topHrPerson.title})` : ""}` : "");
@@ -8572,6 +8600,7 @@ ${closeLine}"`;
         const latestDate = liveApps.map(a => a.appliedAt || "").sort().reverse()[0] || primaryApp?.appliedAt || "";
         const isAgency = AGENCY_RE.test(displayCompany);
         const smartMeta = computeClientSmartSalaryAndTier(displayCompany, cleanRole, address, vip?.summary || primaryApp?.notes || "");
+        if (verifiedSalaryQuote) smartMeta.salaryBand = verifiedSalaryQuote;
         const defaultLangMode = countryGroup === "TR" ? "MULTI" : "EN";
         const routeText = verifiedAddr
           ? `${displayCompany} ${verifiedAddr}`
@@ -8638,7 +8667,7 @@ ${closeLine}"`;
           askForContact: derivedAskFor,
           address,
           mapQuery,
-          jobUrl: (primaryApp?.url && primaryApp.url !== "#") ? primaryApp.url : (vip?.jobUrl || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(displayCompany)}`),
+          jobUrl: verifiedJobUrl || ((primaryApp?.url && primaryApp.url !== "#") ? primaryApp.url : (vip?.jobUrl || `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(displayCompany)}`)),
           summary: primaryApp?.notes || kb?.walkInVerdict || vip?.summary || "Direct company application in pipeline.",
           lang: defaultLangMode,
           vipBadge: vip?.vipBadge || known.badge || null,
@@ -8959,23 +8988,68 @@ ${closeLine}"`;
         executed.push(`Language → ${nextLang}`);
       }
 
+      if (actions.markEmailBlocked) {
+        markEmailBlocked(item.id, true);
+        executed.push("Marked Email Blocked/Bounced");
+      }
+
+      const compKey = item.companyKey || normalizeCompanyKey(item.company || "");
+      const cKey = `co:${compKey}`;
+      const matchingCrmRows = STATE.applied.filter(a => {
+        if (String(a.id) === String(crmTargetId)) return true;
+        return normalizeCompanyKey(a.company || "") === compKey && classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup;
+      });
+
       const cleanNewAddr = String(actions.setAddress || "").trim();
       const cleanNewMap = String(actions.setMapQuery || "").trim() || (cleanNewAddr ? `${String(item.company || "").split("(")[0].trim()} ${cleanNewAddr}`.trim() : "");
       const cleanNewPhone = String(actions.setContactPhone || "").trim();
       const cleanNewAskFor = String(actions.setAskForContact || "").trim();
+      const cleanNewSalary = String(actions.setSalaryQuote || "").trim();
+      const cleanNewJobUrl = /^https?:\/\//i.test(String(actions.setJobUrl || "").trim()) ? String(actions.setJobUrl).trim() : "";
+      const cleanNewCallNote = String(actions.setCallNote || "").trim();
+      const addPeopleArr = (Array.isArray(actions.addPeople) ? actions.addPeople : []).filter(p => p && String(p.name || "").trim().length >= 2);
+      const removePeopleArr = (Array.isArray(actions.removePeople) ? actions.removePeople : []).map(n => foldTurkishToAscii(String(n || "").trim())).filter(Boolean);
 
-      if (cleanNewAddr || cleanNewMap || cleanNewPhone || cleanNewAskFor) {
-        const compKey = item.companyKey || normalizeCompanyKey(item.company || "");
-        const cKey = `co:${compKey}`;
+      if (cleanNewAddr || cleanNewMap || cleanNewPhone || cleanNewAskFor || cleanNewSalary || cleanNewJobUrl || cleanNewCallNote || addPeopleArr.length || removePeopleArr.length) {
         const st = getPipelineCheckState();
         const prevCo = st[cKey] || resolveItemChannels(item, st);
+        const todayIso = new Date().toISOString().slice(0, 10);
+        const applyClientPeopleDelta = (baseArr = [], groupKey) => {
+          const filtered = (Array.isArray(baseArr) ? baseArr : []).filter(
+            p => p && p.name && !removePeopleArr.some(rm => foldTurkishToAscii(p.name) === rm || foldTurkishToAscii(p.name).includes(rm))
+          );
+          for (const add of addPeopleArr) {
+            const g = String(add.group || "").toLowerCase() === "hr" ? "hr" : "cto";
+            if (g !== groupKey) continue;
+            const personObj = {
+              name: String(add.name).trim(),
+              title: String(add.title || "").trim() || (g === "hr" ? `HR / Talent Acquisition at ${item.company}` : `Engineering Lead at ${item.company}`),
+              linkedinUrl: /linkedin\.com\/in\//i.test(String(add.linkedinUrl || "")) ? String(add.linkedinUrl).trim() : buildLinkedInPeopleSearchHref(item.company, "person", item.countryGroup || "TR", String(add.name).trim())
+            };
+            const idx = filtered.findIndex(x => foldTurkishToAscii(x.name) === foldTurkishToAscii(personObj.name));
+            if (idx >= 0) filtered[idx] = { ...filtered[idx], ...personObj };
+            else filtered.unshift(personObj);
+          }
+          return filtered;
+        };
+
         const updatedCo = {
           ...prevCo,
           ...(cleanNewAddr ? { verifiedOfficeAddress: cleanNewAddr } : {}),
           ...(cleanNewMap ? { verifiedMapQuery: cleanNewMap } : {}),
           ...(cleanNewPhone ? { verifiedPhoneDisplay: cleanNewPhone } : {}),
-          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {})
+          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {}),
+          ...(cleanNewSalary ? { verifiedSalaryQuote: cleanNewSalary } : {}),
+          ...(cleanNewJobUrl ? { verifiedJobUrl: cleanNewJobUrl } : {}),
+          ...(cleanNewCallNote ? { callNote: cleanNewCallNote, callNoteUpdatedAt: todayIso } : {})
         };
+        if (addPeopleArr.length || removePeopleArr.length) {
+          updatedCo.customCtoLeads = applyClientPeopleDelta(prevCo.customCtoLeads, "cto");
+          updatedCo.customHrRecruiters = applyClientPeopleDelta(prevCo.customHrRecruiters, "hr");
+          if (removePeopleArr.length) {
+            updatedCo.removedPeople = [...new Set([...(prevCo.removedPeople || []), ...removePeopleArr])];
+          }
+        }
         st[cKey] = updatedCo;
         savePipelineCheckState(st);
         d1Post("/api/outreach-check", { itemId: cKey, checks: updatedCo });
@@ -8985,11 +9059,22 @@ ${closeLine}"`;
           ...(cleanNewAddr ? { verifiedOfficeAddress: cleanNewAddr, officeAndMetro: cleanNewAddr } : {}),
           ...(cleanNewMap ? { verifiedMapQuery: cleanNewMap } : {}),
           ...(cleanNewPhone ? { verifiedPhoneDisplay: cleanNewPhone } : {}),
-          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {})
+          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {}),
+          ...(cleanNewSalary ? { verifiedSalaryQuote: cleanNewSalary } : {}),
+          ...(cleanNewJobUrl ? { verifiedJobUrl: cleanNewJobUrl } : {})
         };
+        if (addPeopleArr.length || removePeopleArr.length) {
+          nextIntel.ctoAndEngLeads = applyClientPeopleDelta(nextIntel.ctoAndEngLeads, "cto");
+          nextIntel.hrAndRecruiters = applyClientPeopleDelta(nextIntel.hrAndRecruiters, "hr");
+          if (removePeopleArr.length) {
+            nextIntel.removedPeople = [...new Set([...(nextIntel.removedPeople || []), ...removePeopleArr])];
+          }
+        }
         item.aiIntel = nextIntel;
         if (cleanNewAddr) item.address = cleanNewAddr;
         if (cleanNewMap) item.mapQuery = cleanNewMap;
+        if (cleanNewSalary && item.smartMeta) item.smartMeta.salaryBand = cleanNewSalary;
+        if (cleanNewJobUrl) item.jobUrl = cleanNewJobUrl;
         if (cleanNewPhone) {
           item.phoneDisplay = cleanNewPhone;
           item.phone = cleanNewPhone.replace(/[^\d+]/g, "");
@@ -8997,21 +9082,24 @@ ${closeLine}"`;
         if (cleanNewAskFor) item.askForContact = cleanNewAskFor;
         try { localStorage.setItem(`jr_intel_${strId}`, JSON.stringify(nextIntel)); } catch {}
 
-        const matchingCrmRows = STATE.applied.filter(a => {
-          if (String(a.id) === String(crmTargetId)) return true;
-          return normalizeCompanyKey(a.company || "") === compKey && classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup;
-        });
         for (const row of matchingCrmRows) {
           if (cleanNewAddr) row.location = cleanNewAddr;
           if (cleanNewPhone) {
             row.contactPhoneDisplay = cleanNewPhone;
             row.contactPhone = cleanNewPhone.replace(/[^\d+]/g, "");
           }
+          if (cleanNewSalary) row.salaryQuote = cleanNewSalary;
+          if (cleanNewJobUrl && String(row.id) === String(crmTargetId)) row.url = cleanNewJobUrl;
           row.aiIntel = { ...(row.aiIntel || {}), ...nextIntel };
           d1Post("/api/apply", row);
         }
         if (cleanNewAddr) executed.push(`Updated Address & Maps: ${cleanNewAddr}`);
         if (cleanNewAskFor) executed.push(`Updated HR Contact: ${cleanNewAskFor}`);
+        if (cleanNewSalary) executed.push(`Updated Salary Quote: ${cleanNewSalary}`);
+        if (cleanNewJobUrl) executed.push(`Updated Job Link`);
+        if (cleanNewCallNote) executed.push(`Saved Call Note`);
+        if (addPeopleArr.length) executed.push(`Added ${addPeopleArr.length} Contact(s)`);
+        if (removePeopleArr.length) executed.push(`Removed ${removePeopleArr.length} Contact(s)`);
       }
 
       if (actions.setContactEmail || actions.setContactPhone || actions.appendNote) {
@@ -9045,29 +9133,46 @@ ${closeLine}"`;
 
       if (actions.updateEmailSubject || actions.updateEmailBody || actions.updateTechDm || actions.updateHrDm) {
         const chosenLang = getPreferredLang(strId, getDefaultLangForItem(item));
-        const nextIntel = { ...(item.aiIntel || {}), lang: chosenLang };
+        const nextIntel = { ...(item.aiIntel || {}), lang: chosenLang, styleVersion: 4 };
         if (actions.updateEmailSubject) nextIntel.customEmailSubject = String(actions.updateEmailSubject).trim();
         if (actions.updateEmailBody) nextIntel.customEmailBody = String(actions.updateEmailBody).trim();
         if (actions.updateTechDm) nextIntel.customExecutiveDm = String(actions.updateTechDm).trim();
         if (actions.updateHrDm) nextIntel.customHrDm = String(actions.updateHrDm).trim();
         item.aiIntel = nextIntel;
         try { localStorage.setItem(`jr_intel_${strId}`, JSON.stringify(nextIntel)); } catch {}
+        const st = getPipelineCheckState();
+        const prevCo = st[cKey] || resolveItemChannels(item, st);
+        st[cKey] = {
+          ...prevCo,
+          customDrafts: {
+            ...(prevCo.customDrafts || {}),
+            styleVersion: 4,
+            lang: chosenLang,
+            ...(actions.updateEmailSubject ? { customEmailSubject: nextIntel.customEmailSubject } : {}),
+            ...(actions.updateEmailBody ? { customEmailBody: nextIntel.customEmailBody } : {}),
+            ...(actions.updateTechDm ? { customExecutiveDm: nextIntel.customExecutiveDm } : {}),
+            ...(actions.updateHrDm ? { customHrDm: nextIntel.customHrDm } : {})
+          }
+        };
+        savePipelineCheckState(st);
+        d1Post("/api/outreach-check", { itemId: cKey, checks: st[cKey] });
         if (crmItem) crmItem.aiIntel = nextIntel;
         executed.push("Updated Outreach Drafts");
       }
 
-      if (actions.setStatus && crmItem) {
-        crmItem.status = String(actions.setStatus).trim();
-        if (IS_LOCAL) {
-          fetch("/api/status", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: crmItem.id, status: crmItem.status })
-          }).catch(() => {});
-        } else {
-          d1Post("/api/status", { id: crmItem.id, status: crmItem.status });
+      if (actions.setStatus) {
+        const newSt = String(actions.setStatus).trim();
+        const targetRows = actions.applyStatusToAllRoles
+          ? matchingCrmRows
+          : actions.targetRoleId
+          ? STATE.applied.filter(a => String(a.id) === String(actions.targetRoleId))
+          : (crmItem ? [crmItem] : []);
+        for (const r of targetRows) {
+          r.status = newSt;
+          if (IS_LOCAL) fetch("/api/status", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: r.id, status: newSt }) }).catch(() => {});
+          else d1Post("/api/status", { id: r.id, status: newSt });
         }
-        executed.push(`Status → ${crmItem.status}`);
+        if (targetRows.length) executed.push(`Status → ${newSt}${targetRows.length > 1 ? ` (${targetRows.length} roles)` : ""}`);
       }
 
       if (crmItem && (actions.markApplied || actions.setContactEmail || actions.setContactPhone || actions.appendNote || actions.updateEmailBody || actions.updateTechDm || actions.updateHrDm)) {
@@ -9082,16 +9187,25 @@ ${closeLine}"`;
         }
       }
 
-      if (Array.isArray(actions.checkChannels) && actions.checkChannels.length) {
+      const toCheckArr = Array.isArray(actions.checkChannels) ? actions.checkChannels : [];
+      const toUncheckArr = Array.isArray(actions.uncheckChannels) ? actions.uncheckChannels : [];
+      if (toCheckArr.length || toUncheckArr.length) {
         const validKeys = ["applied", "email", "techDm", "hrDm", "connDm", "callWalk", "walked"];
         const st = getPipelineCheckState();
-        const cKey = `co:${item.companyKey || normalizeCompanyKey(item.company)}`;
         const cur = resolveItemChannels(item, st);
         const updated = { ...cur };
-        actions.checkChannels.forEach(k => {
-          if (validKeys.includes(k)) updated[k] = true;
+        const todayIso = new Date().toISOString().slice(0, 10);
+        toCheckArr.forEach(k => {
+          if (validKeys.includes(k)) {
+            updated[k] = true;
+            if (k === "callWalk") updated.callDate = updated.callDate || todayIso;
+            if (k === "walked") updated.walkedDate = updated.walkedDate || todayIso;
+          }
         });
-        st[cKey] = updated;
+        toUncheckArr.forEach(k => {
+          if (validKeys.includes(k)) updated[k] = false;
+        });
+        st[cKey] = { ...(st[cKey] || {}), ...updated };
         st[strId] = updated;
         savePipelineCheckState(st);
         if (IS_LOCAL) {
@@ -9101,8 +9215,9 @@ ${closeLine}"`;
             body: JSON.stringify({ itemId: cKey, checks: updated })
           }).catch(() => {});
         }
-        d1Post("/api/outreach-check", { itemId: cKey, checks: updated });
-        executed.push(`Checked: ${actions.checkChannels.join(", ")}`);
+        d1Post("/api/outreach-check", { itemId: cKey, checks: st[cKey] });
+        if (toCheckArr.length) executed.push(`Checked: ${toCheckArr.join(", ")}`);
+        if (toUncheckArr.length) executed.push(`Unchecked: ${toUncheckArr.join(", ")}`);
       }
 
       return executed;
@@ -11180,6 +11295,13 @@ ${closeLine}"`;
         if (data && data.reply) {
           let appliedChanges = [];
           if (data.actions) {
+            if (data.actions.skipScannerJob || data.actions.skipJobId) {
+              const skipId = String(data.actions.skipJobId || ctx?.jobContext?.id || "").trim();
+              if (skipId && !/^VIP-|^CO-/i.test(skipId)) {
+                await quickSkip(skipId);
+                appliedChanges.push(`Dismissed Scanner Job #${skipId}`);
+              }
+            }
             let pipeItem = ctx?.pipelineItemId ? findPipelineItem(ctx.pipelineItemId) : null;
             if (!pipeItem && data.actions.targetCompany) {
               const tKey = normalizeCompanyKey(data.actions.targetCompany);
