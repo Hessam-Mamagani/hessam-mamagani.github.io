@@ -6665,16 +6665,16 @@
         id: "VIP-OBSS",
         company: "OBSS Teknoloji A.Ş.",
         role: "Senior .NET Developer & .NET Full Stack Developer",
-        cluster: "CLUSTER_MASLAK",
-        clusterLabel: "📍 İTÜ Teknokent (ARI 3 Binası · Maslak)",
+        cluster: "CLUSTER_ASIAN",
+        clusterLabel: "📍 Pendik (Teknopark İstanbul · 15m from Kartal)",
         email: "hr@obss.com.tr",
         phone: "+902166883436",
         phoneDisplay: "+90 (216) 688 34 36",
-        address: "İTÜ Ayazağa Kampüsü, ARI 3 Teknokent No:4/601, Maslak / Sarıyer, İstanbul",
-        mapQuery: "İTÜ ARI 3 Teknokent Maslak Sarıyer İstanbul",
+        address: "Sanayi Mah. Teknopark Bulvarı No:1/8A Blok Kat:3 Kapı No:8301, Teknopark İstanbul, Pendik, İstanbul",
+        mapQuery: "OBSS Teknoloji Teknopark İstanbul Pendik",
         jobUrl: "https://tr.linkedin.com/jobs/view/net-full-stack-developer-at-obss-4431928975",
         vipBadge: "💬 Messaged Nilay Turgut · Active .NET Full Stack Ad",
-        summary: "Certified Teknokent R&D center (quota-exempt work permit!). Active .NET Full Stack & Senior roles."
+        summary: "Certified Teknopark İstanbul R&D HQ in Pendik (quota-exempt work permit!). Active .NET Full Stack & Senior roles."
       },
       {
         rank: 10,
@@ -8424,6 +8424,7 @@ ${closeLine}"`;
       const list = [];
 
       const NO_VISA_REMOTE_RE = /\b(alignerr|jobgether|ruby labs|sezzle|canonical|flatiron software|crossing hurdles|turing|oak's lab|oaks lab|outlier)\b/i;
+      const checksForOverrides = getPipelineCheckState();
 
       for (const bucket of grouped.values()) {
         const { companyKey, countryGroup, vip, apps } = bucket;
@@ -8521,14 +8522,36 @@ ${closeLine}"`;
         const callPriority = countryGroup === "TR" ? (CALL_PRIORITY_DIRECTORY[companyKey] || null) : null;
         const scrapedPoster = (mergedIntel?.hrAndRecruiters || []).find(p => /poster/i.test(p?.title || ""));
         const topHrPerson = scrapedPoster || (mergedIntel?.hrAndRecruiters || []).find(p => p?.name && !/recruitment|talent acquisition|insan kaynaklar/i.test(p.name));
-        const derivedAskFor = callPriority?.askFor || (topHrPerson ? `${topHrPerson.name}${topHrPerson.title ? ` (${topHrPerson.title})` : ""}` : "");
-        const rawPhoneDisp = callPriority?.phoneDisplay || (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
+        const coOverride = checksForOverrides[`co:${companyKey}`] || {};
+        const verifiedAddr = String(
+          coOverride.verifiedOfficeAddress ||
+          allRowIntels.find(i => i?.verifiedOfficeAddress)?.verifiedOfficeAddress ||
+          localIntel?.verifiedOfficeAddress || ""
+        ).trim();
+        const verifiedMap = String(
+          coOverride.verifiedMapQuery ||
+          allRowIntels.find(i => i?.verifiedMapQuery)?.verifiedMapQuery ||
+          localIntel?.verifiedMapQuery || ""
+        ).trim();
+        const verifiedPhoneDisp = String(
+          coOverride.verifiedPhoneDisplay ||
+          allRowIntels.find(i => i?.verifiedPhoneDisplay)?.verifiedPhoneDisplay ||
+          localIntel?.verifiedPhoneDisplay || ""
+        ).trim();
+        const verifiedAskFor = String(
+          coOverride.verifiedAskForContact ||
+          allRowIntels.find(i => i?.verifiedAskForContact)?.verifiedAskForContact ||
+          localIntel?.verifiedAskForContact || ""
+        ).trim();
+
+        const derivedAskFor = verifiedAskFor || callPriority?.askFor || (topHrPerson ? `${topHrPerson.name}${topHrPerson.title ? ` (${topHrPerson.title})` : ""}` : "");
+        const rawPhoneDisp = verifiedPhoneDisp || callPriority?.phoneDisplay || (!FAKE_PHONE_GUARD.test(primaryApp?.contactPhoneDisplay || "") ? primaryApp?.contactPhoneDisplay : "") || kb?.phone || known.phoneDisplay || vip?.phoneDisplay || (!FAKE_PHONE_GUARD.test(savedIntel?.phoneDisplay || "") ? savedIntel?.phoneDisplay : "") || "";
         const phoneDisplay = rawPhoneDisp;
-        const phone = callPriority?.phone || primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
+        const phone = (verifiedPhoneDisp ? verifiedPhoneDisp.replace(/[^\d+]/g, "") : "") || callPriority?.phone || primaryApp?.contactPhone || known.phone || vip?.phone || (phoneDisplay ? phoneDisplay.replace(/[^\d+]/g, "") : "");
         const rawAiOffice = String(mergedIntel?.officeAndMetro || "").trim();
         const aiSpecificOffice = rawAiOffice && !/^(istanbul(?:\s*&\s*gebze)?(?:,\s*(?:türkiye|turkey))?|istanbul,\s*istanbul,\s*(?:türkiye|turkey)|türkiye|turkey|remote|hybrid)$/i.test(rawAiOffice) ? rawAiOffice : "";
-        const address = kb?.officeAndMetro || vip?.address || known.address || aiSpecificOffice || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
-        const mapQuery = vip?.mapQuery || known.mapQuery || (aiSpecificOffice ? `${displayCompany.split("(")[0].trim()} ${aiSpecificOffice}` : `${displayCompany.split("(")[0].trim()} ${address}`);
+        const address = verifiedAddr || kb?.officeAndMetro || vip?.address || known.address || aiSpecificOffice || primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"));
+        const mapQuery = verifiedMap || (verifiedAddr ? `${displayCompany.split("(")[0].trim()} ${verifiedAddr}` : "") || vip?.mapQuery || known.mapQuery || (aiSpecificOffice ? `${displayCompany.split("(")[0].trim()} ${aiSpecificOffice}` : `${displayCompany.split("(")[0].trim()} ${address}`);
 
         const uniqueRoleTitles = [];
         for (const a of liveApps) {
@@ -8550,10 +8573,12 @@ ${closeLine}"`;
         const isAgency = AGENCY_RE.test(displayCompany);
         const smartMeta = computeClientSmartSalaryAndTier(displayCompany, cleanRole, address, vip?.summary || primaryApp?.notes || "");
         const defaultLangMode = countryGroup === "TR" ? "MULTI" : "EN";
-        const routeText = `${displayCompany} ${address} ${aiSpecificOffice} ${vip?.clusterLabel || ""} ${primaryApp?.location || ""} ${vip?.summary || ""} ${known.badge || ""} ${known.note || ""}`;
+        const routeText = verifiedAddr
+          ? `${displayCompany} ${verifiedAddr}`
+          : `${displayCompany} ${address} ${aiSpecificOffice} ${vip?.clusterLabel || ""} ${primaryApp?.location || ""} ${vip?.summary || ""} ${known.badge || ""} ${known.note || ""}`;
         const walkRoutes = [];
         if (countryGroup === "TR") {
-          if (/teknopark\s*(?:i|İ|ı)stanbul|teknopark\s*bulvar|kurtköy|kurtkoy|pendik|aeropark|sabiha\s*gökçen|sabiha\s*gokcen|\b(architecht|intertech|orion\s+innovation|icterra|ctech|borda|pegasus)\b/i.test(routeText)) {
+          if (/teknopark\s*(?:i|İ|ı)stanbul|teknopark\s*bulvar|kurtköy|kurtkoy|pendik|aeropark|sabiha\s*gökçen|sabiha\s*gokcen|\b(obss|architecht|intertech|orion\s+innovation|icterra|ctech|borda|pegasus)\b/i.test(routeText)) {
             walkRoutes.push("ROUTE_PENDIK_TEKNO");
           }
           if (/kartal|yakacık|yakacik|soğanlık|soganlik|milangaz|maltepe|küçükyalı|kucukyali|aydınevler|aydinevler|bostancı|bostanci|cevizli|\b(pazarama|pluxee|sodexo)\b|siemens.*kartal|hitachi.*kartal|bosch.*küçükyalı/i.test(routeText)) {
@@ -8568,14 +8593,14 @@ ${closeLine}"`;
           if (/gebze|gosb|bilişim\s*vadisi|bilisim\s*vadisi|kocaeli|tuzla|çayırova|cayirova|dilovası|dilovasi|muallimköy|şekerpınar|sekerpinar|\b(logo\s*yazılım|logo\s*yazilim|festo|bimser|milvus|altınay)\b|softtech.*tuzla/i.test(routeText)) {
             walkRoutes.push("ROUTE_TUZLA_GEBZE");
           }
-          if (vip?.cluster === "CLUSTER_MASLAK" || /(?:itü|İTÜ|itu)\s*(?:arı|ari)?\s*teknokent|(?:itü|İTÜ|itu)\s*ayazağa|maslak|ayazağa|ayazaga|sarıyer|sariyer|spine\s*tower|olive\s*plaza|doğuş\s*center|seba\s*office|maslak\s*uniq|windowist|\b(obss|commencis|bgts|bilgeadam|etiya|veripark|softtech|innova|İnnova|hitit|paycore|fineksus|sovos|token\s*finansal|adesso|trendyol|doğuş\s*teknoloji)\b/i.test(routeText)) {
+          if ((!verifiedAddr && vip?.cluster === "CLUSTER_MASLAK") || /(?:itü|İTÜ|itu)\s*(?:arı|ari)?\s*teknokent|(?:itü|İTÜ|itu)\s*ayazağa|maslak|ayazağa|ayazaga|sarıyer|sariyer|spine\s*tower|olive\s*plaza|doğuş\s*center|seba\s*office|maslak\s*uniq|windowist|\b(commencis|bgts|bilgeadam|etiya|veripark|softtech|innova|İnnova|hitit|paycore|fineksus|sovos|token\s*finansal|adesso|trendyol|doğuş\s*teknoloji)\b/i.test(routeText)) {
             walkRoutes.push("ROUTE_ITU_MASLAK");
           }
-          if (vip?.cluster === "CLUSTER_LEVENT" || /levent|esentepe\s*[/,]\s*(?:şişli|sisli|beşiktaş|besiktas|levent)|büyükdere\s*cad|mecidiyeköy|mecidiyekoy|şişli|sisli|kağıthane|kagithane|beşiktaş|besiktas|gayrettepe|etiler|kanyon|ferko|torun\s*center|trump\s*towers|maya\s*akar|bellevue|libelle|levent\s*199|\b(microsoft|aws|google|insider|amadeus|hepsiburada|midas|colendi|yemeksepeti|delivery\s*hero|mastercard|ibm|peakup|dream\s*games|getir)\b/i.test(routeText)) {
+          if ((!verifiedAddr && vip?.cluster === "CLUSTER_LEVENT") || /levent|esentepe\s*[/,]\s*(?:şişli|sisli|beşiktaş|besiktas|levent)|büyükdere\s*cad|mecidiyeköy|mecidiyekoy|şişli|sisli|kağıthane|kagithane|beşiktaş|besiktas|gayrettepe|etiler|kanyon|ferko|torun\s*center|trump\s*towers|maya\s*akar|bellevue|libelle|levent\s*199|\b(microsoft|aws|google|insider|amadeus|hepsiburada|midas|colendi|yemeksepeti|delivery\s*hero|mastercard|ibm|peakup|dream\s*games|getir)\b/i.test(routeText)) {
             walkRoutes.push("ROUTE_LEVENT_SISLI");
           }
         }
-        const detectedCluster = vip?.cluster || (
+        const detectedCluster = (!verifiedAddr && vip?.cluster) ? vip.cluster : (
           walkRoutes.includes("ROUTE_TUZLA_GEBZE") ? "CLUSTER_GEBZE" :
           walkRoutes.some(r => ["ROUTE_PENDIK_TEKNO", "ROUTE_KARTAL_MALTEPE", "ROUTE_KOZYATAGI_ATASEHIR", "ROUTE_UMRANIYE_USKUDAR"].includes(r)) ? "CLUSTER_ASIAN" :
           walkRoutes.includes("ROUTE_ITU_MASLAK") ? "CLUSTER_MASLAK" :
@@ -8603,7 +8628,7 @@ ${closeLine}"`;
           location: primaryApp?.location || vip?.address || "Istanbul",
           cluster: detectedCluster,
           walkRoutes,
-          clusterLabel: vip?.clusterLabel || `${COUNTRY_DISPLAY_META[countryGroup]?.flag || "📍"} ${primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"))}`,
+          clusterLabel: verifiedAddr ? `📍 ${verifiedAddr}` : (vip?.clusterLabel || `${COUNTRY_DISPLAY_META[countryGroup]?.flag || "📍"} ${primaryApp?.location || (countryGroup === "TR" ? "Istanbul" : (COUNTRY_DISPLAY_META[countryGroup]?.label || "Remote"))}`),
           appliedAt: latestDate,
           status: topStatus,
           email,
@@ -8934,6 +8959,61 @@ ${closeLine}"`;
         executed.push(`Language → ${nextLang}`);
       }
 
+      const cleanNewAddr = String(actions.setAddress || "").trim();
+      const cleanNewMap = String(actions.setMapQuery || "").trim() || (cleanNewAddr ? `${String(item.company || "").split("(")[0].trim()} ${cleanNewAddr}`.trim() : "");
+      const cleanNewPhone = String(actions.setContactPhone || "").trim();
+      const cleanNewAskFor = String(actions.setAskForContact || "").trim();
+
+      if (cleanNewAddr || cleanNewMap || cleanNewPhone || cleanNewAskFor) {
+        const compKey = item.companyKey || normalizeCompanyKey(item.company || "");
+        const cKey = `co:${compKey}`;
+        const st = getPipelineCheckState();
+        const prevCo = st[cKey] || resolveItemChannels(item, st);
+        const updatedCo = {
+          ...prevCo,
+          ...(cleanNewAddr ? { verifiedOfficeAddress: cleanNewAddr } : {}),
+          ...(cleanNewMap ? { verifiedMapQuery: cleanNewMap } : {}),
+          ...(cleanNewPhone ? { verifiedPhoneDisplay: cleanNewPhone } : {}),
+          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {})
+        };
+        st[cKey] = updatedCo;
+        savePipelineCheckState(st);
+        d1Post("/api/outreach-check", { itemId: cKey, checks: updatedCo });
+
+        const nextIntel = {
+          ...(item.aiIntel || {}),
+          ...(cleanNewAddr ? { verifiedOfficeAddress: cleanNewAddr, officeAndMetro: cleanNewAddr } : {}),
+          ...(cleanNewMap ? { verifiedMapQuery: cleanNewMap } : {}),
+          ...(cleanNewPhone ? { verifiedPhoneDisplay: cleanNewPhone } : {}),
+          ...(cleanNewAskFor ? { verifiedAskForContact: cleanNewAskFor } : {})
+        };
+        item.aiIntel = nextIntel;
+        if (cleanNewAddr) item.address = cleanNewAddr;
+        if (cleanNewMap) item.mapQuery = cleanNewMap;
+        if (cleanNewPhone) {
+          item.phoneDisplay = cleanNewPhone;
+          item.phone = cleanNewPhone.replace(/[^\d+]/g, "");
+        }
+        if (cleanNewAskFor) item.askForContact = cleanNewAskFor;
+        try { localStorage.setItem(`jr_intel_${strId}`, JSON.stringify(nextIntel)); } catch {}
+
+        const matchingCrmRows = STATE.applied.filter(a => {
+          if (String(a.id) === String(crmTargetId)) return true;
+          return normalizeCompanyKey(a.company || "") === compKey && classifyCountryGroup(a.company, a.location, a.countryGroup) === item.countryGroup;
+        });
+        for (const row of matchingCrmRows) {
+          if (cleanNewAddr) row.location = cleanNewAddr;
+          if (cleanNewPhone) {
+            row.contactPhoneDisplay = cleanNewPhone;
+            row.contactPhone = cleanNewPhone.replace(/[^\d+]/g, "");
+          }
+          row.aiIntel = { ...(row.aiIntel || {}), ...nextIntel };
+          d1Post("/api/apply", row);
+        }
+        if (cleanNewAddr) executed.push(`Updated Address & Maps: ${cleanNewAddr}`);
+        if (cleanNewAskFor) executed.push(`Updated HR Contact: ${cleanNewAskFor}`);
+      }
+
       if (actions.setContactEmail || actions.setContactPhone || actions.appendNote) {
         ensureCrmItem();
         if (actions.setContactEmail) {
@@ -9003,7 +9083,7 @@ ${closeLine}"`;
       }
 
       if (Array.isArray(actions.checkChannels) && actions.checkChannels.length) {
-        const validKeys = ["applied", "email", "techDm", "hrDm", "connDm", "callWalk"];
+        const validKeys = ["applied", "email", "techDm", "hrDm", "connDm", "callWalk", "walked"];
         const st = getPipelineCheckState();
         const cKey = `co:${item.companyKey || normalizeCompanyKey(item.company)}`;
         const cur = resolveItemChannels(item, st);
@@ -9432,9 +9512,9 @@ ${closeLine}"`;
       const parenIdx = s.indexOf("(");
       if (parenIdx > 1) {
         const name = s.slice(0, parenIdx).trim();
-        let role = s
-          .slice(parenIdx + 1)
-          .replace(/\)+$/, "")
+        const closeIdx = s.indexOf(")", parenIdx);
+        const rawInside = closeIdx > parenIdx ? s.slice(parenIdx + 1, closeIdx) : s.slice(parenIdx + 1);
+        let role = rawInside
           .replace(/\s+(?:at|@)\s+.+$/i, "")
           .replace(/\s*\([^)]*\)\s*/g, " ")
           .replace(/\s*\([^)]*$/, "")
@@ -11099,10 +11179,20 @@ ${closeLine}"`;
         const data = res.ok ? await res.json() : null;
         if (data && data.reply) {
           let appliedChanges = [];
-          if (ctx?.pipelineItemId && data.actions) {
-            const pipeItem = findPipelineItem(ctx.pipelineItemId);
+          if (data.actions) {
+            let pipeItem = ctx?.pipelineItemId ? findPipelineItem(ctx.pipelineItemId) : null;
+            if (!pipeItem && data.actions.targetCompany) {
+              const tKey = normalizeCompanyKey(data.actions.targetCompany);
+              if (!UNIFIED_PIPELINE_ITEMS.length) UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList();
+              pipeItem = UNIFIED_PIPELINE_ITEMS.find(it => it.companyKey === tKey) || null;
+            }
             if (pipeItem) {
               appliedChanges = await applyJobAgentActions(pipeItem, data.actions);
+              if (ctx?.jobContext) {
+                if (data.actions.setAddress) ctx.jobContext.address = String(data.actions.setAddress).trim();
+                if (data.actions.setContactEmail) ctx.jobContext.currentEmail = String(data.actions.setContactEmail).trim();
+                if (data.actions.setContactPhone) ctx.jobContext.currentPhone = String(data.actions.setContactPhone).trim();
+              }
             }
           }
           const snippet = data.copySnippet || data.copyableAnswer || "";
