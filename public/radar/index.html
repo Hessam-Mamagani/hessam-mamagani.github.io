@@ -149,8 +149,8 @@
         <button type="button" id="themeToggleBtn" onclick="toggleThemeMode()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Switch Dark / Light Theme">
           ☀️ Light
         </button>
-        <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v3 CVs (TR & EN — 2-page ATS + 3-page Signed Pilz GM Letter)">
-          📄 My v3 CVs
+        <button type="button" onclick="openCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition cursor-pointer" title="Download your v4 CVs (DotNet & ERP · TR & EN + Signed Pilz GM Letter) or Tailor Any JD">
+          📄 My v4 CVs
         </button>
         <button type="button" onclick="openCallPlaybook(null)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow transition cursor-pointer" title="Phone call scripts for every scenario (TR to say + EN meaning)">
           📞 Call Playbook
@@ -279,7 +279,7 @@
         <div class="lg:col-span-5">
           <div id="inspectorPanel" class="glass rounded-xl p-5 sticky top-20 max-h-[82vh] overflow-y-auto">
             <p class="text-sm text-slate-400 text-center py-12">
-              👈 Select <strong>"Inspect"</strong> on any job card to view its full description, 2027 salary band, recommended v3 CV, and AI Copilot.
+              👈 Select <strong>"Inspect"</strong> on any job card to view its full description, 2027 salary band, recommended v4 CV, 2-Agent AI CV Tailor, and AI Copilot.
             </p>
           </div>
         </div>
@@ -409,7 +409,7 @@
       <div class="glass rounded-xl p-3.5 border border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <button type="button" onclick="setResourceHubSection('cvs')" id="hubBtn-cvs" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white shadow transition cursor-pointer">
-            📄 My v3 CVs, Kariyer.net &amp; Copy Templates
+            📄 My v4 CVs, Kariyer.net &amp; Copy Templates
           </button>
           <button type="button" onclick="setResourceHubSection('interview')" id="hubBtn-interview" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition cursor-pointer">
             🎤 5-Min Live Demo &amp; 36 Interview Q&amp;As
@@ -426,7 +426,7 @@
 
         <div class="glass rounded-xl p-5 border border-slate-800">
           <h2 class="text-sm font-bold text-white mb-1">🚀 Kariyer.net — 1-Click Fresh Searches (Select "Son 3 Gün" in Left Sidebar)</h2>
-          <p class="text-xs text-slate-400 mb-3">Pre-filtered to hide already-applied &amp; already-viewed listings — attach your Turkish v3 CV + Pilz GM Reference PDF (<code>Hessam_Mamagani_CV_ve_Referans_TR.pdf</code>) on Turkish portals.</p>
+          <p class="text-xs text-slate-400 mb-3">Pre-filtered to hide already-applied &amp; already-viewed listings — attach your Turkish v4 CV + Pilz GM Reference PDF (<code>Hessam_Mamagani_CV_ve_Referans_TR.pdf</code>) on Turkish portals.</p>
           <div class="flex flex-wrap gap-2">
             <a href="https://www.kariyer.net/is-ilanlari/istanbul?ct=34,82&amp;kw=yaz%C4%B1l%C4%B1m&amp;dsaj=true&amp;dsij=true" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-teal-600/25 hover:bg-teal-600/40 border border-teal-400/60 text-teal-100 text-xs font-bold">🔗 Yazılım (İstanbul Avr+Asya · Unseen Default)</a>
             <a href="https://www.kariyer.net/is-ilanlari/istanbul-asya-kocaeli?kw=.NET&amp;dsaj=true&amp;dsij=true" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-teal-500/40 text-teal-200 text-xs font-semibold">🔗 .NET (İst. Asya + Gebze)</a>
@@ -621,18 +621,67 @@
     </div>
   </div>
 
-  <!-- 1-Click v3 Optimized CV Kit Modal (Accessible from any tab on Laptop & Mobile) -->
+  <!-- 1-Click v4 Optimized CV Kit Modal (Accessible from any tab on Laptop & Mobile) -->
   <div id="cvQuickModal" onclick="if(event.target===this)closeCvModal()" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="glass rounded-2xl p-5 md:p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto border border-indigo-500/40 shadow-2xl space-y-4">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">📄 v3 OPTIMIZED CV KIT · VISA &amp; WORK PERMIT FOCUSED</span>
-          <h3 class="text-base md:text-lg font-bold text-white mt-1">Full-Contact v3 CVs + Wet-Ink Signed Pilz GM Reference</h3>
+          <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-extrabold">📄 v4 OPTIMIZED CV KIT · DOTNET + ERP/SAP · VISA READY</span>
+          <h3 class="text-base md:text-lg font-bold text-white mt-1">Full-Contact v4 CVs + Wet-Ink Signed Pilz GM Reference</h3>
           <p class="text-xs text-slate-400 mt-0.5">Served privately via JobRadar (includes <code class="text-emerald-300">+90 539 229 4251</code> &amp; signed Pilz GM letters — never exposed publicly on GitHub Pages).</p>
         </div>
         <button type="button" onclick="closeCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/40 text-slate-200 text-xs font-bold cursor-pointer">✕ Close</button>
       </div>
       <div id="cvQuickModalBody"></div>
+    </div>
+  </div>
+
+  <!-- 2-Agent AI CV Tailor & Serverless 2p/3p PDF Modal (100% Mobile & Laptop Ready) -->
+  <div id="tailorCvModal" onclick="if(event.target===this)closeTailorCvModal()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-4">
+    <div class="glass rounded-2xl p-4 sm:p-6 max-w-3xl w-full max-h-[92vh] overflow-y-auto border border-fuchsia-500/45 shadow-2xl space-y-4">
+      <div class="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
+        <div class="min-w-0 flex-1">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-fuchsia-500/20 border border-fuchsia-400/40 text-fuchsia-200 text-[11px] font-extrabold">✨ 2-AGENT AI CV TAILOR · 2p ATS + 3p (+GM REF) PDF</span>
+          <h3 id="tailorCvModalTitle" class="text-base md:text-lg font-bold text-white mt-1 truncate">Tailoring CV...</h3>
+          <p id="tailorCvModalSubtitle" class="text-xs text-slate-400 mt-0.5"></p>
+        </div>
+        <button type="button" onclick="closeTailorCvModal()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-600/40 text-slate-200 text-xs font-bold cursor-pointer shrink-0">✕ Close</button>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/80 border border-slate-800 rounded-xl p-2.5 text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="text-slate-400 font-semibold">Language:</label>
+          <select id="tailorLangSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-semibold">
+            <option value="">Auto (TR/EN)</option>
+            <option value="TR">🇹🇷 Turkish (with Photo)</option>
+            <option value="EN">🇬🇧 English (Photo-free ATS)</option>
+          </select>
+          <label class="text-slate-400 font-semibold">Track:</label>
+          <select id="tailorTrackSelect" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white font-semibold">
+            <option value="">Auto (DotNet / ERP)</option>
+            <option value="dotnet">💻 Full-Stack .NET &amp; AI</option>
+            <option value="erp">🏭 ERP / SAP Integration</option>
+          </select>
+        </div>
+        <button id="tailorReRunBtn" type="button" onclick="runTailorCvInModal(true)" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-xs font-extrabold shadow cursor-pointer transition">
+          🔄 Re-Tailor (2 Agents)
+        </button>
+      </div>
+
+      <div id="tailorJdInputWrap" class="hidden space-y-2 p-3 rounded-xl bg-slate-900/90 border border-violet-500/35">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <input id="tailorCustomCompany" type="text" placeholder="Company name (e.g. Logo Yazılım, Insider...)" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-fuchsia-500" />
+          <input id="tailorCustomTitle" type="text" placeholder="Role title (e.g. Senior Full-Stack .NET Developer)" class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-fuchsia-500" />
+        </div>
+        <textarea id="tailorCustomDesc" rows="5" placeholder="Paste the full Job Description from LinkedIn, Kariyer.net, or company portal here..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-100 focus:outline-none focus:border-fuchsia-500"></textarea>
+        <div class="flex justify-end">
+          <button type="button" onclick="runTailorCvInModal(true)" class="px-4 py-2 rounded-lg bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-xs font-extrabold shadow-lg cursor-pointer">
+            ✨ Run 2-Agent Tailor &amp; Build 2p + 3p PDFs
+          </button>
+        </div>
+      </div>
+
+      <div id="tailorCvModalBody" class="space-y-3"></div>
     </div>
   </div>
 
@@ -740,7 +789,7 @@
       }
     }
 
-    let STATE = { applied: [], skipped: [], outreachChecks: {}, jobChats: {} };
+    let STATE = { applied: [], skipped: [], skippedDetails: [], outreachChecks: {}, jobChats: {} };
     let DB_SHA = null;
     let ALL_SCAN_JOBS = [];
     let LAST_SCAN_JOBS = [];
@@ -1659,34 +1708,50 @@
       {
         key: "tr_ref",
         fileName: "Hessam_Mamagani_CV_ve_Referans_TR.pdf",
-        badge: "🇹🇷 PRIMARY TÜRKİYE · 3 PAGES",
+        badge: "🇹🇷 PRIMARY TÜRKİYE · v4 · 3 PAGES",
         badgeClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-        title: "Turkish v3 CV + Signed Pilz GM Letter",
-        desc: "Best for Kariyer.net, Turkish R&D/Teknopark portals, HR emails & LinkedIn DMs in Türkiye (includes General Manager Ali Yavuz Çopur's wet-ink Turkish letter).",
+        title: "Turkish v4 Full-Stack .NET CV + Signed Pilz GM Letter",
+        desc: "Primary Türkiye PDF for Kariyer.net, R&D/Teknopark portals, HR emails & LinkedIn DMs (exact v4 metrics, clickable live URLs + wet-ink Turkish GM letter).",
       },
       {
         key: "tr",
         fileName: "Hessam_Mamagani_CV_TR.pdf",
-        badge: "🇹🇷 STRICT ATS · 2 PAGES",
+        badge: "🇹🇷 STRICT ATS · v4 · 2 PAGES",
         badgeClass: "bg-teal-500/20 text-teal-200 border-teal-500/40",
-        title: "Turkish v3 Standalone ATS CV",
-        desc: "Clean 2-page single-column Turkish ATS CV (with photo & full contact) for strict Turkish forms that ask for CV without attachments.",
+        title: "Turkish v4 Standalone ATS CV (.NET & AI)",
+        desc: "Clean 2-page single-column Turkish ATS CV (with portrait photo & full contact) for strict portals asking for CV only.",
+      },
+      {
+        key: "tr_erp",
+        fileName: "Hessam_Mamagani_CV_TR_ERP_SAP.pdf",
+        badge: "🏭 TR ERP / SAP · v4 · 2 PAGES",
+        badgeClass: "bg-amber-500/20 text-amber-200 border-amber-500/40",
+        title: "Turkish v4 ERP / SAP Integration CV",
+        desc: "Specialized for SAP SD/ERP, e-Fatura (Sovos/GİB), RPA & enterprise digitalization roles (Logo, Mikro, SabancıDx, NTT DATA, Siemens).",
       },
       {
         key: "en_ref",
         fileName: "Hessam_Mamagani_CV_and_Reference_EN.pdf",
-        badge: "🇬🇧 EU/UK VISA + REF · 3 PAGES",
+        badge: "🇬🇧 EU/UK VISA + REF · v4 · 3 PAGES",
         badgeClass: "bg-indigo-500/20 text-indigo-200 border-indigo-500/40",
-        title: "English v3 CV + Signed Pilz GM Letter",
-        desc: "Best for direct emails & LinkedIn DMs to IE/DE/NL/UK visa sponsors & global tech hubs in Istanbul (includes official English Pilz GM recommendation letter).",
+        title: "English v4 Full-Stack .NET CV + Signed Pilz GM Letter",
+        desc: "Best for direct emails & LinkedIn DMs to IE/DE/NL/UK visa sponsors & global Istanbul hubs (includes official English Pilz GM letter).",
       },
       {
         key: "en",
         fileName: "Hessam_Mamagani_CV_EN.pdf",
-        badge: "🇬🇧 GLOBAL ATS · 2 PAGES",
+        badge: "🇬🇧 GLOBAL ATS · v4 · 2 PAGES",
         badgeClass: "bg-blue-500/20 text-blue-200 border-blue-500/40",
-        title: "English v3 Standalone ATS CV",
-        desc: "Photo-free, 100% single-column Workday / Greenhouse / Lever / LinkedIn Easy Apply ATS CV with ANABIN H+ & EU Blue Card / Critical Skills readiness.",
+        title: "English v4 Standalone ATS CV (.NET & AI)",
+        desc: "Photo-free single-column Workday / Greenhouse / Lever / LinkedIn Easy Apply ATS CV with ANABIN H+ & EU Blue Card / Critical Skills readiness.",
+      },
+      {
+        key: "en_erp",
+        fileName: "Hessam_Mamagani_CV_EN_ERP_SAP.pdf",
+        badge: "🏭 EN ERP / SAP · v4 · 2 PAGES",
+        badgeClass: "bg-purple-500/20 text-purple-200 border-purple-500/40",
+        title: "English v4 ERP / SAP Integration CV",
+        desc: "Tailored for SAP BTP/SD integration, e-Invoicing, enterprise workflow automation & industrial digitalization roles across EU & TR.",
       },
     ];
 
@@ -1723,6 +1788,15 @@
 
       return `
         <div class="space-y-3">
+          <div class="p-3.5 rounded-xl bg-gradient-to-r from-fuchsia-950/60 to-violet-950/60 border border-fuchsia-500/45 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div>
+              <div class="text-xs font-extrabold text-fuchsia-200">✨ 2-Agent AI CV Tailor — Beat HR &amp; LinkedIn ATS Filters in ~5s</div>
+              <p class="text-[11px] text-slate-300 mt-0.5">Paste ANY external JD (Kariyer.net, LinkedIn, portal) to generate BOTH 2-page ATS &amp; 3-page (+Pilz GM Ref) PDFs on mobile with zero laptop.</p>
+            </div>
+            <button type="button" onclick="closeCvModal(); openExternalJdTailorModal();" class="shrink-0 px-3.5 py-2 rounded-lg bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-xs font-extrabold shadow-lg cursor-pointer transition">
+              ✨ Tailor Any Pasted JD → 2p + 3p PDF
+            </button>
+          </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3">${cards}</div>
           <div class="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
             <span>🌐 <strong>Public Portfolio CVs</strong> (phone omitted for privacy on <code class="text-slate-300">hessam-mamagani.github.io</code>):</span>
@@ -1942,6 +2016,7 @@
         STATE = {
           applied: loaded.applied || [],
           skipped: loaded.skipped || [],
+          skippedDetails: loaded.skippedDetails || [],
           outreachChecks: { ...localChecks, ...(loaded.outreachChecks || {}) },
           jobChats: mergeChatsMap(localChats, loaded.jobChats || {})
         };
@@ -1962,6 +2037,7 @@
               STATE = {
                 applied: d1Data.applied || [],
                 skipped: d1Data.skipped || [],
+                skippedDetails: d1Data.skippedDetails || [],
                 outreachChecks: { ...localChecks, ...(d1Data.outreachChecks || {}) },
                 jobChats: mergeChatsMap(localChats, d1Data.jobChats || {})
               };
@@ -1979,6 +2055,7 @@
             STATE = {
               applied: dbFile.data?.applied || [],
               skipped: dbFile.data?.skipped || [],
+              skippedDetails: dbFile.data?.skippedDetails || [],
               outreachChecks: { ...localChecks, ...(dbFile.data?.outreachChecks || {}) },
               jobChats: mergeChatsMap(localChats, dbFile.data?.jobChats || {})
             };
@@ -4363,7 +4440,21 @@
       const appliedUrls = new Set();
       const appliedBrandRoles = new Set();
       const appliedBrandBaseRoles = new Set();
+      const skippedBrandRoles = new Set();
+      const skippedBrandBaseRoles = new Set();
       const appliedByBrand = new Map();
+      for (const s of (STATE.skippedDetails || [])) {
+        if (!s) continue;
+        if (s.id) skippedIds.add(String(s.id));
+        if (s.roleSig && String(s.roleSig).includes("::")) {
+          skippedBrandRoles.add(String(s.roleSig));
+        }
+        const sb = normClientCompanyBrand(s.company || "");
+        const sr = normClientRoleCore(s.title || "");
+        const sbr = normClientRoleBase(s.title || "");
+        if (sb.length >= 3 && sr.length >= 6) skippedBrandRoles.add(`${sb}::${sr}`);
+        if (sb.length >= 3 && sbr.length >= 10) skippedBrandBaseRoles.add(`${sb}::${sbr}`);
+      }
       for (const a of (STATE.applied || [])) {
         if (!a) continue;
         if (a.id) {
@@ -4418,10 +4509,10 @@
           const brand = normClientCompanyBrand(comp);
           const role = normClientRoleCore(tit);
           const baseRole = normClientRoleBase(tit);
-          if (brand.length >= 3 && role.length >= 6 && appliedBrandRoles.has(`${brand}::${role}`)) {
+          if (brand.length >= 3 && role.length >= 6 && (appliedBrandRoles.has(`${brand}::${role}`) || skippedBrandRoles.has(`${brand}::${role}`))) {
             return true;
           }
-          if (brand.length >= 3 && baseRole.length >= 10 && appliedBrandBaseRoles.has(`${brand}::${baseRole}`)) {
+          if (brand.length >= 3 && baseRole.length >= 10 && (appliedBrandBaseRoles.has(`${brand}::${baseRole}`) || skippedBrandBaseRoles.has(`${brand}::${baseRole}`))) {
             return true;
           }
           return false;
@@ -4443,7 +4534,6 @@
       if (!job) return 9999;
       const idStr = String(job.id || "").trim();
       const isPrem = /premium|👑|unblocked|🔓/i.test(String(job.postedAgo || "")) || (Array.isArray(job.tags) && job.tags.some(t => String(t).includes("Top Applicant") || String(t).includes("Unblocked")));
-      if (!isPrem && /^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
       if (job.postedTs && Number(job.postedTs) > 1000000000000) {
         return Math.max(0, (Date.now() - Number(job.postedTs)) / 3600000);
       }
@@ -4469,6 +4559,7 @@
         const dt = Date.parse(job.datetime);
         if (!Number.isNaN(dt) && dt > 1000000000000) return Math.max(0, (Date.now() - dt) / 3600000);
       }
+      if (!isPrem && /^\d{8,}$/.test(idStr) && Number(idStr) < 4465000000) return 9999;
       return null;
     }
 
@@ -5852,6 +5943,9 @@
                 ${(job.tags || []).slice(0, 4).length ? `<span>${(job.tags || []).slice(0, 4).map(escapeHtmlSafe).join(" · ")}</span>` : `<span>#${job.id}</span>`}
               </div>
               <div class="flex items-center gap-1.5">
+                <button onclick="openTailorCvForScannerJob('${job.id}')" class="px-2.5 py-1 rounded bg-fuchsia-600/25 hover:bg-fuchsia-600/45 border border-fuchsia-500/40 text-fuchsia-200 font-bold cursor-pointer" title="2-Agent AI CV Tailor → Generate tailored 2p ATS + 3p (+GM Ref) PDFs">
+                  ✨ Tailor PDF
+                </button>
                 <button onclick="openCopilotForScannerJob('${job.id}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 font-semibold cursor-pointer">
                   🤖 Copilot
                 </button>
@@ -5941,13 +6035,16 @@
           <div class="p-3 rounded-lg bg-slate-900/90 border border-slate-800 space-y-1.5 text-xs">
             <div><strong class="text-slate-300">🏛️ Company Tier:</strong> <span class="text-cyan-300 font-semibold">${escapeHtmlSafe(smartMeta.tierLabel)}</span> <span class="text-slate-400">(${escapeHtmlSafe(smartMeta.hiringSpeed)})</span></div>
             <div class="flex flex-wrap items-center gap-2">
-              <span><strong class="text-slate-300">📄 Recommended v3 CV:</strong> <span class="text-emerald-300 font-semibold">${escapeHtmlSafe(recommendedCvFile)}</span></span>
+              <span><strong class="text-slate-300">📄 Recommended v4 CV:</strong> <span class="text-emerald-300 font-semibold">${escapeHtmlSafe(recommendedCvFile)}</span></span>
               <a href="${getCvUrl(isTrPitch ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px]">📥 Download ${isTrPitch ? 'TR+Ref (3p)' : 'EN ATS (2p)'}</a>
               <a href="${getCvUrl(isTrPitch ? 'tr' : 'en_ref', true)}" target="_blank" rel="noopener" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-[11px]">📥 ${isTrPitch ? 'TR Only (2p)' : 'EN+Ref (3p)'}</a>
             </div>
             <div><strong class="text-slate-300">💰 2027 Quote Band:</strong> <span class="text-amber-300 font-semibold">${escapeHtmlSafe(recommendedSalary)}</span></div>
             <div class="text-[11px] text-slate-400">${escapeHtmlSafe(smartMeta.floorNote)}</div>
             <div class="pt-1.5 flex flex-wrap gap-2">
+              <button type="button" onclick="openTailorCvForScannerJob('${id}')" class="px-2.5 py-1 rounded bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white font-extrabold text-[11px] shadow cursor-pointer">
+                ✨ Tailor 2p + 3p PDF for This Job
+              </button>
               <button type="button" onclick="copyFromStore('${legalKey}', this, '⚖️ Legal / Visa HR note copied!')" class="px-2.5 py-1 rounded bg-indigo-600/30 hover:bg-indigo-600/50 border border-indigo-500/40 text-indigo-200 font-bold text-[11px] cursor-pointer">
                 ⚖️ Copy Visa / Muafiyet HR Note
               </button>
@@ -6205,6 +6302,7 @@
         cvUsed: job.recommendedCvCode || smartMeta.cvCode,
         salaryQuote: job.recommendedSalary || smartMeta.salaryBand,
         url: job.url || `https://www.linkedin.com/jobs/view/${job.id}/`,
+        description: String(job.description || "").slice(0, 14000),
         notes: job.hiringPoster ? `Job Poster: ${job.hiringPoster}` : "",
         ...(job.hiringPoster ? {
           aiIntel: {
@@ -6290,26 +6388,36 @@
     }
 
     async function quickSkip(id) {
+      const skippedJob = findScannerJobById(id) || {};
+      const skipPayload = {
+        id: String(id),
+        company: skippedJob.company || "",
+        title: skippedJob.title || ""
+      };
       addLocalSkippedCache(id);
       if (!STATE.skipped.includes(String(id))) STATE.skipped.push(String(id));
+      if (!Array.isArray(STATE.skippedDetails)) STATE.skippedDetails = [];
+      if ((skipPayload.company || skipPayload.title) && !STATE.skippedDetails.some(s => String(s.id) === String(id))) {
+        STATE.skippedDetails.push(skipPayload);
+      }
       ALL_SCAN_JOBS = (ALL_SCAN_JOBS || []).filter(j => String(j.id) !== String(id));
       LAST_SCAN_JOBS = (LAST_SCAN_JOBS || []).filter(j => String(j.id) !== String(id));
       updateGlobalCountryCounts();
       renderRadarList();
-      showToast(`✕ Hidden job #${id}. <button onclick="undoSkip('${id}')" class="ml-2 px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold hover:bg-yellow-300 transition shadow">↩️ Undo</button>`, false);
+      showToast(`✕ Hidden job #${id} (reposts blocked). <button onclick="undoSkip('${id}')" class="ml-2 px-2 py-0.5 rounded bg-amber-400 text-slate-900 font-bold hover:bg-yellow-300 transition shadow">↩️ Undo</button>`, false);
 
       if (IS_LOCAL) {
         await fetch("/api/skip", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
+          body: JSON.stringify(skipPayload)
         });
       } else {
-        d1Post("/api/skip", { id });
+        d1Post("/api/skip", skipPayload);
         fetch("http://localhost:4545/api/skip", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
+          body: JSON.stringify(skipPayload)
         }).catch(() => {});
         await ghSaveDb();
       }
@@ -6318,6 +6426,7 @@
     async function undoSkip(id) {
       removeLocalSkippedCache(id);
       STATE.skipped = (STATE.skipped || []).filter(s => String(s) !== String(id));
+      STATE.skippedDetails = (STATE.skippedDetails || []).filter(s => String(s.id) !== String(id));
       if (IS_LOCAL) {
         await fetch("/api/unskip", {
           method: "POST",
@@ -6443,6 +6552,7 @@
             <div class="flex items-center gap-3 flex-wrap">
               <a href="${item.url}" target="_blank" class="text-blue-400 hover:underline font-medium">↗ View Job</a>
               <button type="button" onclick="jumpToCompanyCard('${normalizeCompanyKey(item.company)}')" class="text-emerald-400 hover:underline font-semibold cursor-pointer">🎯 Outreach Card →</button>
+              <button type="button" onclick="openTailorCvForCrmItem('${item.id}')" class="text-fuchsia-300 hover:underline font-bold cursor-pointer">✨ Tailor CV</button>
               <button type="button" onclick="openCopilotForCrmItem('${item.id}')" class="text-violet-300 hover:underline font-bold cursor-pointer">🤖 Copilot</button>
             </div>
           </td>
@@ -6457,8 +6567,8 @@
         kitEl.innerHTML = `
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
             <div>
-              <h2 class="text-base font-bold text-white">📄 My v3 Optimized CVs — Full Contact + Signed Pilz GM Letter (Laptop &amp; Mobile)</h2>
-              <p class="text-xs text-slate-400">Your v1 &amp; v2 archives are safely preserved in <code class="text-slate-300">documents_v1_backup/</code> and <code class="text-slate-300">documents_v2_backup/</code>. No-visa remote contractor CVs are removed so every application targets real Work Permit / Visa sponsors.</p>
+              <h2 class="text-base font-bold text-white">📄 My v4 Optimized CVs &amp; 2-Agent AI CV Tailor (Laptop &amp; Mobile)</h2>
+              <p class="text-xs text-slate-400">Includes DotNet &amp; ERP/SAP v4 editions (previous versions archived in <code class="text-slate-300">documents_v3_backup/</code>) plus on-demand 2-Agent ATS tailoring for any JD.</p>
             </div>
           </div>
           ${renderV2CvCardsHtml()}
@@ -9493,7 +9603,7 @@ ${closeLine}"`;
               <div>
                 <span class="text-xs font-bold text-white block">1️⃣ Step 1 — Find Open Role &amp; Apply (${cMeta.flag} ${countryLabel})</span>
                 <span class="text-[11px] text-slate-400">
-                  Recommended CV: <strong class="text-emerald-300">${smart.cvCode === 'TR' ? 'Turkish v3 + Pilz GM Letter (3p)' : 'English v3 ATS CV (2p)'}</strong>
+                  Recommended CV: <strong class="text-emerald-300">${smart.cvCode === 'TR' ? 'Turkish v4 + Pilz GM Letter (3p)' : 'English v4 ATS CV (2p)'}</strong>
                   &middot; Quote: <strong class="text-amber-300">${escapeHtmlSafe(smart.salaryBand)}</strong>
                 </span>
               </div>
@@ -9504,6 +9614,9 @@ ${closeLine}"`;
                 <a href="${item.jobUrl}" target="_blank" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-semibold transition">
                   ${ch.applied ? '↗ View Applied Job' : '🌐 Career Portal'}
                 </a>
+                <button type="button" onclick="openTailorCvForPipelineItem('${item.id}')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-fuchsia-600 to-violet-600 hover:from-fuchsia-500 hover:to-violet-500 text-white text-xs font-extrabold shadow cursor-pointer transition">
+                  ✨ Tailor 2p+3p PDF
+                </button>
                 <a href="${getCvUrl(smart.cvCode === 'TR' ? 'tr_ref' : 'en', true)}" target="_blank" rel="noopener" class="px-2.5 py-1.5 rounded-lg bg-emerald-600/25 hover:bg-emerald-600/40 border border-emerald-500/40 text-emerald-200 text-xs font-bold transition">
                   📥 Download CV (${smart.cvCode === 'TR' ? 'TR+Ref 3p' : 'EN 2p'})
                 </a>
@@ -11488,6 +11601,10 @@ ${closeLine}"`;
         if (drawer && !drawer.classList.contains("hidden")) closeCopilotDrawer();
         const playbook = document.getElementById("callPlaybookDrawer");
         if (playbook && !playbook.classList.contains("hidden")) closeCallPlaybook();
+        const tailorModal = document.getElementById("tailorCvModal");
+        if (tailorModal && !tailorModal.classList.contains("hidden")) closeTailorCvModal();
+        const cvModal = document.getElementById("cvQuickModal");
+        if (cvModal && !cvModal.classList.contains("hidden")) closeCvModal();
         const pop = document.getElementById("healthPopover");
         if (pop && !pop.classList.contains("hidden")) pop.classList.add("hidden");
       }
@@ -11505,6 +11622,295 @@ ${closeLine}"`;
       syncThemeButtonLabel();
     }
     syncThemeButtonLabel();
+
+    // =========================================================================
+    // 2-AGENT AI CV TAILOR & SERVERLESS 2p/3p PDF MODAL (Mobile + Desktop)
+    // =========================================================================
+    let TAILOR_MODAL_STATE = {
+      jobId: "",
+      company: "",
+      title: "",
+      location: "",
+      description: "",
+      isExternal: false,
+      lastResult: null
+    };
+
+    function closeTailorCvModal() {
+      const modal = document.getElementById("tailorCvModal");
+      if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      }
+    }
+
+    function openTailorCvModal(opts = {}) {
+      const modal = document.getElementById("tailorCvModal");
+      if (!modal) return;
+      TAILOR_MODAL_STATE = {
+        jobId: String(opts.jobId || `CUSTOM_${Date.now()}`),
+        company: String(opts.company || ""),
+        title: String(opts.title || ""),
+        location: String(opts.location || "Istanbul, Türkiye"),
+        description: String(opts.description || ""),
+        isExternal: Boolean(opts.isExternal),
+        lastResult: null
+      };
+      const titleEl = document.getElementById("tailorCvModalTitle");
+      const subEl = document.getElementById("tailorCvModalSubtitle");
+      const langSel = document.getElementById("tailorLangSelect");
+      const trackSel = document.getElementById("tailorTrackSelect");
+      const jdWrap = document.getElementById("tailorJdInputWrap");
+      const bodyEl = document.getElementById("tailorCvModalBody");
+
+      if (titleEl) titleEl.textContent = opts.isExternal ? "Paste Any External JD → 2p & 3p Tailored PDFs" : `${TAILOR_MODAL_STATE.company || "Company"} — ${TAILOR_MODAL_STATE.title || "Software Role"}`;
+      if (subEl) subEl.textContent = opts.isExternal ? "Works for Kariyer.net, LinkedIn, or any career portal — generates recruiter-safe 2p ATS & 3p (+Pilz GM Ref) PDFs." : `${TAILOR_MODAL_STATE.location || ""} · ID #${TAILOR_MODAL_STATE.jobId}`;
+      if (langSel) langSel.value = opts.preferredLang || "";
+      if (trackSel) trackSel.value = opts.preferredTrack || "";
+
+      if (jdWrap) {
+        const showInputs = Boolean(opts.isExternal || !TAILOR_MODAL_STATE.description || TAILOR_MODAL_STATE.description.length < 80);
+        jdWrap.classList.toggle("hidden", !showInputs);
+        const cIn = document.getElementById("tailorCustomCompany");
+        const tIn = document.getElementById("tailorCustomTitle");
+        const dIn = document.getElementById("tailorCustomDesc");
+        if (cIn) cIn.value = TAILOR_MODAL_STATE.company;
+        if (tIn) tIn.value = TAILOR_MODAL_STATE.title;
+        if (dIn) dIn.value = TAILOR_MODAL_STATE.description;
+      }
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      if (opts.isExternal) {
+        if (bodyEl) {
+          bodyEl.innerHTML = `<div class="p-4 rounded-xl bg-slate-900/70 border border-slate-800 text-xs text-slate-300 leading-relaxed">Paste the job description above and click <strong>✨ Run 2-Agent Tailor &amp; Build 2p + 3p PDFs</strong>. Agent 1 aligns your v4 CV to the JD's ATS keywords while Agent 2 checks honesty &amp; strict 2-page A4 fit.</div>`;
+        }
+      } else {
+        runTailorCvInModal(false);
+      }
+    }
+
+    function openExternalJdTailorModal() {
+      openTailorCvModal({ jobId: `CUSTOM_${Date.now()}`, isExternal: true });
+    }
+
+    function openTailorCvForScannerJob(id) {
+      const job = findScannerJobById(id) || { id };
+      const cg = classifyCountryGroup(job.company, job.location, job.countryGroup);
+      openTailorCvModal({
+        jobId: String(job.id || id),
+        company: job.company || "",
+        title: job.title || "",
+        location: job.location || (cg === "TR" ? "Istanbul, Türkiye" : cg),
+        description: job.description || ""
+      });
+    }
+
+    function openTailorCvForCrmItem(id) {
+      const app = (STATE.applied || []).find(a => String(a.id) === String(id));
+      if (!app) return openExternalJdTailorModal();
+      openTailorCvModal({
+        jobId: String(app.id),
+        company: app.company || "",
+        title: app.title || "",
+        location: app.location || "Istanbul, Türkiye",
+        description: app.description || ""
+      });
+    }
+
+    function openTailorCvForPipelineItem(id) {
+      if (!UNIFIED_PIPELINE_ITEMS.length) UNIFIED_PIPELINE_ITEMS = getUnifiedPipelineList();
+      const item = findPipelineItem(id);
+      if (!item) return openExternalJdTailorModal();
+      const crmRow = (STATE.applied || []).find(a => String(a.id) === String(item.primaryCrmId || item.id));
+      openTailorCvModal({
+        jobId: String(item.primaryCrmId || item.id),
+        company: item.company || "",
+        title: item.cleanRole || item.role || "",
+        location: item.address || item.location || "Istanbul, Türkiye",
+        description: crmRow?.description || ""
+      });
+    }
+
+    async function runTailorCvInModal(force = false) {
+      const bodyEl = document.getElementById("tailorCvModalBody");
+      const btnEl = document.getElementById("tailorReRunBtn");
+      const langVal = document.getElementById("tailorLangSelect")?.value || "";
+      const trackVal = document.getElementById("tailorTrackSelect")?.value || "";
+      const jdWrap = document.getElementById("tailorJdInputWrap");
+      if (jdWrap && !jdWrap.classList.contains("hidden")) {
+        const cVal = (document.getElementById("tailorCustomCompany")?.value || "").trim();
+        const tVal = (document.getElementById("tailorCustomTitle")?.value || "").trim();
+        const dVal = (document.getElementById("tailorCustomDesc")?.value || "").trim();
+        if (cVal) TAILOR_MODAL_STATE.company = cVal;
+        if (tVal) TAILOR_MODAL_STATE.title = tVal;
+        if (dVal) TAILOR_MODAL_STATE.description = dVal;
+        if (TAILOR_MODAL_STATE.isExternal && dVal.length < 30) {
+          showToast("⚠️ Please paste the job description first (at least 30 characters).", false);
+          return;
+        }
+      }
+
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.innerHTML = "⏳ Running 2 Agents...";
+      }
+      if (bodyEl) {
+        bodyEl.innerHTML = `
+          <div class="p-5 rounded-xl bg-slate-900/90 border border-fuchsia-500/40 space-y-2.5 text-xs">
+            <div class="flex items-center gap-2 text-fuchsia-200 font-bold animate-pulse">
+              <span>✨ 2-Agent AI CV Tailor Active (~4–6s)...</span>
+            </div>
+            <div class="text-[11px] text-slate-300 space-y-1">
+              <div>1️⃣ <strong>Agent 1 (JD Analyzer &amp; Tailor)</strong> — Extracting ATS keywords, ordering projects &amp; weaving transferable skills cleanly into v4 base...</div>
+              <div>2️⃣ <strong>Agent 2 (ATS, Honesty &amp; 2-Page Budget Critic)</strong> — Verifying keyword coverage, red-line blocks &amp; exact 2p / 3p A4 fit...</div>
+            </div>
+          </div>
+        `;
+      }
+
+      try {
+        const res = await fetch(`${CF_WORKER_URL}/api/tailor-cv`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            jobId: TAILOR_MODAL_STATE.jobId,
+            company: TAILOR_MODAL_STATE.company,
+            title: TAILOR_MODAL_STATE.title,
+            location: TAILOR_MODAL_STATE.location,
+            description: TAILOR_MODAL_STATE.description,
+            preferredLang: langVal,
+            preferredTrack: trackVal,
+            force: Boolean(force || langVal || trackVal)
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok || !data.tailored) {
+          throw new Error(data.error || `HTTP ${res.status}`);
+        }
+        TAILOR_MODAL_STATE.lastResult = data;
+        renderTailorCvModalResult(data);
+      } catch (err) {
+        if (bodyEl) {
+          bodyEl.innerHTML = `<div class="p-4 rounded-xl bg-rose-950/40 border border-rose-500/40 text-xs text-rose-200">⚠️ Tailor failed: ${escapeHtmlSafe(err.message || "Network error")}. Click <strong>🔄 Re-Tailor</strong> to retry.</div>`;
+        }
+      } finally {
+        if (btnEl) {
+          btnEl.disabled = false;
+          btnEl.innerHTML = "🔄 Re-Tailor (2 Agents)";
+        }
+      }
+    }
+
+    function renderTailorCvModalResult(data) {
+      const bodyEl = document.getElementById("tailorCvModalBody");
+      if (!bodyEl || !data?.tailored) return;
+      const t = data.tailored;
+      const cv = t.cv || {};
+      const langCode = String(t.lang || "TR") === "EN" ? "EN" : "TR";
+      const trackLabel = t.track === "erp" ? "ERP / SAP" : "Full-Stack .NET";
+      const fn2p = langCode === "TR" ? "Hessam_Mamagani_CV_TR.pdf" : "Hessam_Mamagani_CV_EN.pdf";
+      const fn3p = langCode === "TR" ? "Hessam_Mamagani_CV_ve_Referans_TR.pdf" : "Hessam_Mamagani_CV_and_Reference_EN.pdf";
+      const delta = Math.max(0, Number(t.atsScoreAfter || 0) - Number(t.atsScoreBefore || 0));
+      const addedPills = (t.addedSkills || []).map(s => `<span class="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-[11px] font-bold">+ ${escapeHtmlSafe(s)}</span>`).join("");
+      const summaryItems = (t.changeSummary || []).map(c => `<li>• ${escapeHtmlSafe(c)}</li>`).join("");
+      const skillsPreview = (cv.skills || []).map(s => `<li><strong class="text-white">${escapeHtmlSafe(s.label)}:</strong> <span class="text-slate-300">${escapeHtmlSafe(s.items)}</span></li>`).join("");
+      const bulletsPreview = (cv.pilzBullets || []).map(b => `<li>• ${escapeHtmlSafe(b)}</li>`).join("");
+
+      bodyEl.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40 space-y-2.5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/50 text-emerald-200 text-xs font-extrabold">📊 ATS Match: ${Number(t.atsScoreBefore || 0)}% → ${Number(t.atsScoreAfter || 0)}%${delta > 0 ? ` (+${delta}%)` : ""}</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-200 text-[11px] font-bold">${langCode === "TR" ? "🇹🇷 TR" : "🇬🇧 EN"} · ${trackLabel}</span>
+              ${data.cached ? `<span class="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/35 text-[10px] font-bold">⚡ D1 Cached</span>` : ""}
+            </div>
+            <span class="text-[10px] text-slate-400">🤖 ${escapeHtmlSafe(t.providers?.tailor || "Agent 1")} + ${escapeHtmlSafe(t.providers?.critic || "Agent 2")}</span>
+          </div>
+          ${addedPills ? `<div class="flex flex-wrap items-center gap-1.5"><span class="text-[11px] text-slate-400 font-semibold">Smoothly Aligned Skills:</span>${addedPills}</div>` : ""}
+          ${summaryItems ? `<ul class="text-[11px] text-slate-200 space-y-0.5 leading-snug">${summaryItems}</ul>` : ""}
+          ${t.criticNotes ? `<div class="text-[11px] text-cyan-200/90 border-t border-emerald-500/20 pt-1.5">✅ <strong>Agent 2 Critic:</strong> ${escapeHtmlSafe(t.criticNotes)}</div>` : ""}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div class="p-3 rounded-xl bg-slate-900/95 border border-blue-500/40 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-blue-200">📄 2-Page ATS CV</span>
+              <code class="text-[10px] text-slate-400 truncate">${escapeHtmlSafe(fn2p)}</code>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <a href="${data.pdf2pUrl}" target="_blank" rel="noopener" class="flex-1 text-center px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-extrabold shadow transition">📥 Download 2p PDF</a>
+              <button type="button" onclick="shareTailoredPdf(0, this)" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-blue-500/40 text-blue-200 text-xs font-bold cursor-pointer transition" title="Share straight to Google Drive / OneDrive / WhatsApp (zero local bloat)">📤 Share</button>
+              <a href="${data.html2pUrl}" target="_blank" rel="noopener" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold" title="Print-ready HTML fallback">🖨️</a>
+            </div>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-900/95 border border-emerald-500/40 space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-emerald-200">📑 3-Page CV + Pilz GM Ref</span>
+              <code class="text-[10px] text-slate-400 truncate">${escapeHtmlSafe(fn3p)}</code>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              <a href="${data.pdf3pUrl}" target="_blank" rel="noopener" class="flex-1 text-center px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow transition">📥 Download 3p PDF</a>
+              <button type="button" onclick="shareTailoredPdf(1, this)" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 text-emerald-200 text-xs font-bold cursor-pointer transition" title="Share straight to Google Drive / OneDrive / WhatsApp (zero local bloat)">📤 Share</button>
+              <a href="${data.html3pUrl}" target="_blank" rel="noopener" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs font-semibold" title="Print-ready HTML fallback">🖨️</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[11px] text-slate-400 bg-slate-950/75 border border-slate-800 rounded-lg px-3 py-2">
+          💡 <strong>Mobile tip (0 local clutter):</strong> Both PDFs use clean fixed recruiter filenames (~250 KB) and are generated on-demand from a 3 KB D1 JSON. Use <strong>📤 Share</strong> to send straight to Google Drive / OneDrive and pick from cloud inside LinkedIn!
+        </div>
+
+        <details class="rounded-xl bg-slate-900/80 border border-slate-800 p-3 text-xs space-y-2">
+          <summary class="font-bold text-slate-200 cursor-pointer select-none">👁️ Inspect Tailored Content (Headline, Summary, Skills &amp; Pilz Bullets)</summary>
+          <div class="pt-2 space-y-2.5 border-t border-slate-800 mt-2">
+            <div><span class="text-[11px] text-slate-400 font-semibold block">Headline:</span><div class="font-bold text-white">${escapeHtmlSafe(cv.headline || "")}</div></div>
+            <div><span class="text-[11px] text-slate-400 font-semibold block">Summary:</span><p class="text-[11px] text-slate-200 leading-relaxed">${escapeHtmlSafe(cv.summary || "")}</p></div>
+            <div><span class="text-[11px] text-slate-400 font-semibold block">Core Skills:</span><ul class="text-[11px] space-y-1">${skillsPreview}</ul></div>
+            <div><span class="text-[11px] text-slate-400 font-semibold block">Pilz Experience Bullets:</span><ul class="text-[11px] text-slate-200 space-y-1">${bulletsPreview}</ul></div>
+          </div>
+        </details>
+      `;
+    }
+
+    async function shareTailoredPdf(withRef = 0, btnEl = null) {
+      const data = TAILOR_MODAL_STATE.lastResult;
+      if (!data?.tailored) return;
+      const url = withRef ? data.pdf3pUrl : data.pdf2pUrl;
+      const langCode = String(data.tailored.lang || "TR") === "EN" ? "EN" : "TR";
+      const filename = withRef
+        ? (langCode === "TR" ? "Hessam_Mamagani_CV_ve_Referans_TR.pdf" : "Hessam_Mamagani_CV_and_Reference_EN.pdf")
+        : (langCode === "TR" ? "Hessam_Mamagani_CV_TR.pdf" : "Hessam_Mamagani_CV_EN.pdf");
+      const origText = btnEl ? btnEl.textContent : "";
+      if (btnEl) { btnEl.disabled = true; btnEl.textContent = "⏳..."; }
+      try {
+        const resp = await fetch(url);
+        if (!resp.ok) throw new Error(`PDF HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const file = new File([blob], filename, { type: "application/pdf" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: filename });
+          showToast(`📤 Shared ${filename}!`, true);
+        } else {
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+          showToast(`📥 Downloaded ${filename} (Web Share file API available on mobile).`, true);
+        }
+      } catch (err) {
+        if (err && err.name !== "AbortError") {
+          showToast(`⚠️ Could not share PDF: ${err.message || "error"}`, false);
+        }
+      } finally {
+        if (btnEl) { btnEl.disabled = false; btnEl.textContent = origText || "📤 Share"; }
+      }
+    }
 
     renderCoachTab();
     initApp();
